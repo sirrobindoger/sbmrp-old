@@ -1,6 +1,5 @@
 local net = net
 
-if von then print("YES!!") end
 
 net.OrigWriteTable = net.OrigWriteTable or net.WriteTable
 net.OrigReadTable = net.OrigReadTable or net.ReadTable
