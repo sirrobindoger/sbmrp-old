@@ -100,3 +100,4 @@ if sBMRP.QuestMenu then
 	pcall(function() sBMRP.QuestMenu:Close() end)
 	sBMRP.QuestMenu = nil
 end
+

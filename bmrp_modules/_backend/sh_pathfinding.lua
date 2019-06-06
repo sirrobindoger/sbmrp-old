@@ -2,6 +2,7 @@ if SERVER then
 	--[[-------------------------------------------------------------------------
 	Path finding (https://wiki.garrysmod.com/page/Simple_Pathfinding)
 	---------------------------------------------------------------------------]]
+	local ply = FindMetaTable("Player")
 	util.AddNetworkString("pathfinding")
 	function Astar( start, goal )
 		if ( !IsValid( start ) || !IsValid( goal ) ) then return false end
@@ -87,25 +88,27 @@ if SERVER then
 			prevArea = area
 		end
 	end
-	concommand.Add( "test_astar", function( ply )
-		timer.Create("Navtest", 1, 60, function()
-		// Use the start position of the player who ran the console command
-		local start = navmesh.GetNearestNavArea( ply:GetPos() )
-
-		// Target position, use the player's aim position for this example
-		local goal = navmesh.GetNearestNavArea( Vector(-6064.652344, -3075.306396, -188.968750) )
-
-		local path = Astar( start, goal )
-		if ( !istable( path ) ) then // We can't physically get to the goal or we are in the goal.
-			return
-		end
+	function ply:MapWayPoint(vector)
+		local ply = self
 		local vectorpath = {}
-		for k,v in pairs(path) do table.insert(vectorpath, v:GetCenter()) end
+		if isvector(vector) then
+			
+			print("Mapping waypoint!")
+			local start = navmesh.GetNearestNavArea( ply:GetPos() )
+			local goal = navmesh.GetNearestNavArea( vector )
+			local path = Astar( start, goal )
+			if ( !istable( path ) ) then // We can't physically get to the goal or we are in the goal.
+				print("Path is impossible!")
+				return
+			end	
+			for k,v in pairs(path) do table.insert(vectorpath, v:GetCenter()) end
+		end
+
 		net.Start("pathfinding")
+			if next(vectorpath) == nil then vectorpath = {false} end
 			net.WriteTable(vectorpath)
 		net.Send(ply)
-	end)
-	end )
+	end
 end
 
 
@@ -119,8 +122,8 @@ if CLIENT then
 	--timer.Simple(10, function() sBMRP.DermaTest:CloseDerma() end)
 	net.Receive("pathfinding",function ()
 		local vectorpath = net.ReadTable()
+		if #vectorpath <= 1 then LocalPlayer().drawdir = nil return end
 		LocalPlayer().drawdir = vectorpath
-		PrintTable(vectorpath)
 	end)
 	hook.Add("PreDrawTranslucentRenderables", "bmrp_line-drawling", function()
 		local pathlines = LocalPlayer().drawdir
@@ -128,9 +131,23 @@ if CLIENT then
 		local prevArea
 		for _, area in pairs( pathlines ) do
 			if ( prevArea ) then
-				render.DrawLine( area, prevArea, Color(255,255,255), true )
+				render.DrawLine( area, prevArea, Color(135,206,250), true )
+				render.DrawSphere( pathlines[1], 150, 30, 30, Color( 0, 175, 175, 255 ) )
 			end
 			prevArea = area
+
 		end
 	end)
+	local MAT_WRENCH = Material( "cityworker/wrench.png" )
+    hook.Add( "HUDPaint", "bmrp_quest-drawling", function()
+    	local pathlines = LocalPlayer().drawdir
+    	if !pathlines then return end
+        local screenPos = pathlines[1]:ToScreen()
+--        surface.SetDrawColor( 255, 255, 255 )
+--        surface.SetMaterial( MAT_WRENCH )
+--        surface.DrawTexturedRect( screenPos.x - 16, screenPos.y - 16, 32, 32 )
+
+        draw.SimpleTextOutlined( math.ceil( ( LocalPlayer():GetPos():Distance( pathlines[1] ) / 16 ) / 3.28084 ).."m (" .. GetLocation(pathlines[1]) .. ")", "sBMRP-notify", screenPos.x, screenPos.y + 16, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 1, Color( 0, 0, 0 ) )
+    end )
+    hook.Remove( "HUDPaint", "CITYWORKER.Task.HUDPaint")
 end
