@@ -117,7 +117,16 @@ end
 
 
 if CLIENT then
-
+	surface.CreateFont("sBMRP-waypoint", {
+		font = "ZektonRG-Regular",
+		size = 17,
+		weight = 100,
+		antialias = true,
+		outline = false,
+		additive = true,
+		shadow = true,
+		underline = true
+	})
 	--timer.Simple(5, function() DermaTest("TOP_RIGHT") end)
 	--timer.Simple(10, function() sBMRP.DermaTest:CloseDerma() end)
 	net.Receive("pathfinding",function ()
@@ -132,7 +141,10 @@ if CLIENT then
 		for _, area in pairs( pathlines ) do
 			if ( prevArea ) then
 				render.DrawLine( area, prevArea, Color(135,206,250), true )
-				render.DrawSphere( pathlines[1], 150, 30, 30, Color( 0, 175, 175, 255 ) )
+				render.SetColorMaterial()
+				render.DrawSphere( area, 1, 10, 10, Color( 135,206,250, 255 ) )
+
+				render.DrawSphere( pathlines[1], 150, 30, 30, Color(135,206,250, 10 ) )
 			end
 			prevArea = area
 
@@ -147,7 +159,6 @@ if CLIENT then
 --        surface.SetMaterial( MAT_WRENCH )
 --        surface.DrawTexturedRect( screenPos.x - 16, screenPos.y - 16, 32, 32 )
 
-        draw.SimpleTextOutlined( math.ceil( ( LocalPlayer():GetPos():Distance( pathlines[1] ) / 16 ) / 3.28084 ).."m (" .. GetLocation(pathlines[1]) .. ")", "sBMRP-notify", screenPos.x, screenPos.y + 16, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 1, Color( 0, 0, 0 ) )
+        draw.SimpleTextOutlined( math.ceil( ( LocalPlayer():GetPos():Distance( pathlines[1] ) / 16 ) / 3.28084 ).."m (" .. GetLocation(pathlines[1]) .. ")", "sBMRP-waypoint", screenPos.x, screenPos.y + 16, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 1, Color( 0, 0, 0 ) )
     end )
-    hook.Remove( "HUDPaint", "CITYWORKER.Task.HUDPaint")
 end
