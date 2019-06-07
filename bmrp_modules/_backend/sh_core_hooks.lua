@@ -15,7 +15,9 @@ end)
 
 timer.Create( "Tick60s", 60, 0, function()
 	pcall(function() hook.Call("Tick_60S") end)
-	print("--60s Tick-- [" .. os.date( "%H:%M", os.time()) .. "] {" .. player.GetCount() .. " players}")
+	if CLIENT then return end
+	if #player.GetAll() <= 0 then return end
+	Log("--60s Tick-- [" .. os.date( "%H:%M", os.time()) .. "] {" .. player.GetCount() .. " players}")
 end)
 
 
@@ -61,7 +63,6 @@ end
 
 
 if CLIENT then
-	print("A")
 	-- Darkrp rewrites
 	local function AdminLog(um)
 	    local colour = Color(um:ReadShort(), um:ReadShort(), um:ReadShort())
