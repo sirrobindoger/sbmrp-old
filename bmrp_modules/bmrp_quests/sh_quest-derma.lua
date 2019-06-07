@@ -1,7 +1,7 @@
 if SERVER then return end
 
 
-surface.CreateFont("sBMRP-notify", {
+surface.CreateFont("sBMRP.notify", {
 	font = "ZektonRG-Regular",
 	size = 17,
 	weight = 100,
@@ -53,7 +53,6 @@ function QuestNotify(POS, QUEST_TITLE, QUEST_DIR)
 	function sBMRP.QuestMenu:Think()
 		if (sBMRP.QuestMenu:GetPos() >= ScrH() * 2.5 and moving) then
 			sBMRP.QuestMenu:Close()
-			sBMRP.QuestMenu = nil
 		end
 	end
 
@@ -61,12 +60,15 @@ function QuestNotify(POS, QUEST_TITLE, QUEST_DIR)
 	text:Dock(FILL)
 	text:SetPos(10,20)
 	text:SetContentAlignment(4)
-	text:InsertColorChange(255,255,255,255)
 	text:SetToFullHeight()
-	text:SetFontInternal("sBMRP-notify")
-	text:SetText(QUEST_DIR)
-	text:SetWrap(true)
-xdcxz
+	text:SetFontInternal("sBMRP.notify")
+	for k,v in pairs(QUEST_DIR.Text) do
+		if !QUEST_DIR.Colors[k] then error("[sBMRP.Quest]: Invalid color -> text order! {" .. v .. "}") end
+		text:InsertColorChange(QUEST_DIR.Colors[k][1], QUEST_DIR.Colors[k][2], QUEST_DIR.Colors[k][3], QUEST_DIR.Colors[k][4] or 255)
+		text:AppendText(v)
+		text:SetWrap(true)
+	end
+
 	local header = vgui.Create("DFrame", sBMRP.QuestMenu)
 	header:SetPos(0,0)
 	header:SetTitle("")
@@ -81,7 +83,7 @@ xdcxz
 	local headertext = vgui.Create("DLabel", header)
 	headertext:SetPos(5, 0)
 	headertext:CenterVertical(.5)
-	headertext:SetFont("sBMRP-notify")
+	headertext:SetFont("sBMRP.notify")
 	headertext:SetColor(Color(255,255,255))
 	headertext:SetText(QUEST_TITLE)
 	headertext:SetWrap(false)
@@ -91,8 +93,14 @@ xdcxz
 end
 
 
-timer.Simple(5, function() QuestNotify("TOP_RIGHT", "Test", "Testss\ntest")  end)
-timer.Simple(10, function() sBMRP.QuestMenu:CloseDerma() end)
+net.Receive("sBMRP.Quests",function ()
+	local questinfo = net.ReadTable()
+	local title = questinfo.title
+	local directions = questinfo.directions
+	local pos = questinfo.pos or "TOP_RIGHT"
+	if pos == "DELETE" then pcall(function() sBMRP.QuestMenu:Close() end) return end
+	pcall(function() QuestNotify(pos, title, directions) end)
+end)
 
 
 if sBMRP.QuestMenu then
