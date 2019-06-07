@@ -1,11 +1,9 @@
 --[[-------------------------------------------------------------------------
 TRAM Altercations
 ---------------------------------------------------------------------------]]
-sBMRP.Tram = ents.GetMapCreatedEntity(2331)
 if SERVER then
-	sBMRP.BrokeTram = ents.FindByName("cTram")[1]
-	sBMRP.BrokeTramArm = ents.FindByName("cTramArm")[1]
 
+    sBMRP.Tram = ents.GetMapCreatedEntity(2331)
 	num = 1
 	goodsounds = table.ValuesToKeys({
 	"bmtram/ttrain_start1.wav", 
@@ -68,9 +66,22 @@ if SERVER then
         ent:SetMoveType(MOVETYPE_NONE)
         ent:Spawn()
         ent:GetPhysicsObject():EnableMotion(false)
+
+
+        
+        sBMRP.BrokeTram = ents.FindByName("cTram")[1]
+        sBMRP.BrokeTramArm = ents.FindByName("cTramArm")[1]
+        sBMRP.BrokeTramArm:LerpToVector(Vector(-6350.82, -3796.50, -83.22),2)
+        sBMRP.BrokeTram:LerpToVector(Vector(-6350.84, -3795.70, -260.03), 2)
+        SetGlobalEntity("cTram", sBMRP.BrokeTram)
+        timer.Create("tram_broken-vox", 34, 0, function()
+            SetGlobalEntity("cTram", sBMRP.BrokeTram)
+            sBMRP.BrokeTram:EmitSound("creed-tram-broken")
+        end)
     end
 
     hook.Add("InitPostEntity", "tram-startup", createtram)
+    hook.Add("PostCleanupMap", "tram-loop", createtram)
     --[[-------------------------------------------------------------------------
     sounds
     ---------------------------------------------------------------------------]]
@@ -112,10 +123,8 @@ if SERVER then
         end
     end)
     
-    timer.Create("tram_broken-vox", 34, 0, function()
-    	sBMRP.BrokeTram:EmitSound("creed-tram-broken")
-    end)
 
+    --[[
     local function lerptramtest(ply, args)
         if not ply:IsSirro() then return end
         if args[1] == "1" then
@@ -130,29 +139,31 @@ if SERVER then
     end
     sBMRP.RemoveChatCommand("lerp")
     sBMRP.CreateChatCommand("lerp", lerptramtest)
-
+    ]]--
 end
 
 if CLIENT then
-	--[[
-	sBMRP.BrokeTram = ents.GetByIndex(472)
-	hook.Add( "Think", "Think_Lights!", function()
-		local vec = sBMRP.BrokeTram:GetPos()
-		local dlight = DynamicLight( sBMRP.BrokeTram )
-		if ( dlight ) then
-			dlight.pos = Vector(vec.x-10, vec.y-20, vec.z+80)
-			dlight.r = 255
-			dlight.g = 255
-			dlight.b = 255
-			dlight.dir = Vector(0, 180, 0)
-			dlight.brightness = 3
-			dlight.Decay = 1000
-			dlight.Size = 128
-			dlight.style = 2
-			dlight.DieTime = CurTime() + 1
-		end
-	end )
-
-	PrintTable(ents.FindByModel("models/props/hl20props/c0a0etram.mdl"))
-	]]--
+    local function setupbroketram()
+        
+    	hook.Add( "Think", "Think_Lights!", function()
+            sBMRP.BrokeTram = GetGlobalEntity("cTram")
+            if !IsValid(sBMRP.BrokeTram) or GetLocation(LocalPlayer()) != "Sector D Tram Station" then return end
+    		local vec = sBMRP.BrokeTram:GetPos()
+    		local dlight = DynamicLight( sBMRP.BrokeTram )
+    		if ( dlight ) then
+    			dlight.pos = Vector(vec.x-10, vec.y-20, vec.z+80)
+    			dlight.r = 255
+    			dlight.g = 255
+    			dlight.b = 255
+    			dlight.dir = Vector(0, 180, 0)
+    			dlight.brightness = 3
+    			dlight.Decay = 1000
+    			dlight.Size = 128
+    			dlight.style = 2
+    			dlight.DieTime = CurTime() + 1
+    		end
+    	end )
+    end
+    hook.Add("InitPostEntity", "tram-startup", setupbroketram)
+    hook.Add("PostCleanupMap", "tram-loop", setupbroketram)
 end

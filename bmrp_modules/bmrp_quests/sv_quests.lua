@@ -16,8 +16,8 @@ FETCH_ITEM = {}
 
 FETCH_ITEM[1] = {
 	WayPointObjective = {Vector(-2267.979004, -3622.374756, -165.024750), 150}, -- position and proximity the player must reach to that distance
-	ProgressToNextStage = {function() 
-		if WayPointObjective then 
+	ProgressToNextStage = {function(ply) 
+		if ply.WayPointObjective then 
 			return true 
 		end 
 	end},
@@ -30,7 +30,7 @@ FETCH_ITEM[1] = {
 	}
 }
 
-sBMRP.RegisterQuest(FETCH_ITEM, "FetchQuest")
+sBMRP.RegisterQuest(FETCH_ITEM, "FetchQuest", "science")
 
 for k,v in pairs(player.GetAll()) do
 	sBMRP.Quests.Functions["WayPointObjective"](Vector(-4009.013672, -637.154724, -188.968750), 150, v )
