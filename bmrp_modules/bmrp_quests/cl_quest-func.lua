@@ -92,14 +92,15 @@ function QuestNotify(POS, QUEST_TITLE, QUEST_DIR)
 
 end
 
-
 net.Receive("sBMRP.Quests",function ()
 	local questinfo = net.ReadTable()
 	local title = questinfo.title
 	local directions = questinfo.directions
-	local pos = questinfo.pos or "TOP_RIGHT"
+	local pos = net.ReadString() or "TOP_RIGHT"
+	print(pos .. " POSITION FOR DERMA")
 	if pos == "DELETE" then pcall(function() sBMRP.QuestMenu:Close() end) return end
-	pcall(function() QuestNotify(pos, title, directions) end)
+	QuestNotify(pos, title, directions)
+	print("Epic")
 end)
 
 

@@ -12,7 +12,23 @@ if SERVER then
 		
 
 	end
-
+	function ply:QuestDerma(TITLE,DIR,POS)
+		if POS == "DELETE" then
+			net.Start("sBMRP.Quests")
+				net.WriteString("DELETE")
+			net.Send(self)
+			return
+		else
+			net.Start("sBMRP.Quests")
+				net.WriteString(POS or "TOP_RIGHT")
+				local questinfo = {}
+				questinfo.title = TITLE
+				questinfo.directions = DIR
+				net.WriteTable(questinfo)
+				print("Epic")
+			net.Send(self)
+		end
+	end
 	function sBMRP.RegisterQuest(Quest, name)
 		if sBMRP.Quests[name] then return end
 		sBMRP.Quests[name] = Quest
