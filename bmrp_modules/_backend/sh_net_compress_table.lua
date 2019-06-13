@@ -28,5 +28,5 @@ function net.WriteCompressedTable(tbl)
 end
 
 -- Make WriteTable and ReadTable be the compressed versions.
-net.WriteTable = net.WriteCompressedTable
-net.ReadTable = net.ReadCompressedTable
+--net.WriteTable = net.WriteCompressedTable
+--net.ReadTable = net.ReadCompressedTable

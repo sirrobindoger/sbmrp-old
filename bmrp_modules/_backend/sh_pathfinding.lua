@@ -106,7 +106,7 @@ if SERVER then
 
 		net.Start("pathfinding")
 			if next(vectorpath) == nil then vectorpath = {false} end
-			net.WriteTable(vectorpath)
+			net.WriteCompressedTable(vectorpath)
 		net.Send(ply)
 	end
 end
@@ -130,7 +130,7 @@ if CLIENT then
 	--timer.Simple(5, function() DermaTest("TOP_RIGHT") end)
 	--timer.Simple(10, function() sBMRP.DermaTest:CloseDerma() end)
 	net.Receive("pathfinding",function ()
-		local vectorpath = net.ReadTable()
+		local vectorpath = net.ReadCompressedTable()
 		if #vectorpath <= 1 then LocalPlayer().drawdir = nil return end
 		LocalPlayer().drawdir = vectorpath
 	end)
