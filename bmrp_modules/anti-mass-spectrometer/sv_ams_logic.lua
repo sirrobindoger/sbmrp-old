@@ -11,9 +11,9 @@ weapons/stickybomblauncher_charge_up.wav
 weapons/loose_cannon_charge.wav
 ---------------------------------------------------------------------------]]
 
-AMS = AMS || {}
-bmrpevent.amsstate = 0
-bmrpevent.prev = 0
+sBMRP.AMS = sBMRP.AMS || {}
+sBMRP.AMS.state = 0
+sBMRP.AMS.prev = 0
 local amsbuttons = {
     2554, -- Motor button
     2565, -- Stage 1 Emitters
@@ -53,6 +53,7 @@ local function EntID(id)
 end
 
 ------------------------------
+/*
 hook.Add("Think", "ams_state", function()
     state = 0
     for _,v in pairs(amsbuttons) do
@@ -61,17 +62,18 @@ hook.Add("Think", "ams_state", function()
         end
     end
     if state then 
-        bmrpevent.amsstate = state
+        sBMRP.AMS.state = state
     end
     
-    if (bmrpevent.prev != bmrpevent.amsstate) then
-        hook.Run("AMSStateChange", bmrpevent.amsstate, bmrpevent.prev)
+    if (sBMRP.AMS.prev != sBMRP.AMS.state) then
+        hook.Run("AMSStateChange", sBMRP.AMS.state, sBMRP.AMS.prev)
         print("YES")
         for k,v in pairs(player.GetAll()) do
-            net.Start("bmrpevent_ams")
-            net.WriteInt(bmrpevent.amsstate, 3)
+            net.Start("sBMRP.AMS")
+            net.WriteInt(sBMRP.AMS.state, 3)
             net.Send(v)
         end
-        bmrpevent.prev = bmrpevent.amsstate
+        sBMRP.AMS.prev = sBMRP.AMS.state
     end
 end)
+*/
