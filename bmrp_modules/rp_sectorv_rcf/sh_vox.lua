@@ -14,9 +14,10 @@ if SERVER then
 	util.AddNetworkString("cvox_say")
 	sBMRP.VOX.cVox = {'cvox_1.mp3', 'cvox_10.mp3', 'cvox_11.mp3', 'cvox_12.mp3', 'cvox_13.mp3', 'cvox_14.mp3', 'cvox_15.mp3', 'cvox_16.mp3', 'cvox_17.mp3', 'cvox_18.mp3', 'cvox_19.mp3', 'cvox_2.mp3', 'cvox_20.mp3', 'cvox_3.mp3', 'cvox_4.mp3', 'cvox_5.mp3', 'cvox_6.mp3', 'cvox_7.mp3', 'cvox_8.mp3', 'cvox_9.mp3'}
 	sBMRP.VOX.cFailures = {'cvox_comms_off.mp3', 'cvox_flood_big.mp3', 'cvox_flood_small.mp3', 'cvox_flood_tram.mp3', 'cvox_powerfail_large.mp3', 'cvox_powerfail_small.mp3'}
-	sBMRP.VOX.cVoxCascade = {'cvox_cascade_1.mp3', 'cvox_cascade_10.mp3', 'cvox_cascade_11.mp3', 'cvox_cascade_12.mp3', 'cvox_cascade_13.mp3', 'cvox_cascade_2.mp3', 'cvox_cascade_3.mp3', 'cvox_cascade_4.mp3', 'cvox_cascade_5.mp3', 'cvox_cascade_6.mp3', 'cvox_cascade_7.mp3', 'cvox_cascade_8.mp3', 'cvox_cascade_9.mp3'}
+--	sBMRP.VOX.cVoxCascade = {'cvox_cascade_1.mp3', 'cvox_cascade_10.mp3', 'cvox_cascade_11.mp3', 'cvox_cascade_12.mp3', 'cvox_cascade_13.mp3', 'cvox_cascade_2.mp3', 'cvox_cascade_3.mp3', 'cvox_cascade_4.mp3', 'cvox_cascade_5.mp3', 'cvox_cascade_6.mp3', 'cvox_cascade_7.mp3', 'cvox_cascade_8.mp3', 'cvox_cascade_9.mp3'}
+	sBMRP.VOX.cVoxCascade = {'cvox_4billion.mp3', 'cvox_anyoneleft.mp3','cvox_infinitevoid.mp3','cvox_negative582.mp3','cvox_rabiddogs.mp3','cvox_cascade_1.mp3', 'cvox_cascade_10.mp3', 'cvox_cascade_11.mp3', 'cvox_cascade_12.mp3', 'cvox_cascade_13.mp3', 'cvox_cascade_2.mp3', 'cvox_cascade_3.mp3', 'cvox_cascade_4.mp3', 'cvox_cascade_5.mp3', 'cvox_cascade_6.mp3', 'cvox_cascade_7.mp3', 'cvox_cascade_8.mp3', 'cvox_cascade_9.mp3'}
 	sBMRP.VOX.cJohnson = { 'cvox_91degrees.mp3', 'cvox_accident.mp3', 'cvox_alldisappoint.mp3', 'cvox_amsfrozenfood.mp3',  'cvox_biocontain.mp3', 'cvox_birdsonsatellite.mp3', 'cvox_birdvendorr.mp3', 'cvox_bringyourkid.mp3', 'cvox_casserolecontraband.mp3', 'cvox_catstrash.mp3', 'cvox_centralpowergrid.mp3', 'cvox_cometoams.mp3', 'cvox_contactsexpire.mp3', 'cvox_creategod.mp3', 'cvox_ctram.mp3', 'cvox_duolingo.mp3', 'cvox_firecracker.mp3', 'cvox_gatfay.mp3', 'cvox_governmentofficials.mp3', 'cvox_hermit.mp3', 'cvox_imdead.mp3', 'cvox_limbtolimb.mp3', 'cvox_livetargets.mp3', 'cvox_lukewarmpizza.mp3', 'cvox_maintenance.mp3',  'cvox_nodarpa.mp3', 'cvox_notnekos.mp3', 'cvox_otis.mp3', 'cvox_peanutbutter.mp3', 'cvox_petsentientcasserole.mp3', 'cvox_pornslug.mp3', 'cvox_reactorclaim.mp3', 'cvox_redspy.mp3', 'cvox_runlowmicrowave.mp3', 'cvox_sectorcheadcrabs.mp3', 'cvox_sentientcasserole.mp3', 'cvox_sick.mp3', 'cvox_stoptramsuicide.mp3', 'cvox_surveysurvey.mp3', 'cvox_testsubjects.mp3', 'cvox_toyotahilux.mp3', 'cvox_weapondev.mp3', 'cvox_xenianmeth.mp3', 'cvox_xenopork.mp3', 'cvox_xenpizza.mp3', 'cvox_yourere.mp3'}
-	sBMRP.VOX.cJohnsonCascade = {'cvox_4billion.mp3', 'cvox_anyoneleft.mp3','cvox_infinitevoid.mp3','cvox_negative582.mp3','cvox_rabiddogs.mp3',}
+--	sBMRP.VOX.cJohnsonCascade = {'cvox_4billion.mp3', 'cvox_anyoneleft.mp3','cvox_infinitevoid.mp3','cvox_negative582.mp3','cvox_rabiddogs.mp3',}
 
 	--[[-------------------------------------------------------------------------
 	AUTOMATIC sBMRP.VOX
@@ -26,12 +27,12 @@ if SERVER then
 	local voxnum = 1
 	sBMRP.VOX.State = 1
 	sBMRP.VOX.StateDisclaimers = { -- don't ask
-		[0] = "0: Off",
-		[1] = "1: cVox",
-		[2] = "2: cVox Cascade",
-		[3] = "3: cJohnson",
-		[4] = "4: BM:S Vox",
-		[5] = "5: BM:S Cascade",
+		"off",
+		"cvox",
+		"cvox-cascade",
+		"cjohnson",
+		"bms-vox",
+		"bms-cascade",
 	}
 	sBMRP.VOX.Paths = {
 		cJohnson = "cjohnson/",
@@ -66,18 +67,18 @@ if SERVER then
 			sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
 			local state = tonumber(sBMRP.VOX.State) or r({1, 4, 3})
 			---- Off
-		if state == 0 then
+		if state == 1 then
 			sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
 				return 
-		elseif state == 1 then -- cVox
+		elseif state == 2 then -- cVox
 			sBMRP.VOX.Play(sBMRP.VOX.Paths.cVox .. r(sBMRP.VOX.cVox))
-		elseif state == 2 then --cVox Cascade
+		elseif state == 3 then --cVox Cascade
 			sBMRP.VOX.PlayLoud(sBMRP.VOX.Paths.cVoxCascade .. r(sBMRP.VOX.cVoxCascade))
-		elseif state == 3 then --cJohnson
+		elseif state == 4 then --cJohnson
 			sBMRP.VOX.Play(sBMRP.VOX.Paths.cJohnson .. r(sBMRP.VOX.cJohnson))
-		elseif state == 4 then -- BM:S Vox
+		elseif state == 5 then -- BM:S Vox
 			sBMRP.VOX.Play(sBMRP.VOX.Paths.BMSVox .. "vox_" .. math.random(1,49) .. ".wav")
-		elseif state == 5 then
+		elseif state == 6 then
 			sBMRP.VOX.Play(sBMRP.VOX.Paths.BMSVox .. "vox_cascade_" .. math.random(1,28) .. ".wav")
 		end
 
@@ -129,6 +130,13 @@ if SERVER then
 		sBMRP.CreateChatCommand(k, v)
 	end
 
+	concommand.Add("status-test",function ()
+		local status = {}
+		status.players = player.GetAll()
+		status.admins = player.GetAdmins()
+		status.uptime = os.time()
+		print(util.TableToJSON(status))
+	end)
 
 	/*
 	hook.Add("PlayerSay", "Vox-Commands", function(ply, text)

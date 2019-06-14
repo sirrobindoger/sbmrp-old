@@ -89,7 +89,7 @@ if SERVER then
         name = "creed-tram-broken",
         channel = CHAN_STATIC,
         volume = .8,
-        level = 85,
+        level = 65,
         pitch = {100},
         sound = "tram_burn_2.mp3"
     })

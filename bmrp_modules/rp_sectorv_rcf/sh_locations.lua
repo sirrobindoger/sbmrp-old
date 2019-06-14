@@ -33,7 +33,7 @@ if game.GetMap() == "rp_sectorc_beta" then
 	table.insert(sBMRP.locationnames,{"Lower Canals",Vector(-272.893890,-1687.665527,-1000),Vector(4486.966797,-6044.809082,-3661.552734)})
 	
 	table.insert(sBMRP.locationnames,{"Xen",Vector(-11615.540039,-4814.913574,-5864.372070),Vector(-1696.177734,-13936.375977,2038.580933)})
-elseif game.GetMap() == "rp_sectorv_rc1" then
+elseif game.GetMap() == "rp_sectorc_s" then
 
 	table.insert(sBMRP.locationnames,{"HECU Base",Vector(-2807.275879,-732.159241,567.249573),Vector(-5563.524902,384.642731,821.905457)})
 	table.insert(sBMRP.locationnames,{"Topside Entrance",Vector(-2409.415039, -1720.561646, 845.073547),Vector(-1609.948120, -2699.017578, 564.176758)})
