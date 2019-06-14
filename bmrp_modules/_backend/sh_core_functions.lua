@@ -52,6 +52,14 @@ function ply:IsSirro()
 	return self:SteamID() == "STEAM_0:1:72140646"
 end
 
+function player.GetAdmins()
+	local admins = {}
+	for k,v in pairs(player.GetAll()) do
+		if v:IsAdmin() then table.insert(admins, v) end
+	end
+	return admins
+end
+
 if SERVER then
 	function adminchatall(text)
 		for k,v in pairs(player.GetAll()) do
@@ -132,7 +140,7 @@ function string.starts(String,Start)
 end
 
 
-function SetAllDoorsUnownable()  -- for setup
+function SetAllDoorsUnownable()
 	for k,ent in pairs(ents.GetAll()) do
 		if ent:isDoor() and IsValid(ent) then
 		    ent:setKeysNonOwnable(not ent:getKeysNonOwnable())
