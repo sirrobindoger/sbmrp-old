@@ -3,17 +3,19 @@ RunConsoleCommand("sv_setsteamaccount","2F3DA84B9166661A163C4CBD833EA260")
 
 
 
-print("[WorkshopDL]: Preparing to mount addons...")
 if file.Exists("workshop.txt", "DATA") then
 	local addons = util.JSONToTable(file.Read("workshop.txt", "DATA"))
 
 	for k,addonid in pairs(addons) do
 		resource.AddWorkshop(addonid)
 	end
-
-	print("[WorkshopDL]: Added " .. #addons .. " to the workshop download!")
+	timer.Simple(0, function()
+		print("[WorkshopDL]: Added " .. #addons .. " to the workshop download!")
+	end)
 else
-	print("[WorkshopDL]: Critical error, could not find the workshop list! Please run 'lua_run UpdateWorkshop()' to fix this...")
+	timer.Simple(0, function()
+		print("[WorkshopDL]: Critical error, could not find the workshop list! Please run 'lua_run UpdateWorkshop()' to fix this...")
+	end)
 end
 
 function UpdateWorkshop()

@@ -9,6 +9,14 @@ hook.Add("InitPostEntity","bmrp_jumpstart", function()
 	RunConsoleCommand("kick","bot01")
 end)
 
+
+hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, clpass, name)
+	if clpass != svpass then
+		Log("[" .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp ) .. "] " .. name .. "/" .. steamid .. " attempted to connect with the wrong password: " .. clpass)
+		return false, "--==Access Restricted: Invalid Password.==--\n\nThe server is currently in closed development.\nTo learn more please visit sbmrp.com/discord\n\nHCON | " .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp )
+	end
+end)
+
 timer.Create( "Tick1s", 1, 0, function()
 	pcall(function() hook.Call("Tick_1S") end)
 end)

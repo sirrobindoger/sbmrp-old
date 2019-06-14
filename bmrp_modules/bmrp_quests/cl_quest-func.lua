@@ -110,3 +110,6 @@ if sBMRP.QuestMenu then
 	sBMRP.QuestMenu = nil
 end
 
+-- 
+
+Material("CUSTOM/C1A0/BM_C1A0_LABW5"):SetTexture("$basetexture",Material("CUSTOM/C1A0/BM_C1A0_LABW7B"):GetTexture("$basetexture"))
