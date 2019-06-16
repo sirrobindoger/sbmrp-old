@@ -22,11 +22,39 @@ FETCH_ITEM[1] = {
 		end 
 	end},
 	QuestHooks = {
-		{"PlayerSay", function(ply, args)
+		{"PlayerSay", function(ply, text)
 			if ply:IsAdmin() then 
 				ply:ChatPrint("You are in a quest!")
 			end
 		end},
+	},
+	QuestDerma = {
+			"Quest: Walk & Say!", {
+			Colors = {{255,255,255}, {0,255,255}, {0,255,0}, {0,0,255}},
+			Text = {"I ", " want ", " to ", " die. "}
+		}
+	}
+}
+
+FETCH_ITEM[2] = {
+	ProgressToNextStage = {function(ply)
+		if ply.TalkCheck then
+			return true
+		end
+	end},
+	QuestHooks = {
+		{"PlayerSay", function(ply, text)
+			if ply:IsAdmin() and text == "/lol" then 
+				ply:ChatPrint("You passed!")
+				ply.TalkCheck = true
+			end
+		end},		
+	},
+	QuestDerma = {
+			"Quest: Walk & Say!", {
+			Colors = {{255,255,255}},
+			Text = {"Say something really funny. "}
+		}
 	}
 }
 
@@ -36,9 +64,8 @@ sBMRP.RegisterQuest(FETCH_ITEM, "FetchQuest", "science")
 for k,v in pairs(player.GetAll()) do
 	sBMRP.Quests.Functions["WayPointObjective"](Vector(-4009.013672, -637.154724, -188.968750), 150, v )
 end
-
-player.GetAll()[1]:QuestDerma("Test", {
-	Colors = {255,255,255},
-	Text = "I wanna die lmfao"
-})
 */
+
+
+
+--player.GetAll()[1]:QuestDerma(_,_,"DELETE")

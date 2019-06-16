@@ -24,6 +24,7 @@ NOTIFY_POS = {
 }
 
 function QuestNotify(POS, QUEST_TITLE, QUEST_DIR)
+	if sBMRP.QuestMenu then sBMRP.QuestMenu:Close() end
 	sBMRP.QuestMenu = vgui.Create("DFrame")
 	sBMRP.QuestMenu:SetPos(2000,ScrH() * NOTIFY_POS[POS][2]/720)
 	sBMRP.QuestMenu:LerpPositions(.5,true)
@@ -53,6 +54,7 @@ function QuestNotify(POS, QUEST_TITLE, QUEST_DIR)
 	function sBMRP.QuestMenu:Think()
 		if (sBMRP.QuestMenu:GetPos() >= ScrH() * 2.5 and moving) then
 			sBMRP.QuestMenu:Close()
+			sBMRP.QuestMenu = nil
 		end
 	end
 
@@ -93,23 +95,18 @@ function QuestNotify(POS, QUEST_TITLE, QUEST_DIR)
 end
 
 net.Receive("sBMRP.Quests",function ()
+	local pos = net.ReadString()  or "TOP_RIGHT"
 	local questinfo = net.ReadTable()
+	print(pos .. " POSITION FOR DERMA")
+	if pos == "DELETE" then pcall(function() sBMRP.QuestMenu:CloseDerma() end) return end
 	local title = questinfo.title
 	local directions = questinfo.directions
-	local pos = net.ReadString() or "TOP_RIGHT"
-	print(pos .. " POSITION FOR DERMA")
-	if pos == "DELETE" then pcall(function() sBMRP.QuestMenu:Close() end) return end
-	QuestNotify(pos, title, directions)
-	print("Epic")
-end)
 
+	QuestNotify(pos, title, directions)
+end)
 
 if sBMRP.QuestMenu then
 
 	pcall(function() sBMRP.QuestMenu:Close() end)
 	sBMRP.QuestMenu = nil
 end
-
--- 
-
-Material("CUSTOM/C1A0/BM_C1A0_LABW5"):SetTexture("$basetexture",Material("CUSTOM/C1A0/BM_C1A0_LABW7B"):GetTexture("$basetexture"))
