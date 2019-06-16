@@ -1,8 +1,10 @@
+sBMRP.VOX = sBMRP.VOX || {}
+sBMRP.VOX.Time = 60
+
 if SERVER then
 	--[[-------------------------------------------------------------------------
 	MAIN FUNCTIONS
 	---------------------------------------------------------------------------]]
-	sBMRP.VOX = sBMRP.VOX || {}
 		local function r(t) -- a better table.random
 		local keys = {}
 		for key, value in pairs(t) do
