@@ -92,13 +92,10 @@ if SERVER then
 		local ply = self
 		local vectorpath = {}
 		if isvector(vector) then
-			
-			print("Mapping waypoint!")
 			local start = navmesh.GetNearestNavArea( ply:GetPos() )
 			local goal = navmesh.GetNearestNavArea( vector )
 			local path = Astar( start, goal )
 			if ( !istable( path ) ) then // We can't physically get to the goal or we are in the goal.
-				print("Path is impossible!")
 				return
 			end	
 			for k,v in pairs(path) do table.insert(vectorpath, v:GetCenter()) end
@@ -155,10 +152,7 @@ if CLIENT then
     	local pathlines = LocalPlayer().drawdir
     	if !pathlines then return end
         local screenPos = pathlines[1]:ToScreen()
---        surface.SetDrawColor( 255, 255, 255 )
---        surface.SetMaterial( MAT_WRENCH )
---        surface.DrawTexturedRect( screenPos.x - 16, screenPos.y - 16, 32, 32 )
-
+        
         draw.SimpleTextOutlined( math.ceil( ( LocalPlayer():GetPos():Distance( pathlines[1] ) / 16 ) / 3.28084 ).."m (" .. GetLocation(pathlines[1]) .. ")", "sBMRP-waypoint", screenPos.x, screenPos.y + 16, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 1, Color( 0, 0, 0 ) )
     end )
 end

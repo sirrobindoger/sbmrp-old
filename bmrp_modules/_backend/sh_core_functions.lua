@@ -33,6 +33,10 @@ if SERVER then
 			net.WriteBool(true)
 		net.Broadcast()
 	end
+
+	function dprint(...)
+		if sBMRP.debug then print(...) end
+	end
 end
 
 if CLIENT then

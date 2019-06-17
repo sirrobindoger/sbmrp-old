@@ -96,9 +96,8 @@ end
 
 net.Receive("sBMRP.Quests",function ()
 	local pos = net.ReadString()  or "TOP_RIGHT"
-	local questinfo = net.ReadTable()
-	print(pos .. " POSITION FOR DERMA")
 	if pos == "DELETE" then pcall(function() sBMRP.QuestMenu:CloseDerma() end) return end
+	local questinfo = net.ReadTable()
 	local title = questinfo.title
 	local directions = questinfo.directions
 

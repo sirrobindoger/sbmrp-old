@@ -17,8 +17,8 @@ FETCH_ITEM = {}
 FETCH_ITEM[1] = {
 	WayPointObjective = {Vector(-2267.979004, -3622.374756, -165.024750), 150}, -- position and proximity the player must reach to that distance
 	ProgressToNextStage = {function(ply) 
-		if ply.WayPointObjective then 
-			return true 
+		if ply.Quest.WayPointObjective then 
+			return true
 		end 
 	end},
 	QuestHooks = {
@@ -31,22 +31,22 @@ FETCH_ITEM[1] = {
 	QuestDerma = {
 			"Quest: Walk & Say!", {
 			Colors = {{255,255,255}, {0,255,255}, {0,255,0}, {0,0,255}},
-			Text = {"I ", " want ", " to ", " die. "}
+			Text = {"Proceed ", " to ", " the ", " checkpoint! "}
 		}
 	}
 }
 
 FETCH_ITEM[2] = {
 	ProgressToNextStage = {function(ply)
-		if ply.TalkCheck then
-			return true
+		if ply.Quest.TalkCheck then
+			return true, "END"
 		end
 	end},
 	QuestHooks = {
 		{"PlayerSay", function(ply, text)
 			if ply:IsAdmin() and text == "/lol" then 
 				ply:ChatPrint("You passed!")
-				ply.TalkCheck = true
+				ply.Quest.TalkCheck = true
 			end
 		end},		
 	},
