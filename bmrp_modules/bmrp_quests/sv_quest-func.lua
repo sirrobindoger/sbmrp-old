@@ -4,15 +4,14 @@ if SERVER then
 	sBMRP.Quests = sBMRP.Quests || {} 
 
 	function ply:InQuest()
-		return self:GetNWBool("InQuest",false)
+		return self.QuestName
 	end
 
 	function ply:StartQuest(QUEST)
 		if not sBMRP.Quests[QUEST] then return end
 		--if self:InQuest() then error("[sQuests]:" .. self:Name() .. " is already in a quest.") end
 		-------------Setting up varibles----------
-		self:SetNWString("Quest", QUEST)
-		self:SetNWBool("InQuest", true)
+		self.QuestName = QUEST
 		self.QuestLevel = 1
 		ply.Quest = ply.Quest || {}
 		ply.Quest.QuestHooks = ply.Quest.QuestHooks || {}
@@ -67,10 +66,10 @@ if SERVER then
 						if level then
 							if level == "END" then ply:EndQuest() return end
 							ply.QuestLevel = level
-							sBMRP.Quests.UpdatePlayer(sBMRP.Quests[ply:GetNWString("Quest")][level], ply)	
+							sBMRP.Quests.UpdatePlayer(sBMRP.Quests[ply.QuestName][level], ply)	
 						else
 							ply.QuestLevel = ply.QuestLevel + 1
-							sBMRP.Quests.UpdatePlayer(sBMRP.Quests[ply:GetNWString("Quest")][ply.QuestLevel], ply)
+							sBMRP.Quests.UpdatePlayer(sBMRP.Quests[ply.QuestName][ply.QuestLevel], ply)
 						end
 					end
 				end)
@@ -97,15 +96,14 @@ if SERVER then
 		for k,v in pairs(ply.Quest.QuestHooks) do dprint("Removing " .. v[1] .. " " .. v[2]) hook.Remove(v[1], v[2]) end
 		for k,v in pairs(ply.Quest.QuestTimers) do timer.Remove(v) end
 		table.Empty(ply.Quest)
-		for flag,func in pairs(sBMRP.Quests[ply:GetNWString("Quest")][self.QuestLevel]) do
+		for flag,func in pairs(sBMRP.Quests[ply.QuestName][self.QuestLevel]) do
 			if sBMRP.Quests.Functions[flag] then
 				dprint(sBMRP.Quests.Functions[flag][2])
 				sBMRP.Quests.Functions[flag][2](ply)
 			end
 		end
-		hook.Run("sBMRP.EndQuest", ply, ply:GetNWString("Quest"))
-		ply:SetNWString("Quest", nil)
-		ply:SetNWBool("InQuest",false)
+		hook.Run("sBMRP.EndQuest", ply, ply.QuestName)
+		ply.QuestName = nil
 		self.QuestLevel = 0
 		ply:QuestDerma(_,_,"DELETE")
 	end
