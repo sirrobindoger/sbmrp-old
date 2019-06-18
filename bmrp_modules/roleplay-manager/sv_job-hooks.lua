@@ -96,8 +96,20 @@ timer.Create("bmrp_xen_capture", .25, 0, function()
 		end
 	end
 end)
+	for k,door in pairs(ents.GetAll()) do
+		if door:isDoor() then
+			for k,ply in pairs(player.GetAll()) do
+				ply.Doors = {}
+				
+				if door:getDoorOwner() == ply or (door:getKeysCoOwners() and door:getKeysCoOwners()[ply:UserID()]) then
+					ply.Doors = {}
+					ply.Doors[door] = true
 
-
+				end
+				PrintTable(ply.Doors)
+			end
+		end
+	end
 
 --[[-------------------------------------------------------------------------
 Donator Stuff
