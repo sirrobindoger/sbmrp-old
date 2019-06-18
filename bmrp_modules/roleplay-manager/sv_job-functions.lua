@@ -108,7 +108,7 @@ if SERVER then
 
 	function ply:AllowToXen(bool)
 		if ply:IsAlien() then
-			Log("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s xen permissions when they are a xenian!")
+			error("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s xen permissions when they are a xenian!")
 			return
 		end
 		if bool then
@@ -120,7 +120,7 @@ if SERVER then
 
 	function ply:AllowToEarth(bool)
 		if not ply:IsAlien() then
-			Log("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s earth permissions when they aren't a xenian!")
+			error("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s earth permissions when they aren't a xenian!")
 			return
 		end
 		if bool then

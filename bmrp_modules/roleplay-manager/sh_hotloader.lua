@@ -27,7 +27,6 @@ if SERVER then
 			net.WriteTable(shotloader.hotloadlist)
 		net.Send(ply)
 	end)
-	print("[sHotloader]: Intialized SV.")
 
 
 	function CollectionIDToAddons( html, CollectionURL )

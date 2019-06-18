@@ -107,6 +107,9 @@ if SERVER then
 		self.QuestLevel = 0
 		ply:QuestDerma(_,_,"DELETE")
 	end
+	--[[-------------------------------------------------------------------------
+	Hooks/Commands
+	---------------------------------------------------------------------------]]
 	hook.Add("PlayerDisconnected", "player_quest-cleanup", function()
 		if ply:InQuest() then ply:EndQuest() end
 	end)
