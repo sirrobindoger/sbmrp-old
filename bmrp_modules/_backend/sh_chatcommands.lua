@@ -41,7 +41,7 @@ StateDisclaimers = { -- don't ask
 
 function ulx.setvox(calling_ply, state)
 	sBMRP.VOX.State = table.KeyFromValue(StateDisclaimers, state)
-	ulx.fancyLog( player.GetAdmins(), "#P changed the VOX state to #s",calling_ply, state)
+	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the VOX state to #s",calling_ply, state)
 end
 
 local setvox = ulx.command( CATEGORY_NAME, "ulx setvox", ulx.setvox, nil, false, false)
@@ -52,7 +52,7 @@ setvox:help( "Sets the vox state." )
 function ulx.voxtime(calling_ply, time)
 	sBMRP.VOX.Time = tonumber(time)
 	sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
-	ulx.fancyLog( player.GetAdmins(), "#P changed the VOX time interval to #i seconds",calling_ply, time)
+	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the VOX time interval to #i seconds",calling_ply, time)
 end
 local voxtime = ulx.command(CATEGORY_NAME, "ulx voxtime", ulx.voxtime, nil, false, false )
 voxtime:addParam{type=ULib.cmds.NumArg, min=10, max=720,default=60,hint="time(seconds)",ULib.cmds.round}
@@ -117,10 +117,10 @@ function ulx.toggleannounce(calling_ply, args)
 
 	if sBMRP.AnnounceState then
 	    sBMRP.AnnounceState = false
-		ulx.fancyLog( player.GetAdmins(), "#P disabled the announcement system.",calling_ply)
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P disabled the announcement system.",calling_ply)
 	else
 	    sBMRP.AnnounceState = true
-		ulx.fancyLog( player.GetAdmins(), "#P enabled the announcement system.",calling_ply)
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P enabled the announcement system.",calling_ply)
 	end
 end
 local toggleannounce = ulx.command(CATEGORY_NAME, "ulx toggleannounce", ulx.toggleannounce, "!toggleannounce", true, false )
@@ -227,8 +227,186 @@ allowsinglehecu:defaultAccess(ULib.ACCESS_ADMIN)
 allowsinglehecu:help("Allow the temporary access of a HECU player, will auto revoke on death/teamchange.")
 allowsinglehecu:setOpposite( "ulx unallowsinglehecu", {_, _, true}, "!unallowsinglehecu" )
 
+--[[-------------------------------------------------------------------------
+LOOC
+---------------------------------------------------------------------------]]
+local function LOOC(ply, args)
+    if args == "" then
+        DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+        return ""
+    end
 
+    local DoSay = function(text)
+        if text == "" then
+            DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+            return ""
+        end
+            DarkRP.talkToRange(ply, "(LOOC) " .. ply:Nick(), text, 250)
+    end
+    return args, DoSay
+end
+if SERVER then
+	sBMRP.CreateChatCommand("looc", LOOC, "Local OOC", 1.5)
+end
 
+local function LOOCCustom(ply, txt, public)
+	if string.find(txt, '^' .. ".//") ~= nil then
+		args = string.gsub(txt,".// ","")
+		args = string.gsub(args,".//","")
+		if args == "" then
+            DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+            return ""
+        else
+           DarkRP.talkToRange(ply, "(LOOC) " .. ply:Nick(), args, 250)
+		   return ""
+		end
+	end
+end
+hook.Add( "PlayerSay", "chat_looccustom", LOOCCustom)
+
+--[[-------------------------------------------------------------------------
+GMAN Time
+---------------------------------------------------------------------------]]
+-- Probably not good that I process the whole code here but whatever
+GmanTimeFreezeToggleVar = 0
+function ulx.gmantime(ply, args)
+	if ply:IsAdmin() then
+		if GmanTimeFreezeToggleVar == 0 then
+			GmanTimeFreezeToggleVar = 1
+--[[			for k, v in pairs( ents.FindByName( "train" ) ) do
+				v:SetMoveType(0)
+				v:EmitSound("npc/dog/dog_straining1.wav", 80, 100)
+				v:EmitSound("ambient/machines/wall_ambient1.wav", 80, 100)
+				v:EmitSound("ambient/machines/zap3.wav", 80,100)
+			end -- setpos -17040.894531 8124.455078 -20616.332031;setang -0.214555 102.681900 0.000000
+]]			for k, v in pairs(player.GetAll()) do
+				v:EmitSound("npc/attack_helicopter/aheli_charge_up.wav", 80, 100)
+				v:EmitSound( "TimeGrenade/TimeExplosion.mp3",50 )
+				v:EmitSound( "hl1/ambience/labdrone2.wav",50 )
+				if v:SteamID() != "STEAM_0:1:72140646" then
+					v:Freeze(true)
+				end
+			timer.Simple(2,function()
+				for k, v in pairs(player.GetAll()) do
+					if !v:IsAdmin() then
+						v:Freeze(true)
+					end
+			end
+			end)
+				--local effectdata = EffectData()
+				--while GmanTimeFreezeToggleVar == 1 do
+					--DrawMaterialOverlay( string Material, number RefractAmount )
+				--	effectdata:SetOrigin( v:GetPos() )
+				--	util.Effect( "TimeStop", effectdata )
+				--end
+				timer.Simple(7,function() 			
+					v:EmitSound( "vo/citadel/gman_exit01.wav",50 )
+					timer.Simple(3,function() 
+						v:EmitSound( "vo/citadel/gman_exit02.wav",50 )
+						timer.Simple(4,function()
+							v:EmitSound( "vo/citadel/gman_exit03.wav",50 )
+							timer.Simple(4.5,function()
+								v:EmitSound( "vo/citadel/gman_exit04.wav",50 )
+								timer.Simple(5.8,function()
+									v:EmitSound( "vo/citadel/gman_exit05.wav",50 )
+									timer.Simple(15,function()
+										v:EmitSound( "vo/citadel/gman_exit06.wav",50 )
+										timer.Simple(15,function()
+											v:EmitSound( "vo/citadel/gman_exit07.wav",50 )
+											timer.Simple(14,function()
+												v:EmitSound( "vo/citadel/gman_exit08.wav",50 )
+												timer.Simple(4,function()
+													v:EmitSound( "vo/citadel/gman_exit09.wav",50 )
+													timer.Simple(3,function()
+														v:EmitSound( "vo/citadel/gman_exit10.wav",50 )
+														timer.Simple(5,function()
+														v:Freeze(false)
+														GmanTimeFreezeToggleVar = 0
+														v:ConCommand( "stopsound" )
+															--v:EmitSound( "vo/citadel/gman_exit10.wav",30 )
+														end)
+													end)
+												end)
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+				end)
+				end
+			--end
+		end
+	else
+		ply:ChatPrint("You are not admin!")
+	end
+end
+local gmantime = ulx.command(CATEGORY_NAME, "ulx gmantime", ulx.gmantime, "!gmantime", true, false)
+gmantime:defaultAccess(ULib.ACCESS_ADMIN)
+gmantime:help("Is it really that time again?")
+
+--[[-------------------------------------------------------------------------
+Tram
+---------------------------------------------------------------------------]]
+sBMRP.TramState = true
+function ulx.tram(calling_ply)
+	if sBMRP.TramState then
+		timer.Simple(.1, function() sBMRP.TramState = false end)
+		for k, v in pairs( ents.FindByName( "train" ) ) do
+			v:SetMoveType(0)
+			v:EmitSound("npc/scanner/scanner_explode_crash2.wav", 80, 100)
+			v:EmitSound("npc/dog/dog_straining1.wav", 80, 100)
+			v:EmitSound("ambient/machines/wall_ambient1.wav", 80, 100)
+			v:EmitSound("ambient/machines/zap3.wav", 80,100)
+		end
+		for k, v in pairs( ents.FindByName( "traindoor1") ) do
+			v:Fire( "Open" )
+		end
+		for k, v in pairs( ents.FindByName( "traindoor2") ) do
+			v:Fire( "Open" )
+		end
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P disabled the tram.",calling_ply)
+	else
+		sBMRP.TramState = true
+		for k, v in pairs( ents.FindByName( "train" ) ) do
+			v:SetMoveType(7)
+			v:EmitSound("npc/attack_helicopter/aheli_charge_up.wav", 80, 100)
+			v:EmitSound("npc/scanner/cbot_energyexplosion1.wav", 80, 100)
+			v:EmitSound("ambient/machines/wall_ambient1.wav", 80, 100)
+		end
+		
+		for k, v in pairs( ents.FindByName( "traindoor1") ) do
+			v:Fire( "Close" )
+		end
+		for k, v in pairs( ents.FindByName( "traindoor2") ) do
+			v:Fire( "Close" )
+		end
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P enabled the tram.",calling_ply)
+	end
+end
+
+tram = ulx.command(CATEGORY_NAME, "ulx tram", ulx.tram, "!tram", true, false)
+tram:defaultAccess(ULib.ACCESS_ADMIN)
+tram:help("Toggle the tram to be broken or working.")
+
+--[[-------------------------------------------------------------------------
+Ragdolls
+---------------------------------------------------------------------------]]
+function ulx.ragdolls(calling_ply)
+	RunConsoleCommand( "g_ragdoll_maxcount", "0")
+	--[[
+	for k,v in pairs(ents.FindByClass( "weapon_*" )) do
+		v:Remove()
+	end]]
+	timer.Simple(1,function()
+		RunConsoleCommand( "g_ragdoll_maxcount","32")
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P cleared all corpses.",calling_ply)
+	end)
+end
+ragdolls = ulx.command(CATEGORY_NAME, "ulx ragdolls", ulx.ragdolls, "!ragdolls", true, false)
+ragdolls:defaultAccess(ULib.ACCESS_ADMIN)
+ragdolls:help("Remove Ragdolls.")
 
 --[[-------------------------------------------------------------------------
 ADMIN HELP NOTIFER
