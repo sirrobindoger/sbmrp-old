@@ -3,7 +3,7 @@ TRAM Altercations
 ---------------------------------------------------------------------------]]
 if SERVER then
 
-    sBMRP.Tram = ents.GetMapCreatedEntity(2331)
+    sBMRP.Tram = ents.GetMapCreatedEntity(2215)
 	num = 1
 	goodsounds = table.ValuesToKeys({
 	"bmtram/ttrain_start1.wav", 
@@ -21,10 +21,12 @@ if SERVER then
 	creedsoundsreg = {"6","7","8","13","14","15","16","17","18","19","20","21","22","23","24","25"}
 	creedsoundsbroken = {"9","10","11","12"}
 	currentlist = creedsoundsreg
+    hook.Remove("EntityEmitSound", "bmrp_shit")
 	hook.Add("EntityEmitSound", "bmrp_shit", function(data)
 	    ent = data.Entity
 	    if not IsValid(ent) then return end
 	    if (data.Entity == sBMRP.Tram) then
+            if not sBMRP.TramState then return false end
 	        if sBMRP.Disaster then
 				currentlist = creedsoundsbroken
 			else
@@ -33,14 +35,23 @@ if SERVER then
 			if num >= #currentlist then
 	            num = 1
 	        end
-	        if not (data.SoundName == "creed_") then
+
+	        if not (string.find(data.SoundName, "creed_")) then
 	               if goodsounds[data.SoundName] then
 	                return nil
 	            else
+                    if timer.Exists("creed_Tram-antispam") then return false end
 	                num = num + 1
 	                creedstring = "creed_tram" .. currentlist[num] .. ".mp3"
-	                data.SoundName = creedstring
-	                return true
+	                --data.SoundName = creedstring
+                    local tramsound = CreateSound( sBMRP.Tram, creedstring)
+                    tramsound:SetDSP(57)
+                    tramsound:SetSoundLevel(data.SoundLevel)
+                    tramsound:ChangeVolume(data.Volume)
+                    tramsound:ChangePitch(data.Pitch)
+                    tramsound:Play()
+                    timer.Create("creed_Tram-antispam", 1, 1, function() end)
+	                return false
 	            end
 	        end
 	     end

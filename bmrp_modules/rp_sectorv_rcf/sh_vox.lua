@@ -1,5 +1,6 @@
 sBMRP.VOX = sBMRP.VOX || {}
-sBMRP.VOX.Time = 60
+sBMRP.VOX.Time = sBMRP.VOX.Time or 60
+
 
 if SERVER then
 	--[[-------------------------------------------------------------------------
@@ -27,7 +28,7 @@ if SERVER then
 	local randomline = r(sBMRP.VOX.cJohnson)
 	local cascadenum = 1
 	local voxnum = 1
-	sBMRP.VOX.State = 1
+	sBMRP.VOX.State = sBMRP.VOX.State || 1
 	sBMRP.VOX.StateDisclaimers = { -- don't ask
 		"off",
 		"cvox",
@@ -62,7 +63,6 @@ if SERVER then
 		{"Office Complex Entrance", Vector(213.38430786133,-3221.3225097656,-160.5661315918),80,0.5},
 		{"Sector B", Vector(4385.2573242188,-1507.5706787109,-166.283203125),80,0.5},
 	}
-	sBMRP.VOX.Time = 60
 	sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
 	function sBMRP.VOX.AutoVox()
 		if os.time() > sBMRP.VOX.VoxTime then
@@ -90,68 +90,7 @@ if SERVER then
 	end
 	hook.Add("Think", "bmrp_vox", sBMRP.VOX.AutoVox)
 
-	--[[-------------------------------------------------------------------------
-	CHAT COMMANDS
-	---------------------------------------------------------------------------]]
-	sBMRP.VOX.ChatCommands = {
-		["setvox"] = function(ply, args)
-			if !ply:IsAdmin() then
-				ply:ChatPrint("You are not admin!")
-			end
-			if not args[1] then ply:ChatPrint("Invalid arugment, values: " .. table.concat(sBMRP.VOX.StateDisclaimers, ", ")) return end
-			local state = tonumber(args[1])
-			if state <= 6 and state >= 0 then
-				sBMRP.VOX.State = state
-				ply:ChatPrint("Set value to " .. sBMRP.VOX.StateDisclaimers[state])
-			else
-				ply:ChatPrint("Invalid arugment, values: " .. table.concat(sBMRP.VOX.StateDisclaimers, ", "))
-			end
-			return ""
-		end,
-		["voxtime"] = function(ply, args)
-			if !ply:IsAdmin() then
-				ply:ChatPrint("You are not admin!")
-			end
-			if not isnumber(tonumber(args[1])) then
-				ply:ChatPrint("Please enter the time interval in seconds!")
-			else
-				sBMRP.VOX.Time = tonumber(args[1])
-				sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
-				ply:ChatPrint("Set vox interval to " .. args[1] .. " seconds!")
 
-			end
-			return ""
-		end,
-		["voxmute"] = function(ply, args)
-			if ply then ply:ChatPrint("Chat command is not ready yet.") return end
-
-		end,
-	}
-
-	for k,v in pairs(sBMRP.VOX.ChatCommands) do
-		sBMRP.CreateChatCommand(k, v)
-	end
-
-	concommand.Add("status-test",function ()
-		local status = {}
-		status.players = player.GetAll()
-		status.admins = player.GetAdmins()
-		status.uptime = os.time()
-		print(util.TableToJSON(status))
-	end)
-
-	/*
-	hook.Add("PlayerSay", "Vox-Commands", function(ply, text)
-	    local ltext = string.lower(text)
-	    local args = string.Split(ltext, " ")  
-	    if sBMRP.VOX.ChatCommands[args[1]] != nil then
-	        passargs = table.Copy(args)
-	        table.remove(passargs, 1)
-	        sBMRP.VOX.ChatCommands[args[1]](ply, passargs)
-	        return ""
-	    end
-	end)
-	*/
 	--[[-------------------------------------------------------------------------
 	sBMRP.VOX FUNCTIONS
 	---------------------------------------------------------------------------]]
@@ -163,12 +102,27 @@ if SERVER then
 			net.WriteTable(cSay) 
 		net.Broadcast() -- send nudes
 	end
-
-	function sBMRP.VOX.Play(voxsound, location) -- LOCATION IS OPTIONAL
+	sBMRP.VOX.LocationBlacklist = {
+		"Xen",
+		"Unknown"
+	}
+	function sBMRP.VOX.Play(soundfile, location) -- LOCATION IS OPTIONAL
 		if not location then
-			for k,v in pairs(sBMRP.VOX.VoxLocations) do
-				sound.Play( voxsound, v[2],v[3],100,v[4] )
-			end	
+			--for k,v in pairs(sBMRP.VOX.VoxLocations) do
+				--sound.Play( voxsound, v[2],v[3],100,v[4] )
+			--end
+			local filter = RecipientFilter()
+			for k,v in pairs(player.GetAll()) do
+				if not sBMRP.VOX.LocationBlacklist[GetLocation(v)] then
+					filter:AddPlayer(v)
+				end
+			end
+            local voxsound = CreateSound( game.GetWorld(), soundfile, filter)
+            voxsound:SetDSP(0)
+            voxsound:SetSoundLevel(0)
+            voxsound:ChangeVolume(.1)
+            voxsound:ChangePitch(100)
+            voxsound:Play()
 		else
 			local v = sBMRP.VOX.VoxLocations[location] -- :]
 			sound.Play( voxsound, v[2],v[3],100,v[4] )
@@ -280,4 +234,43 @@ end
 		"observation",
 		"operations report",
 	}
+	--[[-------------------------------------------------------------------------
+	sBMRP.VOX.ChatCommands = {
+		["setvox"] = function(ply, args)
+			if !ply:IsAdmin() then
+				ply:ChatPrint("You are not admin!")
+			end
+			if not args[1] then ply:ChatPrint("Invalid arugment, values: " .. table.concat(sBMRP.VOX.StateDisclaimers, ", ")) return end
+			local state = tonumber(args[1])
+			if state <= 6 and state >= 0 then
+				sBMRP.VOX.State = state
+				ply:ChatPrint("Set value to " .. sBMRP.VOX.StateDisclaimers[state])
+			else
+				ply:ChatPrint("Invalid arugment, values: " .. table.concat(sBMRP.VOX.StateDisclaimers, ", "))
+			end
+			return ""
+		end,
+		["voxtime"] = function(ply, args)
+			if !ply:IsAdmin() then
+				ply:ChatPrint("You are not admin!")
+			end
+			if not isnumber(tonumber(args[1])) then
+				ply:ChatPrint("Please enter the time interval in seconds!")
+			else
+				sBMRP.VOX.Time = tonumber(args[1])
+				sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
+				ply:ChatPrint("Set vox interval to " .. args[1] .. " seconds!")
+
+			end
+			return ""
+		end,
+		["voxmute"] = function(ply, args)
+			if ply then ply:ChatPrint("Chat command is not ready yet.") return end
+
+		end,
+	}
+
+	for k,v in pairs(sBMRP.VOX.ChatCommands) do
+		sBMRP.CreateChatCommand(k, v)
+	end
 ---------------------------------------------------------------------------]]
