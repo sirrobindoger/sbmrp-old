@@ -44,10 +44,9 @@ if SERVER then
 	Quest Logic
 	---------------------------------------------------------------------------]]
 	function sBMRP.Quests.UpdatePlayer(QUEST, ply)
-		dprint("Debug running")
 		if not IsValid(ply) and not ply:IsPlayer() then error("Invalid Parameters!") end
 		-------------Cleanup old varibles----------
-		for k,v in pairs(ply.Quest.QuestHooks) do dprint("Removing " .. v[1] .. " " .. v[2]) hook.Remove(v[1], v[2]) end
+		for k,v in pairs(ply.Quest.QuestHooks) do hook.Remove(v[1], v[2]) end
 		for k,v in pairs(ply.Quest.QuestTimers) do timer.Remove(v) end
 		table.Empty(ply.Quest)
 		ply.Quest.QuestHooks = {}
@@ -56,7 +55,6 @@ if SERVER then
 		
 		for flag, func in pairs(QUEST) do
 			if flag == "ProgressToNextStage" then
-				--if QUEST["ProgressToNextStage"][1](ply) == false then dprint("PROGRESS!") end
  				table.insert(ply.Quest.QuestHooks, {"Think","quest_progress-think_" .. ply:SteamID()})
  				
 				hook.Add("Think", "quest_progress-think_" .. ply:SteamID(), function()
@@ -93,12 +91,11 @@ if SERVER then
 	function ply:EndQuest()
 		local ply = self
 		if !ply:InQuest() then error("Player " .. ply:GetName() .. " is not in a quest!") end
-		for k,v in pairs(ply.Quest.QuestHooks) do dprint("Removing " .. v[1] .. " " .. v[2]) hook.Remove(v[1], v[2]) end
+		for k,v in pairs(ply.Quest.QuestHooks) do hook.Remove(v[1], v[2]) end
 		for k,v in pairs(ply.Quest.QuestTimers) do timer.Remove(v) end
 		table.Empty(ply.Quest)
 		for flag,func in pairs(sBMRP.Quests[ply.QuestName][self.QuestLevel]) do
 			if sBMRP.Quests.Functions[flag] then
-				dprint(sBMRP.Quests.Functions[flag][2])
 				sBMRP.Quests.Functions[flag][2](ply)
 			end
 		end
@@ -154,7 +151,6 @@ if SERVER then
 		end)
 	end, 
 	function(ply)
-		dprint("LMAO")
 		ply:MapWayPoint(false)
 	end}
 
