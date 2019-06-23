@@ -71,10 +71,17 @@ if SERVER then
 						end
 					end
 				end)
-				
+			elseif flag == "QuestTimers" then
+				for _, timers in pairs(QUEST["QuestTimers"]) do
+					local timername = ply:SteamID() .. "_timerhook-" .. _
+					table.insert(ply.Quest.QuestTimers, timername)
+
+					timer.Create(timername, timers[1], timers[2], function() timers[3](ply) end)
+				end
 			elseif flag == "QuestHooks" then
 				for _, hooks in pairs(QUEST["QuestHooks"]) do
 					local hookname = ply:SteamID() .. "_questhook-" .. hooks[1]
+					print(hookname)
 					table.insert(ply.Quest.QuestHooks, {hooks[1], hookname})
 
 					hook.Add(hooks[1], hookname, hooks[2])
@@ -84,6 +91,10 @@ if SERVER then
 			elseif sBMRP.Quests.Functions[flag] then
 				table.insert(func, ply) -- fuck this shit ya'know
 				sBMRP.Quests.Functions[flag][1](unpack(func))
+			elseif flag == "Functions" then
+				for k,func in pairs(QUEST["Functions"]) do
+					func(ply)
+				end
 			end
 
 		end
@@ -93,6 +104,12 @@ if SERVER then
 		if !ply:InQuest() then error("Player " .. ply:GetName() .. " is not in a quest!") end
 		for k,v in pairs(ply.Quest.QuestHooks) do hook.Remove(v[1], v[2]) end
 		for k,v in pairs(ply.Quest.QuestTimers) do timer.Remove(v) end
+		if ply.QuestEnts then
+			for k,v in pairs(ply.QuestEnts) do
+				SafeRemoveEntity(v)
+			end
+			table.Empty(ply.QuestEnts)
+		end
 		table.Empty(ply.Quest)
 		for flag,func in pairs(sBMRP.Quests[ply.QuestName][self.QuestLevel]) do
 			if sBMRP.Quests.Functions[flag] then
@@ -115,11 +132,11 @@ if SERVER then
 		Log(ply:GetName() .. " concluded quest: " .. quest)
 		ply:Notify("You completed the quest!")
 	end)
-	concommand.Add("StartQuest", function()
-		player.GetAll()[1]:StartQuest("FetchQuest")
+	concommand.Add("StartQuest", function(ply)
+		ply:StartQuest("FetchQuest")
 	end)
-	concommand.Add("EndQuest",function ()
-		player.GetAll()[1]:EndQuest()
+	concommand.Add("EndQuest",function (ply)
+		ply:EndQuest()
 	end)
 	--[[-------------------------------------------------------------------------
 	Quest functions
@@ -153,5 +170,6 @@ if SERVER then
 	function(ply)
 		ply:MapWayPoint(false)
 	end}
+
 
 end
