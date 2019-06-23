@@ -9,11 +9,20 @@ hook.Add("InitPostEntity","bmrp_jumpstart", function()
 	RunConsoleCommand("kick","bot01")
 end)
 
+local goodgroups = table.ValuesToKeys({
+	"superadmin",
+	"staff",
+	"trialstaff",
+	"trusted",
+	"supporter",
+	"whitelisted",
+})
 
 hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, clpass, name)
-	if clpass != svpass then
-		Log("[" .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp ) .. "] " .. name .. "/" .. steamid .. " attempted to connect with the wrong password: " .. clpass)
-		return false, "--==Access Restricted: Invalid Password.==--\n\nThe server is currently in closed development.\nTo learn more please visit sbmrp.com/discord\n\nHCON | " .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp )
+	local steamid = util.SteamIDFrom64(steamid)
+	if not ULib.ucl.users[steamid] || not ULib.ucl.users[steamid].group || not goodgroups[ULib.ucl.users[steamid].group] then
+		Log("[" .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp ) .. "] " .. name .. "/" .. steamid .. " attempted to connect, but has invalid permissions. ")
+		return false, "--==Access Restricted: Unauthorized Usergroup.==--\n\nThe server is currently in closed development.\nTo learn more please visit sbmrp.com/discord\n\nsCON | " .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp )
 	end
 end)
 
