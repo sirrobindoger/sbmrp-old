@@ -104,6 +104,17 @@ net.Receive("sBMRP.Quests",function ()
 	QuestNotify(pos, title, directions)
 end)
 
+net.Receive("sBMRP.DrawHalo",function()
+	local halos = net.ReadCompressedTable()
+
+	if next(halos) != nil then
+		LocalPlayer().Halos = halos
+	else
+		LocalPlayer().Halos = false
+	end
+end)
+
+
 if sBMRP.QuestMenu then
 
 	pcall(function() sBMRP.QuestMenu:Close() end)
