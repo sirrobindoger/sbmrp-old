@@ -170,8 +170,12 @@ function SetAllDoorsUnownable()
 	end
 
 end
-
-
+if CLIENT then
+	concommand.Add("getposvec", function(ply)
+		location = LocalPlayer():EyePos()
+		print("Vector(" .. location[1] .. "," .. location[2] .. "," .. location[3] .. ")")
+	end)
+end
 function table.ValuesToKeys(tab)
 	local newtab = {}
 	for k, v in pairs(tab) do
