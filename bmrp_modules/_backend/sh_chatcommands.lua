@@ -136,7 +136,7 @@ function ulx.DisableBuilding(calling_ply)
 	    sBMRP.DisableBuilding = true
 		ulx.fancyLog( player.GetAll(), "#P disabled building for players.",calling_ply)
 		local function blockspawning(ply)
-			if ply:IsAdmin() then
+			if not ply:IsAdmin() then
 				return false
 			end
 		end
