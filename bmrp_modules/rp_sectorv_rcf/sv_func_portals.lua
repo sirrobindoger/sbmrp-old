@@ -1,5 +1,12 @@
+concommand.Add("tee",function ()
+	for k,v in pairs(ents.GetAll()) do 
+		if v:GetPos():WithinAABox(Vector(7277.736328125,-9325.5,-563.47277832031),Vector(7534.0014648438,-9109.5087890625,-819.39190673828)) then
+			print(v:MapCreationID() .. " " .. v:GetClass() .. " " .. v:GetName())
+		end
+	end
+end)
 local function SpawnPortals()
-	for k,v in pairs({4671,4852,3518,3519,4853,3525,3524}) do
+	for k,v in pairs({5143, 5144, 5142,5282,5283,5284,5285,5286,5288,5289,5290 }) do
 		pcall(function() ents.GetMapCreatedEntity(v):Remove() end)
 	end
 	
