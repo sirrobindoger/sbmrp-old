@@ -14,7 +14,7 @@ end
 
 
 
---hook.Add("EntityTakeDamage", "sBMRP_AntiRDM", AntiRDM())
+hook.Add("EntityTakeDamage", "sBMRP_AntiRDM", AntiRDM)
 --[[-------------------------------------------------------------------------
 Weapon Restrict
 ---------------------------------------------------------------------------]]
@@ -104,7 +104,7 @@ local function MapDoorNames()
 			for LabName,v in pairs(sBMRP.Labs) do
 				for k,v in ipairs(v[1]) do -- L O O P S
 					if ent:MapCreationID() == v then
-						ent:SetName(LabName)
+						ent.LabName = LabName
 					end
 				end
 			end
@@ -115,51 +115,68 @@ sBMRP.MapHook("sBMRP_LabInit", MapDoorNames)
 
 
 local function OnLabBuy(ply, door)
+	if not sBMRP.Labs[door.LabName] then return end
 	if table.Count(ply:GetOwnedDoors()) > 0 then
 		return false, "You already own a lab!"
-	elseif !ply:IsScience() and sBMRP.Labs[door:GetName()] then
-		return false, "Only Science Staff can own a lab!"
-	elseif ply:Team() == TEAM_ASSOCIATE and sBMRP.Labs[door:GetName()] then
+	elseif !ply:IsScience() then
+		return false, "Only Scientists can own a lab!"
+	elseif ply:Team() == TEAM_ASSOCIATE then
 		if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
 			return false, "Interns cannot own a lab. You can co-own one with a scientist!"
 		end
 	else
+		for k,v in pairs(sBMRP.Labs[door.LabName][1]) do
+			if IsValid(ents.GetMapCreatedEntity(v)) then
+				ents.GetMapCreatedEntity(v):keysOwn(ply)
+			end
+		end
 		return true
 	end
 end
 hook.Add("playerBuyDoor", "bmrp_lab-functions", OnLabBuy)
 
-
-timer.Create("sBMRP-Lab-Cleanup", .5, 0, function()
-	for k,ent in pairs(ents.GetAll()) do
-		if ent:CPPIGetOwner() and ent:CPPIGetOwner():IsPlayer() then
-			ply = ent:CPPIGetOwner()
+local function OnLabSell(ply, door)
+	for k,v in pairs(ents.GetAll()) do
+		if ent:CPPIGetOwner() == ply then
 			if sBMRP.Labs[GetLocation(ent:GetPos())] then
-				for k,v in pairs(sBMRP.Labs) do
-					for k,v in pairs(v[1]) do
-						door = ents.GetMapCreatedEntity(v)
-						if door:getDoorOwner() == ply or (door:getKeysCoOwners() and door:getKeysCoOwners()[ply:UserID()]) then
-							continue
-						else
-							ent:Remove() 
-						end
+				for k,v in pairs(sBMRP.Labs[GetLocation(ent:GetPos())][1]) do
+					door = ents.GetMapCreatedEntity(v)
+					plydoors = table.ValuesToKeys(ply:GetOwnedDoors())
+					if plydoors[door] then
+						continue
+					else
+						ent:Remove() 
 					end
 				end		
+			end			
+		end
+	end
+	ply:Notify("Locking lab doors in 10 seconds. Please vacate the lab.", 1, 10)
+	if sBMRP.Labs[door.LabName] then
+		for k,v in pairs(sBMRP.Labs[door.LabName][1]) do
+			if isnumber(v) and IsValid(ents.GetMapCreatedEntity(v)) then
+				ents.GetMapCreatedEntity(v):keysUnOwn(ply)
+				ents.GetMapCreatedEntity(v):Fire("Unlock")
+				timer.Simple(10, function()
+					ents.GetMapCreatedEntity(v):EmitSound("buttons/combine_button_locked.wav")
+					ents.GetMapCreatedEntity(v):Fire("Close")
+					ents.GetMapCreatedEntity(v):Fire("Lock")
+				end)
 			end
 		end
 	end
-end)
+end
+hook.Add("playerSellDoor", "bmrp_lab-functions", OnLabSell)
 
 local function LabBlockSpawning(ply)
-	--if ply:IsAdmin() then return end
+	if ply:IsAdmin() then return end
 	loc = GetLocation(ply)
 	if sBMRP.Labs[loc] then
-		for k,v in pairs(sBMRP.Labs) do
-			for k,v in pairs(v[1]) do
-				door = ents.GetMapCreatedEntity(v)
-				if door:getDoorOwner() == ply or  (door:getKeysCoOwners() and door:getKeysCoOwners()[ply:UserID()]) then
-					return true
-				end
+		for k,v in pairs(sBMRP.Labs[loc][1]) do
+			door = ents.GetMapCreatedEntity(v)
+			plydoors = table.ValuesToKeys(ply:GetOwnedDoors())
+			if plydoors[door] then
+				return true
 			end
 		end
 		ply:Notify("You do not own/co-own this lab.", 1, 1)
@@ -173,9 +190,9 @@ end
 local function LabPlayerSpawn(ply)
 	if table.Count(ply:GetOwnedDoors()) > 0 then
 		for k,door in pairs(ply:GetOwnedDoors()) do
-			if sBMRP.Labs[door:GetName()] then
+			if sBMRP.Labs[door.LabName] then
 				timer.Simple(0, function()
-					ply:SetPos(DarkRP.findEmptyPos(sBMRP.Labs[door:GetName()][2], {}, 300, 30, Vector(16,16,64)))
+					ply:SetPos(DarkRP.findEmptyPos(sBMRP.Labs[door.LabName][2], {}, 300, 30, Vector(16,16,64)))
 					ply:SetVelocity(Vector(0,0,0))
 				end)
 			end
@@ -183,6 +200,28 @@ local function LabPlayerSpawn(ply)
 	end
 end
 hook.Add("PlayerSpawn", "lab_rp-spawn", LabPlayerSpawn)
+
+
+/*
+timer.Create("sBMRP-Lab-Cleanup", .5, 0, function()
+	for k,ent in pairs(ents.GetAll()) do
+		if ent:CPPIGetOwner() and ent:CPPIGetOwner():IsPlayer() then
+			ply = ent:CPPIGetOwner()
+			if sBMRP.Labs[GetLocation(ent:GetPos())] then
+				for k,v in pairs(sBMRP.Labs[GetLocation(ent:GetPos())][1]) do
+					door = ents.GetMapCreatedEntity(v)
+					plydoors = table.ValuesToKeys(ply:GetOwnedDoors())
+					if plydoors[door] then
+						continue
+					else
+						ent:Remove() 
+					end
+				end		
+			end
+		end
+	end
+end)*/
+
 --[[-------------------------------------------------------------------------
 Prop and tools
 ---------------------------------------------------------------------------]]
