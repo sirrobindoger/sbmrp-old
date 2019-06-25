@@ -103,8 +103,8 @@ if SERVER then
 		net.Broadcast() -- send nudes
 	end
 	sBMRP.VOX.LocationBlacklist = {
-		"Xen",
-		"Unknown"
+		["Xen"] = true,
+		["Unknown"] = true
 	}
 	function sBMRP.VOX.Play(soundfile, location) -- LOCATION IS OPTIONAL
 		if not location then
