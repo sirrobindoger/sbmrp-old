@@ -1,4 +1,21 @@
 --[[-------------------------------------------------------------------------
+AntiRDM
+---------------------------------------------------------------------------]]
+local function AntiRDM(ent,dmginfo)
+	local inf = dmginfo:GetInflictor()
+	local att = dmginfo:GetAttacker()
+	if inf == NULL or inf == nil or att == NULL or inf == nil or (inf:GetClass() == nil and not(att:IsPlayer())) then return end
+	if ent:IsPlayer() and att:IsPlayer() then
+		if not att:CanHurt(ent) then
+			return true
+		end
+	end
+end
+
+
+
+--hook.Add("EntityTakeDamage", "sBMRP_AntiRDM", AntiRDM())
+--[[-------------------------------------------------------------------------
 Weapon Restrict
 ---------------------------------------------------------------------------]]
 local function WepRestrict(ply,wep)
@@ -19,19 +36,153 @@ local function WepRestrict(ply,wep)
 end
 hook.Add( "PlayerCanPickupWeapon", "bmrp_restrict_weaponpickup", WepRestrict)
 
--- DarkRP doors
-hook.Add("playerBuyDoor", "bmrp_door_block", function(ply, door)
-	if ply:Team() == TEAM_ASSOCIATE then
-		return false, "Research associates can't own labs!"
-	elseif not ply:IsBlackMesa() then
-		return false, "You are not a Black Mesa Employee!"
+--[[-------------------------------------------------------------------------
+Lab Restriction
+---------------------------------------------------------------------------]]
+sBMRP.Labcost = {}
+sBMRP.Labcost.Small = 450
+sBMRP.Labcost.Medium = 600
+sBMRP.Labcost.Large = 750
+
+sBMRP.Labs = {
+	["Sector A Lab 1"] = {
+		{2306}, Vector(-11028.186523, -826.935303, -188.968750), "Medium"
+	},
+	["Sector A Lab 2"] = {
+		{2352}, Vector(-11006.873047, -44.445019, -188.968750), "Large"
+	},
+	["Sector A Lab 3"] = {
+		{3286}, Vector(-11719.198242, -228.716599, -188.968750), "Medium"
+	},
+	["Sector A Lab 4"] = {
+		{3285}, Vector(-11556.583984, -765.396118, -188.968750), ""
+	},	
+	["Sector C Lab 1"] = {
+		{1881}, Vector(-3210.531738, -1184.199463, -164.968750), "Medium"
+	},
+	["Sector C Lab 2"] = {
+		{1880}, Vector(-3875.118896, -1565.995483, -164.968750), "Medium"
+	},
+	["Sector C Lab 3"] = {
+		{3398, 3320}, Vector(-5009.699219, -479.791321, -237.046753), "Large"
+	},
+	["Sector C Lab 4"] = {
+		{3321}, Vector(-5333.298340, -597.528564, -237.046753), "Small"
+	},
+	["Sector C Lab 5"] = {
+		{3319}, Vector(-5668.966309, -652.146240, -237.046753), "Small"
+	},
+	["Sector C Lab 6"] = {
+		{3295, 3875}, Vector(-5589.724121, -1260.996338, -237.046753), "Large"
+	},
+	["Bio Sector Lab 3"] = {
+		{3881}, Vector(-1796.953125, -2881.724854, -164.968750), "Large"
+	},
+	["Bio Sector Lab 2"] = {
+		{3913}, Vector(-2676.284180, -2563.989502, -164.968750), "Medium"
+	},
+	["Bio Sector Lab 1"] = {
+		{3898}, Vector(-1660.430908, -2497.404053, -164.968750), "Large"
+	},
+}
+
+local meta = FindMetaTable("Player")
+
+function meta:GetOwnedDoors()
+	local owneddoors = {}
+	for k,door in pairs(ents.GetAll()) do
+		if door:isDoor() and door:getDoorOwner() == self or (door:getKeysCoOwners() and door:getKeysCoOwners()[self:UserID()]) then
+			table.insert(owneddoors, door)
+		end
+	end
+	return owneddoors
+end
+
+local function MapDoorNames()
+	for k,ent in pairs(ents.GetAll()) do
+		if IsValid(ent) and ent:isDoor() then
+			for LabName,v in pairs(sBMRP.Labs) do
+				for k,v in ipairs(v[1]) do -- L O O P S
+					if ent:MapCreationID() == v then
+						ent:SetName(LabName)
+					end
+				end
+			end
+		end
+	end
+end 
+sBMRP.MapHook("sBMRP_LabInit", MapDoorNames)
+
+
+local function OnLabBuy(ply, door)
+	if table.Count(ply:GetOwnedDoors()) > 0 then
+		return false, "You already own a lab!"
+	elseif !ply:IsScience() and sBMRP.Labs[door:GetName()] then
+		return false, "Only Science Staff can own a lab!"
+	elseif ply:Team() == TEAM_ASSOCIATE and sBMRP.Labs[door:GetName()] then
+		if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
+			return false, "Interns cannot own a lab. You can co-own one with a scientist!"
+		end
+	else
+		return true
+	end
+end
+hook.Add("playerBuyDoor", "bmrp_lab-functions", OnLabBuy)
+
+
+timer.Create("sBMRP-Lab-Cleanup", .5, 0, function()
+	for k,ent in pairs(ents.GetAll()) do
+		if ent:CPPIGetOwner() and ent:CPPIGetOwner():IsPlayer() then
+			ply = ent:CPPIGetOwner()
+			if sBMRP.Labs[GetLocation(ent:GetPos())] then
+				for k,v in pairs(sBMRP.Labs) do
+					for k,v in pairs(v[1]) do
+						door = ents.GetMapCreatedEntity(v)
+						if door:getDoorOwner() == ply or (door:getKeysCoOwners() and door:getKeysCoOwners()[ply:UserID()]) then
+							continue
+						else
+							ent:Remove() 
+						end
+					end
+				end		
+			end
+		end
 	end
 end)
 
+local function LabBlockSpawning(ply)
+	--if ply:IsAdmin() then return end
+	loc = GetLocation(ply)
+	if sBMRP.Labs[loc] then
+		for k,v in pairs(sBMRP.Labs) do
+			for k,v in pairs(v[1]) do
+				door = ents.GetMapCreatedEntity(v)
+				if door:getDoorOwner() == ply or  (door:getKeysCoOwners() and door:getKeysCoOwners()[ply:UserID()]) then
+					return true
+				end
+			end
+		end
+		ply:Notify("You do not own/co-own this lab.", 1, 1)
+		return false
+	end
+end
+for k,v in pairs({"PlayerSpawnProp", "CanTool", "PlayerSpawnVehicle","PlayerSpawnRagdoll", "PlayerSpawnEffect"}) do
+	hook.Add(v, "sBMRP.LabRestriction", LabBlockSpawning)
+end
 
-
-
-
+local function LabPlayerSpawn(ply)
+	if table.Count(ply:GetOwnedDoors()) > 0 then
+		for k,door in pairs(ply:GetOwnedDoors()) do
+			if sBMRP.Labs[door:GetName()] then
+				timer.Simple(0, function()
+					ply:SetPos(DarkRP.findEmptyPos(sBMRP.Labs[door:GetName()][2], {}, 300, 30, Vector(16,16,64)))
+					ply:SetVelocity(Vector(0,0,0))
+				end)
+			end
+		end
+	end
+end
+hook.Add("PlayerSpawn", "lab_rp-spawn", LabPlayerSpawn)
 --[[-------------------------------------------------------------------------
 Prop and tools
 ---------------------------------------------------------------------------]]
