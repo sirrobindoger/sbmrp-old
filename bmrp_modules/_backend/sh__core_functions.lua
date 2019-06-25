@@ -81,6 +81,13 @@ if SERVER then
 end
 
 
+if SERVER then
+	function sBMRP.MapHook(name, func)
+		hook.Add("InitPostEntity", name, func)
+		hook.Add("PostCleanupMap", name, func)
+	end
+end
+
 function ply:Notify(text, typeint, time)
 	DarkRP.notify(self, typeint or 5, time or 5, text)
 end
@@ -100,7 +107,8 @@ if SERVER then
 		local entindex = self:EntIndex()
 		local ent = self
 		hook.Add("Think", "lerp-motion_" .. entindex, function()
-			if not IsValid(self) or ent:GetPos():Round() == targetvec:Round() then hook.Remove("Think", "lerp-motion_" .. entindex) hook.Run("LerpMovementEnded", ent) return end
+			if not IsValid(self) then hook.Remove("Think", "lerp-motion_" .. entindex) end -- something went wrong
+			if ent:GetPos():Round() == targetvec:Round() then hook.Remove("Think", "lerp-motion_" .. entindex) hook.Run("LerpMovementEnded", ent) return end
 			local newpos = LerpVector(FrameTime()*mult, ent:GetPos(), targetvec)
 			--local dir = (targetvec - self:GetPos()):GetNormalized() * mult
 			--ent:SetPos(self:GetPos() + dir )
@@ -146,7 +154,7 @@ end
 
 function SetAllDoorsUnownable()
 	for k,ent in pairs(ents.GetAll()) do
-		if ent:isDoor() and IsValid(ent) then
+		if IsValid(ent) then
 		    ent:setKeysNonOwnable(not ent:getKeysNonOwnable())
 		    ent:removeAllKeysExtraOwners()
 		    ent:removeAllKeysAllowedToOwn()
