@@ -2,6 +2,39 @@
 Core Hooks 
 ---------------------------------------------------------------------------]]
 
+hook.Add("Think", "player_location-process", function()
+	for k,v in pairs(player.GetAll()) do
+		local plyloc = GetLocationRaw(v)
+		local currlocation = v.location
+		if v.location != plyloc then
+			v.location = plyloc
+			hook.Run("PlayerChangedLocation", v, currlocation, plyloc)
+		end
+
+	end
+end)
+
+function GetLocation(recpos)
+	if type(recpos) == "Player" then
+		return recpos.location
+	end
+	local location = DarkRP.getPhrase("gm_unknown")
+	for k,v in pairs(sBMRP.locationnames) do
+		if CheckInRange(v[2],v[3],recpos) then
+			location = v[1]
+			break
+		else location = "Unknown"
+		end
+	end
+	return location
+end
+
+
+if SERVER then
+	hook.Add("PlayerChangedLocation", "ply_location-log", function(ply, old, new)
+		Log(ply:GetName() .. " changed locations (" .. (old or "NULL") .. " --> " .. new .. ")")
+	end)
+end
 hook.Add("InitPostEntity","bmrp_jumpstart", function()
 	print("\n\n\n----SERVER HAS FINISHED INITALIZING----\n\n\n")
 	RunConsoleCommand("bot")
@@ -17,6 +50,20 @@ local goodgroups = table.ValuesToKeys({
 	"supporter",
 	"whitelisted",
 })
+
+if SERVER then
+	local function staffmeeting(ply)
+		if ply:IsAdmin() then
+			timer.Simple(0, function()
+				ply:SetPos(Vector(-3522.1098632813,-1446.458984375,-117.6547088623))
+			end)
+		end
+	end
+	hook.Add("PlayerInitialSpawn", "vaaa", staffmeeting)
+	hook.Add("PlayerSpawn", "vaaa", staffmeeting)
+
+end
+
 
 hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, clpass, name)
 	local steamid = util.SteamIDFrom64(steamid)
