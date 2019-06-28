@@ -113,6 +113,7 @@ if SERVER then
     vehicles/v8/v8_turbo_on_loop1.wav
     ---------------------------------------------------------------------------]]
     hook.Add("LerpMovementEnded", "tram_slam-loop", function(ent)
+        if not IsValid(sBMRP.BrokeTramArm) or not IsValid( sBMRP.BrokeTram) then return end
         if ent:GetPos():Round() == Vector(-6350.84, -3795.70, -260.03):Round() then
 
             sBMRP.BrokeTramArm:LerpToVector(Vector(-6400.82, -3796.50, -83.22), 3)
