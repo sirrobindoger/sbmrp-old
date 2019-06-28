@@ -107,7 +107,7 @@ if SERVER then
 		local entindex = self:EntIndex()
 		local ent = self
 		hook.Add("Think", "lerp-motion_" .. entindex, function()
-			if not IsValid(self) then hook.Remove("Think", "lerp-motion_" .. entindex) end -- something went wrong
+			if not IsValid(ent) or not IsValid(targetvec) then hook.Remove("Think", "lerp-motion_" .. entindex) end -- something went wrong
 			if ent:GetPos():Round() == targetvec:Round() then hook.Remove("Think", "lerp-motion_" .. entindex) hook.Run("LerpMovementEnded", ent) return end
 			local newpos = LerpVector(FrameTime()*mult, ent:GetPos(), targetvec)
 			--local dir = (targetvec - self:GetPos()):GetNormalized() * mult
@@ -202,7 +202,7 @@ function TriggerEnt(entid, event) -- safe way to execute map functions
 end
 
 
-function GetLocation(recpos)
+function GetLocationRaw(recpos)
 	if type(recpos) == "Player" then
 		recpos = recpos:GetPos()
 	end
