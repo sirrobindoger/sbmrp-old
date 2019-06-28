@@ -1,20 +1,9 @@
-concommand.Add("tee",function ()
-	for k,v in pairs(ents.GetAll()) do 
-		if v:GetPos():WithinAABox(Vector(7277.736328125,-9325.5,-563.47277832031),Vector(7534.0014648438,-9109.5087890625,-819.39190673828)) then
-			print(v:MapCreationID() .. " " .. v:GetClass() .. " " .. v:GetName())
-		end
-	end
-end)
+
 local function SpawnPortals()
-	for k,v in pairs({5143, 5144, 5142,5282,5283,5284,5285,5286,5288,5289,5290 }) do
-		pcall(function() ents.GetMapCreatedEntity(v):Remove() end)
-	end
+	--for k,v in pairs({5143, 5144, 5142,5282,5283,5284,5285,5286,5288,5289,5290,5216,5217,5221 }) do
+	--	SafeRemoveEntity(ents.GetMapCreatedEntity(v))
+	--end
 	
-
-	for k, v in pairs( ents.FindInSphere(Vector(-8571.630859375,-7904.9389648438,-2850.7353515625),50) ) do
-		v:Remove() --Contingency
-	end
-
 	
 	for k, v in pairs( ents.FindByClass( "portal_xen_*" ) ) do
 		v:Remove()
@@ -25,16 +14,16 @@ local function SpawnPortals()
 		
 		{
 			noalien=true,
-			pos=Vector(-5675.5,-11101,-2848),
+			pos=Vector(7391.0590820313,-9207.099609375,-677.96875),
 			dest={
-				{Vector(-13100.44140625,-846.84008789063,-412.96875),Angle(0,90,0)},
+				{Vector(-3490.4821777344,-1082.5817871094,-164.96875),Angle(0,90,0)},
 			},
 			aliendest={
-				{Vector(-13150.047851563,-948.74255371094,-348.96875),Angle(0,90,0)},
-				{Vector(-11425.114257813,-1061.2156982422,-184.96875),Angle(0,90,0)},
-				{Vector(-10207.090820313,-435.19815063477,-188.96875),Angle(0,-135,0)},
-				{Vector(-8469.548828125,-1096.9293212891,-72.854202270508),Angle(30,90,0)},
-				{Vector(-6912.5561523438,629.63995361328,-234.86169433594),Angle(0,0,0)},
+				{Vector(4619.3256835938,-3456.037109375,104.21855926514),Angle(0,90,0)},
+				{Vector(4617.7358398438,-8899.4052734375,-703.96875),Angle(0,90,0)},
+				--{Vector(-10207.090820313,-435.19815063477,-188.96875),Angle(0,-135,0)},
+				--{Vector(-8469.548828125,-1096.9293212891,-72.854202270508),Angle(30,90,0)},
+				--{Vector(-6912.5561523438,629.63995361328,-234.86169433594),Angle(0,0,0)},
 			},
 			destgravity=1,
 			name="portal_XenToEarthL_entrance",
@@ -108,5 +97,5 @@ local function SpawnPortals()
 	end
 end
 
-hook.Add("PostCleanupMap", "gm_mapcleanup_portals", SpawnPortals)
-hook.Add("InitPostEntity", "gm_mapinitialization_portals", function() timer.Simple(1,function() SpawnPortals();print("--Initial Portals!--") end) end)
+--hook.Add("PostCleanupMap", "gm_mapcleanup_portals", SpawnPortals)
+--hook.Add("InitPostEntity", "gm_mapinitialization_portals", function() timer.Simple(1,function() SpawnPortals();print("--Initial Portals!--") end) end)
