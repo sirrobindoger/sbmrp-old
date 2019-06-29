@@ -51,18 +51,6 @@ local goodgroups = table.ValuesToKeys({
 	"whitelisted",
 })
 
-if SERVER then
-	local function staffmeeting(ply)
-		if ply:IsAdmin() then
-			timer.Simple(0, function()
-				ply:SetPos(Vector(-3522.1098632813,-1446.458984375,-117.6547088623))
-			end)
-		end
-	end
-	hook.Add("PlayerInitialSpawn", "vaaa", staffmeeting)
-	hook.Add("PlayerSpawn", "vaaa", staffmeeting)
-
-end
 
 
 hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, clpass, name)
@@ -148,4 +136,116 @@ if CLIENT then
 	    MsgC(Color(0, 175, 196, 255), "[" .. GAMEMODE.Name .. "] ", Color(200, 200, 200, 255), txt, "\n")
 	end
 	usermessage.Hook("_Notify", DisplayNotify)
+end
+
+
+if SERVER then
+	util.AddNetworkString("playerconnect")
+	util.AddNetworkString("spawn")
+	util.AddNetworkString("disconnect")
+	gameevent.Listen( "player_connect" )
+	hook.Add( "player_connect", "connectnotification", function( data )
+		local name = data.name			
+		local steamid = data.networkid	
+		local info = name .. " [" .. steamid .. "] has connected to the server."
+		for k,v in pairs (player.GetAll()) do
+		net.Start("playerconnect")
+	    local sendinfo = info
+	    net.WriteString(sendinfo)
+	 
+	    	net.Send(v)
+	    end
+	end )
+	gameevent.Listen( "player_disconnect" )
+	hook.Add("player_disconnect", "disconnectnotification", function(data)
+		local name = data.name			
+		local steamid = data.networkid	
+		local reason = data.reason
+		local info = name .. " [" .. steamid .. "] has left the server <" .. reason .. ">."
+		for k,v in pairs (player.GetAll()) do 
+		net.Start("disconnect")
+	    local sendinfo = info
+	    net.WriteString(sendinfo)
+
+	    	net.Send(v)
+	    end
+	end)
+
+	hook.Add("PlayerInitialSpawn", "spawnoticiation", function(ply)
+		local name = ply:GetName()			
+		local steamid = ply:SteamID()	
+		local info = name .. " [" .. steamid .. "] has spawned in the server."
+		for k,v in pairs (player.GetAll()) do
+		net.Start("spawn")
+	    local sendinfo = info
+	    net.WriteString(sendinfo)
+	 
+	    	net.Send(v)
+	    end
+	end)
+
+end
+
+if CLIENT then
+	net.Receive("playerconnect",function()
+		connectinfo = net.ReadString()
+		chat.AddText(Color(18, 204, 48), connectinfo )
+		surface.PlaySound("ui/buttonclick.wav")
+	end)
+
+	net.Receive("spawn",function()
+		spawninfo = net.ReadString()
+		chat.AddText(Color(2, 244, 41), spawninfo )
+		surface.PlaySound("player/footsteps/dirt2.wav")
+	end)
+
+	net.Receive("disconnect",function()
+		spawninfo = net.ReadString()
+		chat.AddText(Color(255, 0, 0), spawninfo )
+		surface.PlaySound("garrysmod/ui_return.wav")
+	end)
+	hook.Add( "ChatText", "hide_joinleave", function( index, name, text, typ )
+		if ( typ == "joinleave" ) then return true end
+	end)
+end
+
+--[[-------------------------------------------------------------------------
+Client Optimizations
+---------------------------------------------------------------------------]]
+
+if CLIENT then
+	local function antilagOn()
+		RunConsoleCommand("gmod_mcore_test", "1")
+		RunConsoleCommand("mat_queue_mode", "-1")
+		RunConsoleCommand("cl_threaded_bone_setup", "1")
+		RunConsoleCommand("cl_threaded_client_leaf_system", "1")
+		RunConsoleCommand("r_threaded_client_shadow_manager", "1")
+		RunConsoleCommand("r_threaded_particles", "1")
+		RunConsoleCommand("r_threaded_renderables", "1")
+		RunConsoleCommand("r_queued_ropes", "1")
+		RunConsoleCommand("studio_queue_mode", "1")
+		
+		hook.Remove("RenderScreenspaceEffects", "RenderColorModify")
+	        hook.Remove("RenderScreenspaceEffects", "RenderBloom")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderToyTown")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderTexturize")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderSunbeams")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderSobel")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderSharpen")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderMaterialOverlay")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderMotionBlur")
+	 	hook.Remove("RenderScene", "RenderStereoscopy")
+	 	hook.Remove("RenderScene", "RenderSuperDoF")
+	 	hook.Remove("GUIMousePressed", "SuperDOFMouseDown")
+	 	hook.Remove("GUIMouseReleased", "SuperDOFMouseUp")
+	 	hook.Remove("PreventScreenClicks", "SuperDOFPreventClicks")
+	 	hook.Remove("PostRender", "RenderFrameBlend")
+	 	hook.Remove("PreRender", "PreRenderFrameBlend")
+	 	hook.Remove("Think", "DOFThink")
+	 	hook.Remove("RenderScreenspaceEffects", "RenderBokeh")
+	 	hook.Remove("NeedsDepthPass", "NeedsDepthPass_Bokeh")
+	 	hook.Remove("PostDrawEffects", "RenderWidgets")
+	 	hook.Remove("PostDrawEffects", "RenderHalos")
+	end
+	timer.Simple(0, antilagOn)
 end
