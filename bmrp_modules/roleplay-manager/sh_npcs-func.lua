@@ -10,4 +10,4 @@ local function GetGonarch()
     end
 end
 
-print(GetGonarch():GetName())
+print(GetGonarch():GetClass())
