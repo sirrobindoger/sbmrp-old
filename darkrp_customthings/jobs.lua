@@ -230,8 +230,123 @@ TEAM_SURVEYTEAM_COMMANDER = DarkRP.createJob("Survey Team Commander", {
 })
 
 --[[-------------------------------------------------------------------------
+Faculty
+---------------------------------------------------------------------------]]
+
+TEAM_CHEF = DarkRP.createJob("Facility Cook", {
+    color = Color(238, 99, 99, 255),
+    model = {
+        "models/fearless/chef1.mdl"
+    },
+    description = [[Make a cafe within Black Mesa and keep the Staff properally fed.]],
+    weapons = {},
+    command = "cook",
+    max = 2,
+    admin = 0,
+    salary = 50,
+    rdmgroup = "BMRF",
+    isblackmesa = true,
+    category = "Black Mesa Faculty"
+})
+
+TEAM_SERVICE = DarkRP.createJob("Engineering Specalist", {
+    color = Color(238, 99, 99, 255),
+    model = {
+--      "models/humans/bms_cwork.mdl",
+        "models/humans/bms_engineer.mdl",
+--      "models/heartbit_female_maintenance_pm.mdl"
+    },
+    description = [[You work to maintain backend systems like power, trams, etc.]],
+    weapons = {"broom","weapon_extinguisher_infinite","weapon_pipewrench","fire_keys"},
+    command = "service",
+    max = 4,
+    admin = 0,
+    salary = 60,
+    rdmgroup = "BMRF",
+    isblackmesa = true,
+    category = "Black Mesa Faculty",
+    PlayerSpawn = function(ply) 
+        ply:ChatPrint("You can walk up to the 'Central Power Grid' next to where you spawn and hit it with your wrench to repair it! Failure to do so could result in power outages!") 
+    end,
+})
+
+TEAM_ITTECH = DarkRP.createJob("IT Technician", {
+    color = Color(34, 85, 85, 255),
+    model = {"models/player/hostage/hostage_02.mdl",
+        "models/player/hostage/hostage_03.mdl"
+    },
+    description = [[Setup and maintain the computers for the Office Workers.]],
+    weapons = {},
+    command = "ittech",
+    max = 4,
+    salary = 120,
+    admin = 0,
+    vote = false,
+    hasLicense = false,
+    candemote = false,
+    category = "Black Mesa Faculty",
+    ------------------
+    rdmgroup = "BMRF",
+    isblackmesa = true
+    ------------------
+})
+
+
+TEAM_OFFICE = DarkRP.createJob("Office Employee", {
+    color = Color(34, 85, 85, 255),
+    model = {
+    "models/player/suits/male_07_closed_tie.mdl",
+    "models/player/suits/male_07_open.mdl",
+    "models/player/suits/male_07_open_tie.mdl",
+    "models/player/suits/male_07_open_waistcoat.mdl",
+    },
+    description = [[You are an office employee of BMRF, do your work and be nice to your co-workers.]],
+    weapons = {},
+    command = "officeworker",
+    max = 6,
+    salary = 120,
+    admin = 0,
+    vote = false,
+    hasLicense = false,
+    candemote = false,
+    category = "Black Mesa Faculty",
+    ------------------
+    rdmgroup = "BMRF",
+    isblackmesa = true
+    ------------------
+})
+
+
+TEAM_OFFICEMANAGER = DarkRP.createJob("Office Manager", {
+    color = Color(34, 85, 85, 255),
+    model = {
+    "models/player/suits/male_07_closed_tie.mdl",
+    "models/player/suits/male_07_open.mdl",
+    "models/player/suits/male_07_open_tie.mdl",
+    "models/player/suits/male_07_open_waistcoat.mdl",
+    },
+    description = [[You are the #1 regional manager of the BMRF Office Complex.]],
+    weapons = {},
+    command = "officemanger",
+    max = 1,
+    salary = 120,
+    admin = 0,
+    vote = false,
+    hasLicense = false,
+    candemote = false,
+    category = "Black Mesa Faculty",
+    ------------------
+    rdmgroup = "BMRF",
+    isblackmesa = true,
+    ------------------
+    NeedToChangeFrom = TEAM_OFFICE,
+})
+
+--[[-------------------------------------------------------------------------
 Security Jobs
 ---------------------------------------------------------------------------]]
+
+
 
 
 TEAM_SECURITYCHEIF = DarkRP.createJob("Security Chief", {
@@ -302,84 +417,6 @@ TEAM_SECURITYRECRUIT = DarkRP.createJob("Security Recruit", {
 })
 
 
-
-
---[[-------------------------------------------------------------------------
-Administration/Office Jobs
----------------------------------------------------------------------------]]
-
-TEAM_OFFICE = DarkRP.createJob("Office Employee", {
-    color = Color(34, 85, 85, 255),
-    model = {
-    "models/player/suits/male_07_closed_tie.mdl",
-    "models/player/suits/male_07_open.mdl",
-    "models/player/suits/male_07_open_tie.mdl",
-    "models/player/suits/male_07_open_waistcoat.mdl",
-    },
-    description = [[You are an office employee of BMRF, do your work and be nice to your co-workers.]],
-    weapons = {},
-    command = "officeworker",
-    max = 6,
-    salary = 120,
-    admin = 0,
-    vote = false,
-    hasLicense = false,
-    candemote = false,
-    category = "Office Personnel",
-    ------------------
-    rdmgroup = "BMRF",
-    isblackmesa = true
-    ------------------
-})
-
-
-TEAM_OFFICEMANAGER = DarkRP.createJob("Office Manager", {
-    color = Color(34, 85, 85, 255),
-    model = {
-    "models/player/suits/male_07_closed_tie.mdl",
-    "models/player/suits/male_07_open.mdl",
-    "models/player/suits/male_07_open_tie.mdl",
-    "models/player/suits/male_07_open_waistcoat.mdl",
-    },
-    description = [[You are the #1 regional manager of the BMRF Office Complex.]],
-    weapons = {},
-    command = "officemanger",
-    max = 1,
-    salary = 120,
-    admin = 0,
-    vote = false,
-    hasLicense = false,
-    candemote = false,
-    category = "Office Personnel",
-    ------------------
-    rdmgroup = "BMRF",
-    isblackmesa = true,
-    ------------------
-    NeedToChangeFrom = TEAM_OFFICE,
-})
-
-TEAM_ITTECH = DarkRP.createJob("IT Technician", {
-    color = Color(34, 85, 85, 255),
-    model = {"models/player/hostage/hostage_02.mdl",
-        "models/player/hostage/hostage_03.mdl"
-    },
-    description = [[Setup and maintain the computers for the Office Workers.]],
-    weapons = {},
-    command = "ittech",
-    max = 4,
-    salary = 120,
-    admin = 0,
-    vote = false,
-    hasLicense = false,
-    candemote = false,
-    category = "Office Personnel",
-    ------------------
-    rdmgroup = "BMRF",
-    isblackmesa = true
-    ------------------
-})
-
-
 TEAM_ADMINISTRATOR = DarkRP.createJob("Facility Administrator", {
     color = Color(214, 0, 0, 255),
     model = {"models/player/breen.mdl"},
@@ -435,12 +472,9 @@ TEAM_BIO = DarkRP.createJob("Bioworker", {
     rdmgroup = "BMRF",
     isblackmesa = true,
     isbio = true,
-    category = "Bioworker Division"
+    category = "Bio Sector"
 })
 
---[[-------------------------------------------------------------------------
-Specimens job
----------------------------------------------------------------------------]]
 
 TEAM_TESTSUBJECT = DarkRP.createJob("Human Test Subject", {
     color = Color(255, 97, 3, 255),
@@ -468,52 +502,215 @@ TEAM_TESTSUBJECT = DarkRP.createJob("Human Test Subject", {
     end,
     noradio = true,
     issubject = true,
-    category = "BMRF Specimens"
+    category = "Bio Sector"
 })
 
-/*
-TEAM_HEADCRAB = DarkRP.createJob("De-Fanged Headcrab", {
-    color = Color(160, 100, 190, 255),
-    model = "models/player/inv2.mdl",
-    description = [[*headcrab noises*]],
-    weapons = {},
-    command = "headcrab",
+
+--[[-------------------------------------------------------------------------
+Xenians
+---------------------------------------------------------------------------]]
+TEAM_CONTROLLER = DarkRP.createJob("Xenian Controller", {
+    color = Color(234, 0, 255, 255),
+    model = {"models/player/bms_controller.mdl"},
+    description = [[You are a species of Xenian that can control the lesser minds of the creatures that inhabit Xen. ]],
+    weapons = {"weapon_possessor", "weapon_sporelauncher"},
+    command = "controller",
     max = 2,
+    salary = 250,
     admin = 0,
-    salary = 1,
-    PlayerSpawn = function(ply) 
-        if not ply:Alive() or not IsValid(ply) then 
-            return 
-        end 
-        if not ply:IsAdmin() then 
-            pk_pills.apply(ply,"headcrab",'lock-life') 
-        elseif not ply:GetNWBool("IsInPill") == true then 
-            pk_pills.apply(ply,"headcrab",'force') 
-        end 
-        ply:SetNoTarget(true) 
-        ply:SetNWBool("IsInPill", true)
-        ply:SetGravity(1.5)
-        ply:SetWalkSpeed(200)
-        ply:SetRunSpeed(500)
-        end,
-    PlayerDeath = function(ply, weapon, killer) 
-        ply:SetNoTarget(false) 
-        pk_pills.restore(ply,true) 
-        ply:SetNWBool("IsInPill", false) 
-        end,
-    rdmnoblockingdamage = true,
-    rdmnogivingdamage = true,
+    vote = true,
+    hasLicense = false,
+    candemote = false,
+    category = "Xenians",
+    rdmgroup = "Xenian",
     noradio = true,
-    issubject = true,
-    category = "Biolabs - Bioscience Division"
+    isalien = true,
 })
-*/
 
+TEAM_VORT = DarkRP.createJob("Vortigaunt", {
+    color = Color(148, 0, 211, 255),
+    model =  "models/player/bms_vortigaunt.mdl",
+    description = [[You are a Vortigaunt. You were born on XEN to protect it with your life. 
+    Do not leave XEN or you will be banned from the job for a period of time. 
+    The only reason to leave XEN is with authorization or during a cascade]],
+    weapons = {"swep_vortigaunt_beam","mininglaser"},
+    command = "vortigaunt",
+    max = 6,
+    admin = 0,
+    salary = 45,
+    canTalkToGlobal = false,
+    PlayerSpawn = function(ply) ply:SetGravity(0.4) ply:SetNoTarget(true) end,
+    PlayerDeath = function(ply, weapon, killer) ply:SetNoTarget(false) end,
+    rdmgroup = "Xenian",
+    noradio = true,
+    isalien = true,
+    category = "Xenians",
+})
+
+TEAM_GRUNT = DarkRP.createJob("Alien Grunt", {
+    color = Color(80, 45, 0, 255),
+    model =  "models/player/bms_agrunt.mdl",
+    description = [[You are a Alien Grunt. You were born on XEN to protect it with your life. 
+    Do not leave XEN or you will be banned from the job for a period of time. 
+    The only reason to leave XEN is with authorization or during a cascade]],
+    weapons = {"weapon_bms_hivehand"},
+    command = "aliengrunt",
+    max = 4,
+    admin = 0,
+    salary = 45,
+    PlayerSpawn = function(ply) ply:SetArmor(100) ply:SetBodygroup(0, 1) ply:SetBodygroup(1, 1) ply:SetGravity(0.4) ply:SetNoTarget(true) end,
+    PlayerDeath = function(ply, weapon, killer) ply:SetNoTarget(false) end,
+    rdmgroup = "Xenian",
+    noradio = true,
+    isalien = true,
+    category = "Xenians",
+})
+
+
+TEAM_GARGA = DarkRP.createJob("Baby Gargantua", {
+    color = Color(101, 0, 201, 255),
+    model = {"models/bm/gargantua.mdl"},
+    description = [[You'll soon grow to be the big scary fire-shooting alien that everyone loathes to encounter.]],
+    weapons = {"weapon_752_m2_flamethrower"},
+    command = "gargantua",
+    max = 1,
+    admin = 0,
+    salary = 55,
+    vote = true,
+    ammo = {
+        ["ar2"] = 150
+    },
+    PlayerSpawn = function(ply)
+        ply:SetMaxHealth(250)
+        ply:SetHealth(250)
+        ply:SetArmor(150)
+        ply:SetRunSpeed(150)
+        ply:SetWalkSpeed(100)
+        ply:SetModelScale(1.3)
+    end,
+    PlayerDeath = function(ply, weapon, killer)
+        ply:teamBan()
+        ply:changeTeam(GAMEMODE.DefaultTeam, true)
+        DarkRP.notifyAll(0, 4, "The gargantua has been slain.")
+        ply:SetModelScale(1)
+    end,
+    rdmgroup = "Xenian",
+    noradio = true,
+    isalien = true,
+    category = "Xenians",
+})
 
 
 --[[-------------------------------------------------------------------------
 TOPSIDE HECU 
 ---------------------------------------------------------------------------]]
+
+TEAM_INSPECTOR = DarkRP.createJob("Facility Inspector", {
+    color = Color(87, 219, 219, 240),
+    model = {
+    "models/player/suits/male_07_closed_tie.mdl",
+    "models/player/suits/male_07_open.mdl",
+    "models/player/suits/male_07_open_tie.mdl",
+    "models/player/suits/male_07_open_waistcoat.mdl",
+    },
+    description = [[Check up on Black Mesa East to make sure everything is within safety regulation.]],
+    weapons = {},
+    command = "facilityinspector",
+    max = 1,
+    admin = 0,
+    salary = 80,
+    rdmgroup = "BMRF",
+    isblackmesa = true,
+    category = "Government"
+})
+
+
+TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
+    color = Color(0, 100, 0, 255),
+    model = "models/player/bms_blackops.mdl",
+    description = [[HECU Special Division. Does not have to take orders from commander but cannot interfere with HECU activities.]],
+    weapons = { "weapon_knife","weapon_sniperrifle","weapon_eagle", "weapon_camo"},
+    command = "blackops",
+    max = 2,
+    admin = 0,
+    salary = 85,
+    PlayerSpawn = function(ply) ply:SetArmor(100) end,
+    rdmgroup = "HECU",
+    ishecu = true,
+    category = "Government"
+})
+
+TEAM_HECU = DarkRP.createJob("HECU Grunt", {
+    color = Color(0, 100, 0, 255),
+    model = {
+        "models/player/bms_marine.mdl",
+        "models/player/gasmask_hecu.mdl",
+        "models/player/gasmask_hecu2.mdl",
+        "models/player/gasmask_hecu3.mdl",
+        "models/hgrunt4.mdl",
+        "models/hgrunt5.mdl",
+        --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
+
+    },
+    description = [[You are the firepower for the onsight military. Listen to your sergeant]],
+    weapons = {"tfa_bms_mp5", "weapon_knife","itemstore_pickup"},
+    command = "hecu",
+    max = 6,
+    admin = 0,
+    salary = 85,
+    PlayerSpawn = function(ply) ply:SetArmor(100) end,
+    rdmgroup = "HECU",
+    ishecu = true,
+    category = "Government"
+})
+
+TEAM_HECUMED = DarkRP.createJob("HECU Medic", {
+    color = Color(0, 100, 0, 255),
+    model = {
+        "models/player/bms_marine.mdl",
+        "models/player/gasmask_hecu.mdl",
+        "models/player/gasmask_hecu2.mdl",
+        "models/player/gasmask_hecu3.mdl",
+        "models/hgrunt4.mdl",
+        "models/hgrunt5.mdl",
+        --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
+
+    },
+    description = [[You make sure everyone in the H.E.C.U force is in tip-top shape. Listen to your sergeant]],
+    weapons = {"weapon_medkit","tfa_bms_mp5","weapon_knife","itemstore_pickup"},
+    command = "hecumedic",
+    max = 4,
+    admin = 0,
+    salary = 90,
+    PlayerSpawn = function(ply) ply:SetArmor(100) end,
+    rdmgroup = "HECU",
+    ishecu = true,
+    category = "Government"
+})
+
+TEAM_HECUCOMMAND = DarkRP.createJob("HECU Sergeant", {
+    color = Color(0, 100, 0, 255),
+    model = {
+        "models/player/bms_marine.mdl",
+        "models/player/gasmask_hecu.mdl",
+        "models/player/gasmask_hecu2.mdl",
+        "models/player/gasmask_hecu3.mdl",
+        "models/hgrunt3.mdl",
+        --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
+    },
+    description = [[You are the head of the onsight millitary; H.E.C.U. Lead the main force of security of BMRF, and to make sure that all unauthorized personnel are taken care of.]],
+    weapons = {"tfa_bms_shotgun","tfa_bms_mp5","itemstore_pickup"},
+    command = "hecucommander",
+    max = 1,
+    admin = 0,
+    salary = 100,
+    admin = 0,
+    vote = true,
+    PlayerSpawn = function(ply) ply:SetArmor(100) end,
+    rdmgroup = "HECU",
+    ishecu = true,
+    category = "Government"
+})
 
 
 --[[-------------------------------------------------------------------------

@@ -77,7 +77,7 @@ DarkRP.createCategory{
 
 
 DarkRP.createCategory{
-    name = "Bioworker Division",
+    name = "Bio Sector",
     categorises = "jobs",
     startExpanded = true,
     color = Color(66, 244, 116),
@@ -86,16 +86,7 @@ DarkRP.createCategory{
 }
 
 DarkRP.createCategory{
-    name = "BMRF Specimens",
-    categorises = "jobs",
-    startExpanded = false,
-    color = Color(66, 244, 116),
-    canSee = function(ply) return true end,
-    sortOrder = 26
-}
-
-DarkRP.createCategory{
-    name = "Military/Government",
+    name = "Government",
     categorises = "jobs",
     startExpanded = true,
     color = Color(124, 123, 130, 255),
