@@ -35,7 +35,8 @@ if game.GetMap() == "rp_sectorc_beta" then
 	table.insert(sBMRP.locationnames,{"Xen",Vector(1082.2784423828,-9863.03515625,-2590.9377441406),Vector(-1696.177734,-13936.375977,2038.580933)})
 elseif game.GetMap() == "rp_sectorc_s" then
 
-	table.insert(sBMRP.locationnames,{"Gronarch Lair",Vector(7098.5668945313,1623.1097412109,-271.58898925781),Vector(3751.6201171875,-1233.2895507813,1136.5404052734)})
+	table.insert(sBMRP.locationnames,{"Gonarch Lair",Vector(7098.5668945313,1623.1097412109,-271.58898925781),Vector(3751.6201171875,-1233.2895507813,1136.5404052734)})
+	table.insert(sBMRP.locationnames,{"Xenian Cave",Vector(3284.3041992188,-4713.1157226563,-286.81982421875),Vector(1371.0236816406,-8697.5986328125,-2389.3171386719)})
 
 	table.insert(sBMRP.locationnames,{"Xen",Vector(1082.2784423828,-9863.03515625,-2590.9377441406),Vector(7520.4252929688,3365.5139160156,1773.4493408203)})
 	table.insert(sBMRP.locationnames,{"HECU Base",Vector(-2807.275879,-732.159241,567.249573),Vector(-5563.524902,384.642731,821.905457)})
