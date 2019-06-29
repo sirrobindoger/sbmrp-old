@@ -124,3 +124,36 @@ end
 
 hook.Add("OnPlayerChangedTeam", "bmrp_donate", supporterinv)
 hook.Add("PlayerSpawn", "bmrp_donate_hoook", supporterinv) 
+
+--[[-------------------------------------------------------------------------
+Addon rewrite
+---------------------------------------------------------------------------]]
+
+function CheckForENVExplosion()
+	
+	local env_explosion = ents.FindByClass("env_explosion") 
+	
+	for k, v in pairs(env_explosion) do
+		if v:MapCreationID() then return end
+		local pos = v:GetPos()
+				
+		local tr = util.TraceLine( {
+			start  = pos,
+			endpos = pos,
+			mask   = MASK_SOLID_BRUSHONLY
+		} )
+
+		if tr.HitWorld then 
+			ParticleEffect(table.Random({"boom_barrel","boom_barrel","boom_barrel"}), pos, Angle(0,math.random(0,360),0), nil)
+		else
+			ParticleEffect(table.Random({"boom_barrel","boom_barrel","boom_barrel"}), pos, Angle(0,math.random(0,360),0), nil)
+
+		end
+		sound.Play( "hd/new_grenadeexplo.mp3", pos, math.random(80,120), math.random(80,120), 1)
+
+		v:Remove()
+		
+	end
+
+end
+hook.Add("Think", "CheckForENVExplosion", CheckForENVExplosion)
