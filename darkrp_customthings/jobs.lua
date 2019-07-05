@@ -120,10 +120,10 @@ TEAM_HEAD_SCIENTIST = DarkRP.createJob("Head Researcher", {
 	description = [[You are the head researcher at the Black Mesa Research Facility, it is your job to make sure that all experiments are running smoothly and that saftey is being practiced at all times.]],
 	weapons = {},
 	command = "reserachhead",
-	max = 0,
+	max = 1,
 	salary = 35,
 	admin = 0,
-	vote = false,
+	vote = true,
 	hasLicense = false,
 	candemote = false,
 	-----------------
@@ -169,7 +169,7 @@ TEAM_SURVEY_SUPPORT = DarkRP.createJob("Survey Munitions Expert",{
 	description = [[You're the person that knows how to make weapons. Setup a weapons station and use your team's help to craft deadly weapons to protect yourself.]],
 	weapons = {},
 	command = "surveysupport",
-	max = 6,
+	max = 4,
 	salary = 50,
 	admin = 0,
 	vote = false,
@@ -191,7 +191,7 @@ TEAM_SURVEY_CATCHER = DarkRP.createJob("Survey Specimen Extractor",{
 	description = [[Your job is to find and extract Xenian specimens for the bio sector back on Earth.]],
 	weapons = {},
 	command = "surveycatcher",
-	max = 6,
+	max = 3,
 	salary = 50,
 	admin = 0,
 	vote = false,
@@ -451,8 +451,32 @@ TEAM_ADMINISTRATOR = DarkRP.createJob("Facility Administrator", {
 Bio Sector jobs
 ---------------------------------------------------------------------------]]
 
+TEAM_BIO_HEAD = DarkRP.createJob("Head Bio Researcher", {
+    color = Color(255, 97, 3, 255),
+     model = {
+        "models/hazmatcitizens/p_hazmatmale07.mdl",
+        "models/hazmatcitizens/p_hazmatfemale01.mdl",
+        "models/hazmatcitizens/p_hazmatfemale02.mdl",
+        "models/hazmatcitizens/p_hazmatfemale03.mdl",
+        "models/hazmatcitizens/p_hazmatmale01.mdl",
+        "models/hazmatcitizens/p_hazmatmale02.mdl",
+        "models/hazmatcitizens/p_hazmatmale03.mdl"
+    },
+    description = [[You are the head of the Bio Sector, you have access to all the labs & can activate certain facility functions.]],
+    weapons = {"taser","cage","weapon_leash_bio"},
+    command = "headbioresearcher",
+    max = 4,
+    admin = 0,
+    salary = 75,
+    rdmgroup = "BMRF",
+    isblackmesa = true,
+    isbio = true,
+    category = "Bio Sector",
+    vote = true
+})
 
-TEAM_BIO = DarkRP.createJob("Bioworker", {
+
+TEAM_BIO = DarkRP.createJob("Bio Researcher", {
     color = Color(255, 97, 3, 255),
      model = {
         "models/hazmatcitizens/p_hazmatmale07.mdl",
@@ -465,7 +489,7 @@ TEAM_BIO = DarkRP.createJob("Bioworker", {
     },
     description = [[Run experiments on your subjects, handle hazerdous materials.]],
     weapons = {"taser","cage","weapon_leash_bio"},
-    command = "bioworker",
+    command = "bioresearcher",
     max = 4,
     admin = 0,
     salary = 75,
