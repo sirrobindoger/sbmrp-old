@@ -83,7 +83,7 @@ DarkRP.createEntity("Crystal Exporter Console", {
 	allowed = TEAM_CRYSTALSSPECIALIST,
 	category = "Research Equipment"
 })
-
+/*
 DarkRP.createEntity("Universal Tester", {
 	ent = "tester_universal",
 	model = "models/props_lab/surgical_laser.mdl",
@@ -95,7 +95,7 @@ DarkRP.createEntity("Universal Tester", {
 	allowed = TEAM_CRYSTALSSPECIALIST,
 	category = "Research Equipment"
 })
-
+*/
 DarkRP.createEntity("Ballistic Tester", {
 	ent = "tester_bullet",
 	model = "models/props_lab/surgical_laser.mdl",
