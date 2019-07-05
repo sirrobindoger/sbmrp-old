@@ -28,7 +28,7 @@ local xenlocations = {
 local function LocationChanged(ply, old, new)
 	if ply:IsAdmin() then return end 
 
-	if ply:
+
 end
 --[[-------------------------------------------------------------------------
 Weapon Restrict
