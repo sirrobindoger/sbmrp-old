@@ -218,3 +218,107 @@ function SuitDown(ply)
 		DarkRP.notify(ply, 6, 3, "You have taken off your vest and are now off-duty.")
 	end
 end
+
+--[[-------------------------------------------------------------------------
+Tazer
+---------------------------------------------------------------------------]]
+
+function Taze(ent,mode)
+	if ent:IsPlayer() or ent:IsBot() then
+		if ent:GetNWBool("IsBeingTased!") then return end
+		ent:SetNWBool("IsBeingTased!", true)
+		ent:ViewPunch( Angle(-10, 0, 0))
+		if(false) then
+			ent:DropWeapon(ent:GetActiveWeapon())
+		end
+		ent:DrawViewModel(false)
+		
+		local weps = {}
+		for u, l in pairs(ent:GetWeapons()) do
+			table.insert(weps,l:GetClass())
+		end
+		
+		ent.Weps = weps
+		local weapon = ent:GetActiveWeapon()
+		if weapon:IsValid() then
+			ent.LastWeap = weapon:GetClass()
+		end
+		ent:StripWeapons(weps)
+		ent.Armor = ent:Armor()
+		local ragdoll = ents.Create("prop_ragdoll")
+		ragdoll:SetPos(ent:GetPos())
+		ragdoll:SetAngles(ent:GetAngles())
+		ragdoll:SetModel(ent:GetModel())
+		ragdoll:SetVelocity(ent:GetVelocity())
+		ragdoll:Spawn()
+		ragdoll.IsTased = true
+		ragdoll.TaseOwner = ent
+		ragdoll:Activate()
+		ragdoll:EmitSound("ambient/energy/spark5.mp3")
+		
+		local effectdata = EffectData()
+		effectdata:SetOrigin( ragdoll:GetPos() )
+		util.Effect( "cball_explode", effectdata )
+		ent:SetParent(ragdoll)
+		ent:ScreenFade(SCREENFADE.IN, Color(230, 230, 230), 0.7, 1.4)
+		ent:Spectate(OBS_MODE_CHASE)
+		ent:SpectateEntity(ragdoll)
+		if mode == "testsubject" then
+			local head = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_Pelvis" ) ) )
+			if timer.Exists("TaserJolt_"..ent:UniqueID()) then timer.Destroy("TaserJolt_"..ent:UniqueID()) end		
+			head:ApplyForceCenter( Vector(0,0,1000) )
+			timer.Create("TaserJolt_"..ent:UniqueID(), 0.01, 100, function ()
+				--local x = math.max(1000,math.min(3000,(3000 * math.rand(-1,1))))
+				--local y = math.max(1000,math.min(3000,(3000 * math.rand(-1,1))))
+				local x = 1000*(math.Round(math.random(-1,1)))
+				local y = 1000*(math.Round(math.random(-1,1)))
+				--local z = 500*(math.Round(math.random(-1,1)))
+				head:ApplyForceCenter( Vector(x,y,-1500) )--* math.Rand( -5, 5 ) )
+			end)
+		else
+			local head = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_Head1" ) ) )
+			local spine = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_Spine1" ) ) )
+			local pelvis = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_Pelvis" ) ) )
+			local lhand = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_L_Hand" ) ) )
+			local rhand = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_R_Hand" ) ) )
+			local lfoot = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_L_Foot" ) ) )
+			local rfoot = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( ragdoll:LookupBone( "ValveBiped.Bip01_R_Foot" ) ) )
+			if timer.Exists("TaserJolt_"..ent:SteamID()) then timer.Destroy("TaserJolt_"..ent:SteamID()) end		
+			pelvis:ApplyForceCenter( Vector(0,0,-2000) )
+			timer.Create("TaserJolt_"..ent:SteamID(), 0.01, 50, function ()
+				--local x = math.max(1000,math.min(3000,(3000 * math.rand(-1,1))))
+				--local y = math.max(1000,math.min(3000,(3000 * math.rand(-1,1))))
+				local x = 150*(math.Round(math.random(-1,1)))
+				local y = 150*(math.Round(math.random(-1,1)))
+				--local z = 500*(math.Round(math.random(-1,1)))
+				pelvis:ApplyForceCenter( Vector(0,0,-2000) )
+				lhand:ApplyForceCenter( Vector(x*-1,y*-1,0) )--* math.Rand( -5, 5 ) )
+				rhand:ApplyForceCenter( Vector(x,y,0) )--* math.Rand( -5, 5 ) )				
+				rfoot:ApplyForceCenter( Vector(x*-1,y*-1,0) )--* math.Rand( -5, 5 ) )				
+				lfoot:ApplyForceCenter( Vector(x,y,0) )--* math.Rand( -5, 5 ) )
+				head:ApplyForceCenter( Vector(x/2,y/2,-1000) )--* math.Rand( -5, 5 ) )
+				spine:ApplyForceCenter( Vector(0,0,-1000) )--* math.Rand( -5, 5 ) )
+			end)
+		end		
+		if timer.Exists("TaserTimer_"..ent:UniqueID()) then timer.Destroy("TaserTimer_"..ent:UniqueID()) end
+		timer.Create("TaserTimer_"..ent:UniqueID(), 8, 1, function ()
+			ent:SetNWBool("IsBeingTased!",false)
+			ent:UnSpectate()
+			ent:SetParent()
+			ent:Spawn()
+			local pos = ragdoll:GetPos()
+			ent:SetPos(pos)
+			ent:SetModel(ragdoll:GetModel())
+			ragdoll:Remove()
+			ent:DrawViewModel(true)
+			ent:SetPos(DarkRP.findEmptyPos(pos, {ent}, 600, 10, Vector(0, 0, 30)))
+			if mode == "testsubject" then
+				ent:KillSilent()
+			end
+			ent:SetNWBool("IsBeingTased!", false)
+			for i=1, #ent.Weps do
+				ent:Give(ent.Weps[i])
+			end
+		end)
+	end
+end
