@@ -80,7 +80,7 @@ if SERVER then
 			end
 		end
 
-		if npc:IsPlayer() and npc:IsAlien() and IsValid(ply) and ply:IsPlayer() then
+		if npc:IsPlayer() and npc:IsAlien() and IsValid(ply) and ply:IsPlayer()  then
 			for k,v in pairs(ents.FindInSphere(npc:GetPos(), 3000)) do
 				if IsValid(v) and v:IsNPC() then
 					v:AddEntityRelationship(ply,D_HT,99)
