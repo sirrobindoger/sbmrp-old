@@ -1,39 +1,38 @@
+sBMRP.locationnames = {}
+sBMRP.LocList = {}
+--[[-------------------------------------------------------------------------
+Quick access loc tables
+---------------------------------------------------------------------------]]
+sBMRP.LocList.Xen = {
+	["Xen"] = true,
+	["Xenian Cave"] = true,
+	["Gonarch Lair"] = true,
+}
+
+sBMRP.LocList.Topside = {
+	["Topside Entrance"] = true,
+	["Topside Parking Lot"] = true,
+	["HECU Base"] = true,
+	["Topside Lobby"] = true,
+	["Parking Lot Elevator"] = true,
+	["Topside Underground"] = true,
+	["Ventilation Shaft"] = true,
+	["Topside"] = true,
+}
+
+sBMRP.LocList.Biosector = {
+	["Bio Sector Lab 1"] = true,
+	["Bio Sector Lab 2"] = true,
+	["Bio Sector Lab 3"] = true,
+	["Bio Sector Main Lab"] = true,
+	["Bio Sector"] = true,
+}
+
 --[[-------------------------------------------------------------------------
 sBMRP Locations
 ---------------------------------------------------------------------------]]
-sBMRP.locationnames = {}
-if game.GetMap() == "rp_sectorc_beta" then
-	table.insert(sBMRP.locationnames,{"HECU Base",Vector(-2807.275879,-732.159241,567.249573),Vector(-5563.524902,384.642731,821.905457)})
-	table.insert(sBMRP.locationnames,{"Topside",Vector(-1583.432983,-2711.485352,1175.700684),Vector(-10901.039063,-244.456085,457.127136)})
-	table.insert(sBMRP.locationnames,{"Sector H",Vector(-6044.6728515625,994.28479003906,1282.7595214844),Vector(-9646.9599609375,-426.29504394531,545.421875)})
-	table.insert(sBMRP.locationnames,{"Sector A Security Room",Vector(-10412.298828,-1239.380859,-256.606445),Vector(-10663.860352,-618.754700,-60.018631)})
-	table.insert(sBMRP.locationnames,{"Sector A Lab 1",Vector(-11264.538086,-893.771729,-63.702896),Vector(-10846.016602,-634.912354,-253.795746)})
-	table.insert(sBMRP.locationnames,{"Sector A Lab 2",Vector(-11272.318359,-370.406067,-256.014526),Vector(-10749.855469,333.548676,69.050468)})
-	table.insert(sBMRP.locationnames,{"Sector A Lab 3",Vector(-11272.318359,-370.406067,-256.014526),Vector(-12214.122070,11.295838,-62.144188)})
-	table.insert(sBMRP.locationnames,{"Sector A Lab 4",Vector(-11806.405273,-635.380737,-270.877167),Vector(-11296.560547,-1156.130859,80.841766)})
-	table.insert(sBMRP.locationnames,{"Sector A Xen Teleporter",Vector(-13675.705078,42.873905,339.552917),Vector(-12076.139648,-1003.819336,-464.552429)})
-	table.insert(sBMRP.locationnames,{"Sector A",Vector(-13856.784180,354.020020,-480.311707),Vector(-9525.233398,-1416.123047,504.963776)})
-	table.insert(sBMRP.locationnames,{"Sector A Tram Station",Vector(-7399.680176,1961.003906,315.674377),Vector(-9485.122070,-1452.933105,-778.312683)})
-	table.insert(sBMRP.locationnames,{"Service Tunnel",Vector(-6576.504883,885.723450,-320.602234),Vector(-7618.748535,-1257.396851,-66.930435)})
-	table.insert(sBMRP.locationnames,{"Sector C Locker Room",Vector(-6558.045898,968.227600,-381.548157),Vector(-5542.659180,-170.103485,-36.064056)})
-	table.insert(sBMRP.locationnames,{"AMS Chamber",Vector(-5386.953613,-1500.900635,-695.280579),Vector(-2608.192627,-4478.685059,-1776.814209)})
-	table.insert(sBMRP.locationnames,{"Bio Labs",Vector(-1898.773071,-3990.525391,-248.276398),Vector(-2905.365723,-1661.649170,155.706757)})
-	table.insert(sBMRP.locationnames,{"Bio Labs Cage",Vector(-2443.264404,-3478.053955,-237.089386),Vector(-2804.818359,-3755.833496,46.718834)})
-	table.insert(sBMRP.locationnames,{"Sector C Lab 1",Vector(-3366.358398,-1481.771484,-232.367706),Vector(-3073.752197,-965.234253,-36.687782)})
-	table.insert(sBMRP.locationnames,{"Sector C Lab 2",Vector(-3697.277344,-1807.172241,-235.233948),Vector(-4055.693359,-1269.069214,-41.257652)})
-	table.insert(sBMRP.locationnames,{"Sector C",Vector(-1158.375854,-4013.810791,77.264313),Vector(-6011.024902,412.513031,-607.998718)})
-	table.insert(sBMRP.locationnames,{"Vents",Vector(-472.697021,-4153.957520,-230.990479),Vector(-2298.149658,-4641.252441,161.796249)})
-	table.insert(sBMRP.locationnames,{"Sector D",Vector(-1105.521362,-2992.188477,-265.386902),Vector(800.101746,-5675.752930,213.623749)})
-	table.insert(sBMRP.locationnames,{"Upper Canals",Vector(38.297348,-2313.536865,-999.864502),Vector(3186.919434,433.956787,575.985474)})
-	table.insert(sBMRP.locationnames,{"Lambda Reactor Entrance (Upper Canals)",Vector(2968.382813,440.670654,-133.777222),Vector(2003.770996,1706.876709,-413.832001)})
-	table.insert(sBMRP.locationnames,{"Sector B Hangar",Vector(4285.126953,-1214.390137,-449.446045),Vector(2483.240967,-1910.883179,362.880615)})
-	table.insert(sBMRP.locationnames,{"Sector B Security Hangar",Vector(4075.048828,-2932.104980,171.309677),Vector(4618.212402,-1937.223145,-263.182495)})
-	table.insert(sBMRP.locationnames,{"Jail",Vector(4918.770996,-2533.864746,-19.810013),Vector(4615.703613,-2948.170654,-254.640411)})
-	table.insert(sBMRP.locationnames,{"Sector B",Vector(5650.587402,-466.528595,-644.487244),Vector(2501.908203,-2949.483887,443.769043)})
-	table.insert(sBMRP.locationnames,{"Lower Canals",Vector(-272.893890,-1687.665527,-1000),Vector(4486.966797,-6044.809082,-3661.552734)})
-	
-	table.insert(sBMRP.locationnames,{"Xen",Vector(1082.2784423828,-9863.03515625,-2590.9377441406),Vector(-1696.177734,-13936.375977,2038.580933)})
-elseif game.GetMap() == "rp_sectorc_s" then
+
+if game.GetMap() == "rp_sectorc_s" then
 
 	table.insert(sBMRP.locationnames,{"Gonarch Lair",Vector(7098.5668945313,1623.1097412109,-271.58898925781),Vector(3751.6201171875,-1233.2895507813,1136.5404052734)})
 	table.insert(sBMRP.locationnames,{"Xenian Cave",Vector(3284.3041992188,-4713.1157226563,-286.81982421875),Vector(1371.0236816406,-8697.5986328125,-2389.3171386719)})
