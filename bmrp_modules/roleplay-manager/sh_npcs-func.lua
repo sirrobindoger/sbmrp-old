@@ -9,12 +9,6 @@ sBMRP.NPCs.Spawnlist = {
 	Vector(5893,-5913,49),
 	Vector(6745,-5404,75),
 }
-sBMRP.XenLocList = {
-	["Xen"] = true,
-	["Xenian Cave"] = true,
-	["Gonarch Lair"] = true,
-
-}
 --[[-------------------------------------------------------------------------
 Gronarch Boss fight
 ---------------------------------------------------------------------------]]
@@ -46,9 +40,10 @@ if SERVER then
 	Relationship Processesor
 	---------------------------------------------------------------------------]]
 	hook.Add("OnEntityCreated", "npc_logic", function(npc)
-		if not npc:IsNPC() then return end
+		if not IsValid(npc) or not npc:IsNPC() or not npc.PrintName then return end
 		timer.Simple(.5, function()
 			for k,v in pairs(ents.GetAll()) do
+				if not IsValid(v) then continue end
 				if v:IsNPC() and v:GetClass() == npc:GetClass() then
 					npc:AddEntityRelationship(v,D_LI,99)
 				elseif v:IsPlayer() and v:IsAlien() then
@@ -98,11 +93,11 @@ if SERVER then
 		local surveycount = 0
 		local npccount = 0
 		for k,ent in pairs(ents.GetAll()) do
-			if ent:IsPlayer() and ent:IsAlien() and sBMRP.XenLocList[GetLocation(ent)] then
+			if ent:IsPlayer() and ent:IsAlien() and sBMRP.LocList.Xen[GetLocation(ent)] then
 				xenjobcount = xenjobcount + 1
-			elseif ent:IsPlayer() and ent:IsSurvey() and sBMRP.XenLocList[GetLocation(ent)] then
+			elseif ent:IsPlayer() and ent:IsSurvey() and sBMRP.LocList.Xen[GetLocation(ent)] then
 				surveycount = surveycount + 1
-			elseif ent:IsNPC() and ent.PrintName and sBMRP.XenLocList[GetLocation(ent:GetPos())] then
+			elseif ent:IsNPC() and ent.PrintName and sBMRP.LocList.Xen[GetLocation(ent:GetPos())] then
 				npccount = npccount + 1
 			end
 		end
@@ -118,6 +113,7 @@ if CLIENT then
 	}
 	local npchud = sBMRP.AppendFont("bossfight", ScreenScale(10))
 	timer.Create("bmrp_npc-hud", 1, 0, function()
+		if not IsValid(LocalPlayer()) then return end
 		local foundnpc = false
 		for k,v in pairs(ents.FindInSphere(LocalPlayer():GetPos(),1000)) do
 			if v:IsNPC() and not NoUseNPCs[v:GetClass()] and v.PrintName then
