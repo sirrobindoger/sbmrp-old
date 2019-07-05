@@ -37,6 +37,13 @@ if SERVER then
 	function dprint(...)
 		if sBMRP.debug then print(...) end
 	end
+
+	concommand.Add("weapondet", function(ply)
+		if not ply:GetActiveWeapon() then return end
+		
+		ply:ChatPrint(ply:GetActiveWeapon():GetWeaponWorldModel())
+		ply:ChatPrint(ply:GetActiveWeapon():GetClass())
+	end)
 end
 
 if CLIENT then
@@ -199,6 +206,24 @@ end
 function TriggerEnt(entid, event) -- safe way to execute map functions
 	if !IsValid(ents.GetMapCreatedEntity(entid)) then return end
 	ents.GetMapCreatedEntity(entid):Fire(event)
+end
+
+if CLIENT then
+	function sBMRP.AppendFont(name, size, weight, antialias, outline, additive, shadow, underline)
+		surface.CreateFont("sBMRP." .. name, {
+			font = "ZektonRG-Regular",
+			size = size or 17,
+			weight = weight or 100,
+			antialias = antialias or true,
+			outline = outline or false,
+			additive = additive or true,
+			shadow = shadow or true,
+			underline = underline or false,
+		})
+		sBMRP.Fonts = sBMRP.Fonts || {}
+		sBMRP.Fonts[name] = true
+		return "sBMRP." .. name
+	end
 end
 
 
