@@ -1,3 +1,11 @@
+
+
+
+function flashply(ply)
+    if not ply or not ply:IsPlayer() then return end
+    ply:DoScreenFade(Color(0, 255, 0, 200), 0.3, 0)
+end
+
 function SpawnXenFlash(position)
     local effectdata = EffectData()
     effectdata:SetOrigin( position )
@@ -24,16 +32,23 @@ function SpawnXenFlash(position)
     ent:SetPos( position )
     ent:Spawn()
     for k,v in pairs(player.GetAll()) do if ent:Visible(v) then flashply(v) end end
-    util.Effect( "cball_explode", effectdata )
-    util.Effect("Sparks",effectdata)
     for i = 40, 100, 1 do
         timer.Simple(1 / i, function()
+            local effectdata = EffectData()
+            effectdata:SetStart(position)
+            effectdata:SetOrigin(position)
+            effectdata:SetScale(1)
+            effectdata:SetMagnitude(1)
+            effectdata:SetScale(3)
+            effectdata:SetRadius(2)
+            effectdata:SetEntity(ent)
             util.Effect("TeslaHitBoxes", effectdatat, true, true)
         end)
     end
+
 end
 
-function SpawnXenFlashNPC(position, NPCClass)
+function SpawnXenFlashNPC(NPCClass,position)
     local effectdata = EffectData()
     effectdata:SetOrigin( position )
     effectdata:SetRadius(10)
@@ -67,8 +82,35 @@ function SpawnXenFlashNPC(position, NPCClass)
     for k,v in pairs(player.GetAll()) do if ent:Visible(v) then flashply(v) end end
     for i = 40, 100, 1 do
         timer.Simple(1 / i, function()
+            local effectdata = EffectData()
+            effectdata:SetStart(position)
+            effectdata:SetOrigin(position)
+            effectdata:SetScale(1)
+            effectdata:SetMagnitude(1)
+            effectdata:SetScale(3)
+            effectdata:SetRadius(2)
+            effectdata:SetEntity(ent)
             util.Effect("TeslaHitBoxes", effectdatat, true, true)
         end)
     end
     return ent
+end
+
+-- npc/strider/charging.wav
+function DramaticNPCSpawn(npc, position)
+    sound.Play("npc/strider/charging.wav", position)
+    local effectdata = EffectData() 
+    effectdata:SetOrigin( position )
+    util.Effect( "dc_portal_implode", effectdata )
+    timer.Simple(1.254, function()
+        local ent = SpawnXenFlashNPC(npc,position)
+        sound.Play("ambient/levels/citadel/portal_beam_shoot1.wav", position)
+        local neweffect = EffectData() 
+        neweffect:SetOrigin( position ) 
+        util.Effect( "dc_portal_explode", neweffect )
+        effectdata:SetOrigin( position ) 
+        util.Effect( "dc_teleport_in", effectdata )
+        --timer.Simple(.5, function() ParticleEffectAttach("portal_seq_main",PATTACH_ABSORIGIN,ent,0) end)
+        return ent
+    end)
 end
