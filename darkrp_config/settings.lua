@@ -90,7 +90,7 @@ GM.Config.dynamicvoice                  = true
 -- earthquakes - Enable/disable earthquakes.
 GM.Config.earthquakes                   = false
 -- enablebuypistol - Turn /buy on of off.
-GM.Config.enablebuypistol               = false
+GM.Config.enablebuypistol               = true
 -- enforceplayermodel - Whether or not to force players to use their role-defined character models.
 GM.Config.enforceplayermodel            = true
 -- globalshow - Whether or not to display player info above players' heads in-game.
@@ -142,7 +142,7 @@ GM.Config.restrictallteams              = false
 -- restrictbuypistol - Enabling this feature makes /buy available only to Gun Dealers.
 GM.Config.restrictbuypistol             = true
 -- restrictdrop - Enable/disable restricting the weapons players can drop. Setting this to true disallows weapons from shipments from being dropped.
-GM.Config.restrictdrop                  = true
+GM.Config.restrictdrop                  = false
 -- revokeLicenseOnJobChange - Whether licenses are revoked when a player changes jobs.
 GM.Config.revokeLicenseOnJobChange      = true
 -- shouldResetLaws - Enable/Disable resetting the laws back to the default law set when the mayor changes.
@@ -154,7 +154,7 @@ GM.Config.telefromjail                  = true
 -- teletojail - Enable/disable teleporting to jail.
 GM.Config.teletojail                    = true
 -- unlockdoorsonstart - Enable/Disable unlocking all doors on map start.
-GM.Config.unlockdoorsonstart            = true
+GM.Config.unlockdoorsonstart            = false
 -- voiceradius - Enable/disable local voice chat.
 GM.Config.voiceradius                   = true
 -- tax - Whether players pay taxes on their wallets.
@@ -233,7 +233,7 @@ GM.Config.mprintamount                  = 250
 -- normalsalary - Sets the starting salary for newly joined players.
 GM.Config.normalsalary                  = 45
 -- npckillpay - Sets the money given for each NPC kill.
-GM.Config.npckillpay                    = 750
+GM.Config.npckillpay                    = 0
 -- paydelay - Sets how long it takes before people get salary.
 GM.Config.paydelay                      = math.huge
 -- pocketitems - Sets the amount of objects the pocket can carry.
