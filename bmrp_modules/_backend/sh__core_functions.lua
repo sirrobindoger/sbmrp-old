@@ -25,6 +25,9 @@ if SERVER then
 		DarkRP.defineChatCommand(command, func)
 	end
 
+	function ARitzDDMsg(...)
+		return -- ARitz can go fuck himself
+	end
 	function sBMRP.RemoveChatCommand(command)
 		if not command then error("Invalid parameters!") end
 		DarkRP.removeChatCommand(command)
