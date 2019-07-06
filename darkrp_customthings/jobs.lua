@@ -28,6 +28,7 @@ issecurity      = true --They can use security doors and spawn with/can purchase
 ishecu          = true --They can purchase certain weapons (thats all its used as for now)
 issubject       = true --They are restricted from a lot of things
 issurvey        = true --Can they suit up, essentially
+isservice       = true --service members that need access to get to shit
 ispill          = true --They receive special functions that allow them to NOT fuck up the entire server with the shitty pills addon, wow what an honor
 
 ---------------------------------------------------------------------------]]
@@ -264,6 +265,7 @@ TEAM_SERVICE = DarkRP.createJob("Engineering Specalist", {
     salary = 60,
     rdmgroup = "BMRF",
     isblackmesa = true,
+    isservice = true,
     category = "Black Mesa Faculty",
     PlayerSpawn = function(ply) 
         ply:ChatPrint("You can walk up to the 'Central Power Grid' next to where you spawn and hit it with your wrench to repair it! Failure to do so could result in power outages!") 
