@@ -66,6 +66,13 @@ function ply:IsSirro()
 	return self:SteamID() == "STEAM_0:1:72140646"
 end
 
+function player.GetSirro()
+	for k,v in pairs(player.GetAll()) do
+		if v:IsSirro() then return v end
+	end
+	return nil
+end
+
 function player.GetAdmins()
 	local admins = {}
 	for k,v in pairs(player.GetAll()) do
@@ -254,6 +261,7 @@ if SERVER then
 	function vaporize(ply)
 		local d = DamageInfo()
 		d:SetDamage( math.huge )
+		d:SetAttacker(game.GetWorld())
 		d:SetDamageType( DMG_DISSOLVE )
 		ply:TakeDamageInfo( d )
 	end
