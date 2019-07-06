@@ -1,6 +1,6 @@
 sBMRP.NPCs = sBMRP.NPCs || {}
 sBMRP.NPCs.Population = 20
-sBMRP.NPCs.Behavior = 1
+sBMRP.NPCs.Behavior = D_LI
 sBMRP.NPCs.Spawnlist = {
 	Vector(6393,-3341,383),
 	Vector(4109,-4067,110),
@@ -8,6 +8,14 @@ sBMRP.NPCs.Spawnlist = {
 	Vector(5631,-2696,86),
 	Vector(5893,-5913,49),
 	Vector(6745,-5404,75),
+}
+
+sBMRP.NPCs.Types = {
+	{"monster_alien_slv"},
+	{"monster_agrunt"},
+	{"monster_bullsquid"},
+	{"monster_hound_eye"},
+	{"npc_stukabat"}
 }
 --[[-------------------------------------------------------------------------
 Gronarch Boss fight
@@ -40,37 +48,37 @@ if SERVER then
 	Relationship Processesor
 	---------------------------------------------------------------------------]]
 	hook.Add("OnEntityCreated", "npc_logic", function(npc)
-		if not IsValid(npc) or not npc:IsNPC() or not npc.PrintName then return end
+		
 		timer.Simple(.5, function()
+			if not npc:IsNPC() or not npc.PrintName or not npc.bScripted then return end
 			for k,v in pairs(ents.GetAll()) do
 				if not IsValid(v) then continue end
-				if v:IsNPC() and v:GetClass() == npc:GetClass() then
-					npc:AddEntityRelationship(v,D_LI,99)
+				if v:IsNPC() and v:MapCreationID() then
+					npc:AddEntityRelationship(v,sBMRP.NPCs.Behavior,99)
 				elseif v:IsPlayer() and v:IsAlien() then
-					npc:AddEntityRelationship(v,D_LI,99)
+					npc:AddEntityRelationship(v,sBMRP.NPCs.Behavior,99)
 				elseif v:IsPlayer() and not v:IsAlien() then
 					if GetLocation(npc:GetPos()) == "Gonarch Lair" then continue end
-					if sBMRP.NPCs.Behavior >= 2 then
+					if not sBMRP.LocList.Xen[GetLocation(npc:GetPos())] then
 
 						npc:AddEntityRelationship(v,D_HT,99)
 					else
-						npc:AddEntityRelationship(v,D_LI,99)
+						npc:AddEntityRelationship(v,sBMRP.NPCs.Behavior,99)
 					end
 				end
 			end
-			npc:SetNPCState(NPC_STATE_NONE)
 		end)
 	end)
 
 	hook.Add("EntityTakeDamage", "npc_logic", function(npc, data)
+		if not npc:IsNPC() or not npc.PrintName or not npc.bScripted then return end
 		ply = data:GetAttacker()
-
 		if IsValid(ply) and ply:IsPlayer() then
 			npc:AddEntityRelationship(ply,D_HT,99)
 			for k,v in pairs(ents.FindInSphere(npc:GetPos(), 3000)) do
 				if IsValid(v) and v:IsNPC() then
 					v:AddEntityRelationship(ply,D_HT,99)
-					v:SetNPCState(NPC_STATE_COMBAT)
+					--v:SetSchedule(SCHED_BIG_FLINCH)
 				end
 			end
 		end
@@ -79,7 +87,6 @@ if SERVER then
 			for k,v in pairs(ents.FindInSphere(npc:GetPos(), 3000)) do
 				if IsValid(v) and v:IsNPC() then
 					v:AddEntityRelationship(ply,D_HT,99)
-					v:SetNPCState(NPC_STATE_COMBAT)
 				end
 			end			
 		end
@@ -103,7 +110,33 @@ if SERVER then
 		end
 		return xenjobcount, surveycount, npccount
 	end
-
+	timer.Create("bmrp_xen-population", 1, 0, function()
+		local xenjobcount,surveycount,npccount = sBMRP.GetXenPopulation()
+		if (xenjobcount > 1 or surveycount > 1) and not sBMRP.NPCs.Sterile then
+			if npccount < sBMRP.NPCs.Population then
+				sBMRP.PopulateXen(sBMRP.NPCs.Population-npccount)
+			end
+		elseif npccount > 0 then
+			for k,v in pairs(ents.GetAll()) do
+				if v:IsNPC() and v.PrintName and sBMRP.LocList.Xen[GetLocation(v:GetPos())] then
+					SpawnXenFlash(v:GetPos())
+					v:Remove()
+				end
+			end
+		end
+	end)
+	function sBMRP.PopulateXen(num)
+		local num = num or 1
+		Log('Spawing Xen NPC === ' .. num)
+		for i=num, 1, -1 do
+			local npcent = ents.Create(table.Random(sBMRP.NPCs.Types)[1])
+			if ( !IsValid( npcent ) ) then return end 
+			npcent:SetPos(DarkRP.findEmptyPos(table.Random(sBMRP.NPCs.Spawnlist),{},600, 30, Vector(34, 34, 64)))
+			npcent:Spawn()
+			SpawnXenFlash(npcent:GetPos())
+			npcent:Fire("startpatrolling")
+		end
+	end
 end
 
 if CLIENT then
