@@ -21,7 +21,7 @@ local function mapinit()
 	Sounds
 	---------------------------------------------------------------------------]]
 
-	for k,v in pairs({5201, 5198, 5197, 5205}) do
+	for k,v in pairs({5201, 5198, 5197, 5205, 5207}) do
 		SafeRemoveEntity(ents.GetMapCreatedEntity(v))
 	end
 	timer.Create("ambience-sound_fix", 1, 0, function()

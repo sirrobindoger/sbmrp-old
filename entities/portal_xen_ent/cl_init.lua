@@ -13,7 +13,7 @@ portalmat_entrance:SetTexture("$basetexture", tempMat:GetTexture("$basetexture")
 function ENT:Draw()
 	cam.Start3D() -- Start the 3D function so we can draw onto the screen.
 		local drawcolor = Color(255,255,255,255)
-		if self:GetHumanOrEventOnly()==true and LocalPlayer():IsAlien() and not(bmrp_xenallowed) then 
+		if self:GetHumanOrEventOnly()==true and LocalPlayer():IsAlien() and not(LocalPlayer():IsAllowedEarth()) then 
 			drawcolor = Color(255,0,0,255)
 		end
 		render.SetMaterial(portalmat_entrance)

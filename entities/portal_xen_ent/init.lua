@@ -29,9 +29,9 @@ function ENT:RebuildPhysics( value )
 end
 function ENT:StartTouch(ent)
 	if self:GetPlayersOnly() and not(ent:IsPlayer()) then return end
-	if self:GetSafeMode() and (ent:GetClass() == "physgun_beam" or ent:GetClass() =="sammyservers_textscreen" or ent:IsWorld() or ent:GetClass() == "prop_dynamic" or ent:IsConstrained()) then return end
+	if self:GetSafeMode() and (ent:GetClass() == "physgun_beam" or ent:GetClass() =="sammyservers_textscreen" or ent:IsWorld() or ent:GetClass() == "prop_dynamic" or ent:IsConstrained() or ent:MapCreationID() != -1) then return end
 	if table.HasValue(self.Blacklist,ent:GetModel()) or table.HasValue(self.Blacklist,ent:GetClass()) then return end
-	if self:GetHumanOrEventOnly() and ent:IsPlayer() and ent:IsAlien() then ent:ChatPrint(self.AlienBlockMsg) return end
+	if self:GetHumanOrEventOnly() and ent:IsPlayer() and ent:IsAlien() and not ent:IsAllowedEarth() then ent:ChatPrint(self.AlienBlockMsg) return end
 	
 	if self:GetTeleSound() then 
 		local telesound = self.TeleportSounds[math.random(1,#self.TeleportSounds )]
@@ -39,11 +39,12 @@ function ENT:StartTouch(ent)
 		timer.Simple(0.1,function() self:EmitSound(telesound) end)
 	end
 	local dest = self.Destination[ math.random( #self.Destination ) ]
-	if self:GetHumanOrEventOnly() and ent:IsPlayer() and ent:IsAlien() and (bmrpevent.cascade or bmrpevent.xenallowed) then 
+	if (ent:IsPlayer() and ent:IsAlien()) and (table.Count(self.AlienDestination) > 0) then
 		dest = self.AlienDestination[ math.random( #self.AlienDestination ) ]
 	end
 	ent:SetPos(dest[1])
 	if ent:IsPlayer() then
+		SpawnXenFlash(ent:GetPos())
 		ent:SetGravity(self.DestinationGravity)
 		ent:SetEyeAngles(dest[2])
 		if self:GetArrivalText() != "" then
