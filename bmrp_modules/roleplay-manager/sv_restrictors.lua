@@ -27,7 +27,7 @@ local xenlocations = {
 
 local function LocationChanged(ply, old, new)
 	if ply:IsAdmin() then return end 
-	if old == "Unknown" then return end
+	if old == "Unknown" or new == "Unknown" then return end
 	if new == "Rift" and not ply:IsAlien() and not ply:HasHEV() then
 		if not ply:IsAllowedXen() then
 			vaporize(ply)
@@ -41,10 +41,30 @@ local function LocationChanged(ply, old, new)
 			vaporize(ply)
 		end
 	end
-
 end
 
 hook.Add("PlayerChangedLocation", "bmrp_location", LocationChanged)
+
+
+function sBMRP.LocationScan()
+	for k,v in pairs(player.GetAll()) do
+		if v:IsAdmin() then continue end
+		local new = GetLocation(ply)
+		if sBMRP.LocList.Xen[new] and not ply:IsAlien() and not ply:HasHEV() then
+			if not ply:IsAllowedXen() then
+				vaporize(ply)
+			end
+		elseif ply:IsAlien() and not sBMRP.LocList.Xen[new] then
+			if not ply:IsAllowedEarth() then
+				vaporize(ply)
+			end
+		elseif ply:IsHECU() and not sBMRP.LocList.Topside[new] then
+			if not ply:IsAllowedBMRF() then
+				vaporize(ply)
+			end
+		end		
+	end
+end
 --[[-------------------------------------------------------------------------
 Weapon Restrict
 ---------------------------------------------------------------------------]]
