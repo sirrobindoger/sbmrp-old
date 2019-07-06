@@ -62,7 +62,7 @@ local function scanner(ply, ent)
 	end
 
 	if sciencedoors[mapid] then
-		if not ply:IsScience() or not ply:IsService() then
+		if not ply:IsScience() and not ply:IsService()then
 			ent:EmitSound("vox/access.wav", 45, 100)
 			ent:EmitSound("buttons/button2.wav", 80, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
