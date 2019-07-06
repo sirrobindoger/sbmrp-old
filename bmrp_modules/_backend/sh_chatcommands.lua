@@ -1,7 +1,7 @@
 --[[-------------------------------------------------------------------------
 sBMRP ChatCommand handler
 ---------------------------------------------------------------------------]]
-CATEGORY_NAME = "Black Mesa Roleplay"
+CATEGORY_NAME = "BMRP"
 -- Useless DarkRP commands
 DarkRP.removeChatCommand("addagenda")
 DarkRP.removeChatCommand("addlaw")
@@ -44,7 +44,7 @@ function ulx.setvox(calling_ply, state)
 	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the VOX state to #s",calling_ply, state)
 end
 
-local setvox = ulx.command( CATEGORY_NAME, "ulx setvox", ulx.setvox, nil, false, false)
+local setvox = ulx.command( CATEGORY_NAME .. " - Chat", "ulx setvox", ulx.setvox, nil, false, false)
 setvox:addParam{ type=ULib.cmds.StringArg, completes=StateDisclaimers, hint="Vox Alert State", error="invalid state \"%s\" specified", ULib.cmds.restrictToCompletes }
 setvox:defaultAccess( ULib.ACCESS_ADMIN)
 setvox:help( "Sets the vox state." )
@@ -54,7 +54,7 @@ function ulx.voxtime(calling_ply, time)
 	sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
 	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the VOX time interval to #i seconds",calling_ply, time)
 end
-local voxtime = ulx.command(CATEGORY_NAME, "ulx voxtime", ulx.voxtime, nil, false, false )
+local voxtime = ulx.command(CATEGORY_NAME .. " - Chat", "ulx voxtime", ulx.voxtime, nil, false, false )
 voxtime:addParam{type=ULib.cmds.NumArg, min=10, max=720,default=60,hint="time(seconds)",ULib.cmds.round}
 voxtime:defaultAccess(ULib.ACCESS_ADMIN)
 voxtime:help("Sets the vox time in seconds.")
@@ -123,7 +123,7 @@ function ulx.toggleannounce(calling_ply, args)
 		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P enabled the announcement system.",calling_ply)
 	end
 end
-local toggleannounce = ulx.command(CATEGORY_NAME, "ulx toggleannounce", ulx.toggleannounce, "!toggleannounce", true, false )
+local toggleannounce = ulx.command(CATEGORY_NAME .. " - Chat", "ulx toggleannounce", ulx.toggleannounce, "!toggleannounce", true, false )
 toggleannounce:defaultAccess(ULib.ACCESS_ADMIN)
 toggleannounce:help("Disable or enable the announcement system.")
 
@@ -152,7 +152,7 @@ function ulx.DisableBuilding(calling_ply)
 		end
 	end
 end
-local DisableBuilding = ulx.command(CATEGORY_NAME, "ulx disablebuilding", ulx.DisableBuilding, "!disablebuilding", true, false)
+local DisableBuilding = ulx.command(CATEGORY_NAME .. " - Map", "ulx disablebuilding", ulx.DisableBuilding, "!disablebuilding", true, false)
 DisableBuilding:defaultAccess(ULib.ACCESS_ADMIN)
 DisableBuilding:help("Enable or disable propspawing and toolgun usage.")
 
@@ -186,7 +186,7 @@ function ulx.allowsinglexenian(calling_ply, target_ply, disallow)
 		hook.Add(k, "sBMRP.EarthRestrictPerms", resetperms)
 	end
 end
-local allowsinglexenian = ulx.command(CATEGORY_NAME, "ulx allowsinglexenian", ulx.allowsinglexenian, "!allowsinglexenian", true, false)
+local allowsinglexenian = ulx.command(CATEGORY_NAME .. " - Players", "ulx allowsinglexenian", ulx.allowsinglexenian, "!allowsinglexenian", true, false)
 allowsinglexenian:addParam{ type=ULib.cmds.PlayersArg }
 allowsinglexenian:addParam{ type=ULib.cmds.BoolArg, invisible=true}
 allowsinglexenian:defaultAccess(ULib.ACCESS_ADMIN)
@@ -220,12 +220,102 @@ function ulx.allowsinglehecu(calling_ply, target_ply, disallow)
 		hook.Add(k, "sBMRP.AllowToBMRF", resetperms)
 	end
 end
-local allowsinglehecu = ulx.command(CATEGORY_NAME, "ulx allowsinglehecu", ulx.allowsinglehecu, "!allowsinglehecu", true, false)
+local allowsinglehecu = ulx.command(CATEGORY_NAME.. " - Players", "ulx allowsinglehecu", ulx.allowsinglehecu, "!allowsinglehecu", true, false)
 allowsinglehecu:addParam{ type=ULib.cmds.PlayersArg }
 allowsinglehecu:addParam{ type=ULib.cmds.BoolArg, invisible=true}
 allowsinglehecu:defaultAccess(ULib.ACCESS_ADMIN)
 allowsinglehecu:help("Allow the temporary access of a HECU player, will auto revoke on death/teamchange.")
 allowsinglehecu:setOpposite( "ulx unallowsinglehecu", {_, _, true}, "!unallowsinglehecu" )
+
+--[[-------------------------------------------------------------------------
+Allow ALL xenians/hecu
+---------------------------------------------------------------------------]]
+
+function ulx.AllowAllHECU(calling_ply)	
+	if not sBMRP.AllowHECUToBMRF then
+	    sBMRP.AllowHECUToBMRF = true
+		ulx.fancyLog( player.GetAll(), "#P allowed HECU's entry into BMRF!",calling_ply)
+	else
+	    sBMRP.AllowHECUToBMRF = false
+	    sBMRP.LocationScan()
+		ulx.fancyLog( player.GetAll(), "#P revoked HECU's entry into BMRF.",calling_ply)
+	end
+end
+local AllowAllHECU = ulx.command(CATEGORY_NAME .. " - Players", "ulx allowallhecu", ulx.AllowAllHECU, "!allowallhecu", true, false)
+AllowAllHECU:defaultAccess(ULib.ACCESS_ADMIN)
+AllowAllHECU:help("Enable or disable HECU's entry into BMRF.")
+
+function ulx.AllowAllXenians(calling_ply)	
+	if not sBMRP.ToEarthAllowAll then
+	    sBMRP.ToEarthAllowAll = true
+		ulx.fancyLog( player.GetAll(), "#P allowed Xenian's entry into Earth!",calling_ply)
+	else
+	    sBMRP.ToEarthAllowAll = false
+	    sBMRP.LocationScan()
+		ulx.fancyLog( player.GetAll(), "#P revoked Xenian's entry into Earth.",calling_ply)
+	end
+end
+local AllowAllXenians = ulx.command(CATEGORY_NAME .. " - Players", "ulx allowallxenians", ulx.AllowAllXenians, "!allowallxenians", true, false)
+AllowAllXenians:defaultAccess(ULib.ACCESS_ADMIN)
+AllowAllXenians:help("Enable or disable Xenian's entry into Earth.")
+
+
+--[[-------------------------------------------------------------------------
+NPC XEN SHIT
+---------------------------------------------------------------------------]]
+function ulx.npcpopulation(calling_ply, pop)
+	local population = tonumber(pop)
+	if population == 0 then
+		sBMRP.NPCs.Sterile = true
+		sBMRP.NPCs.Population = 0
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P disabled the spawning of xenian NPCs",calling_ply)
+	else
+		sBMRP.NPCs.Sterile = false
+		sBMRP.NPCs.Population = population
+		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the xenian population to #i",calling_ply, population)
+		for k,v in pairs(ents.GetAll()) do
+			if v:IsNPC() and v.PrintName and sBMRP.LocList.Xen[GetLocation(v:GetPos())] then
+				SpawnXenFlash(v:GetPos())
+				v:Remove()
+			end
+		end
+	end
+	
+end
+local npcpopulation = ulx.command(CATEGORY_NAME .. " - Map", "ulx npcpopulation", ulx.npcpopulation, nil, false, false )
+npcpopulation:addParam{type=ULib.cmds.NumArg, min=0, max=20,default=20,hint="Amount of NPCs",ULib.cmds.round}
+npcpopulation:defaultAccess(ULib.ACCESS_ADMIN)
+npcpopulation:help("Sets NPC Population in xen, 0 to disable spawning.")
+
+local behaviors = { -- don't ask
+	["hostile"] = D_HT,
+	["fear"] = D_FR,
+	["neutral"] = D_NU,
+	["like"] = D_LI,
+}
+
+local titles = {
+	"hostile",
+	"fear",
+	"neutral",
+	"like"
+}
+
+function ulx.xenbehavior(calling_ply, state)
+	sBMRP.NPCs.Behavior = behaviors[state]
+	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the Xenian NPC's state to #s",calling_ply, state)
+	for k,v in pairs(ents.GetAll()) do
+		if v:IsNPC() and v.PrintName and sBMRP.LocList.Xen[GetLocation(v:GetPos())] then
+			SpawnXenFlash(v:GetPos())
+			v:Remove()
+		end
+	end
+end
+
+local xenbehavior = ulx.command( CATEGORY_NAME  .. " - Map", "ulx xenbehavior", ulx.xenbehavior, nil, false, false)
+xenbehavior:addParam{ type=ULib.cmds.StringArg, completes=titles, hint="Xen NPC's Behavior", error="invalid state \"%s\" specified", ULib.cmds.restrictToCompletes }
+xenbehavior:defaultAccess( ULib.ACCESS_ADMIN)
+xenbehavior:help( "Sets the xenian NPC's behavior towards humans." )
 
 --[[-------------------------------------------------------------------------
 LOOC
@@ -342,7 +432,7 @@ function ulx.gmantime(ply, args)
 		ply:ChatPrint("You are not admin!")
 	end
 end
-local gmantime = ulx.command(CATEGORY_NAME, "ulx gmantime", ulx.gmantime, "!gmantime", true, false)
+local gmantime = ulx.command(CATEGORY_NAME .. " - Players", "ulx gmantime", ulx.gmantime, "!gmantime", true, false)
 gmantime:defaultAccess(ULib.ACCESS_ADMIN)
 gmantime:help("Is it really that time again?")
 
@@ -386,7 +476,7 @@ function ulx.tram(calling_ply)
 	end
 end
 
-tram = ulx.command(CATEGORY_NAME, "ulx tram", ulx.tram, "!tram", true, false)
+tram = ulx.command(CATEGORY_NAME .. " - Map", "ulx tram", ulx.tram, "!tram", true, false)
 tram:defaultAccess(ULib.ACCESS_ADMIN)
 tram:help("Toggle the tram to be broken or working.")
 
@@ -404,7 +494,7 @@ function ulx.ragdolls(calling_ply)
 		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P cleared all corpses.",calling_ply)
 	end)
 end
-ragdolls = ulx.command(CATEGORY_NAME, "ulx ragdolls", ulx.ragdolls, "!ragdolls", true, false)
+ragdolls = ulx.command(CATEGORY_NAME .. " - Map", "ulx ragdolls", ulx.ragdolls, "!ragdolls", true, false)
 ragdolls:defaultAccess(ULib.ACCESS_ADMIN)
 ragdolls:help("Remove Ragdolls.")
 
