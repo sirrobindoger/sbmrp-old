@@ -190,7 +190,7 @@ TEAM_SURVEY_CATCHER = DarkRP.createJob("Survey Specimen Extractor",{
 	color = Color(255, 153, 0, 255),
 	model = Scientistmodels,
 	description = [[Your job is to find and extract Xenian specimens for the bio sector back on Earth.]],
-	weapons = {},
+	weapons = {"weapon_leash_survey"},
 	command = "surveycatcher",
 	max = 3,
 	salary = 50,
@@ -465,7 +465,7 @@ TEAM_BIO_HEAD = DarkRP.createJob("Head Bio Researcher", {
         "models/hazmatcitizens/p_hazmatmale03.mdl"
     },
     description = [[You are the head of the Bio Sector, you have access to all the labs & can activate certain facility functions.]],
-    weapons = {"taser","cage","weapon_leash_bio"},
+    weapons = {"taser","cage","weapon_leash_bio", "copsbracelet"},
     command = "headbioresearcher",
     max = 4,
     admin = 0,
@@ -490,7 +490,7 @@ TEAM_BIO = DarkRP.createJob("Bio Researcher", {
         "models/hazmatcitizens/p_hazmatmale03.mdl"
     },
     description = [[Run experiments on your subjects, handle hazerdous materials.]],
-    weapons = {"taser","cage","weapon_leash_bio"},
+    weapons = {"taser","cage","weapon_leash_bio", "copsbracelet"},
     command = "bioresearcher",
     max = 4,
     admin = 0,

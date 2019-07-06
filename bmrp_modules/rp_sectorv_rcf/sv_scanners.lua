@@ -72,6 +72,7 @@ local function scanner(ply, ent)
 		end
 	elseif blackmesadoors[mapid] then
 		if not ply:IsBlackMesa() then
+			if ply:IsHECU() and sBMRP.AllowHECUToBMRF then return end
 			ent:EmitSound("vox/access.wav", 45, 100)
 			ent:EmitSound("buttons/button2.wav", 80, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
