@@ -45,7 +45,7 @@ DarkRP.createEntity("Crystal Storage", {
 	cmd = "buycrystalstorage",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_storage" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 DarkRP.createEntity("Crystal Analzyer", {
@@ -56,7 +56,7 @@ DarkRP.createEntity("Crystal Analzyer", {
 	cmd = "buycrystalanalyzer",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_analyzer" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -68,7 +68,7 @@ DarkRP.createEntity("Crystal Exporter", {
 	cmd = "buycrystalexporter",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "crystal_sale_machine" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -80,7 +80,7 @@ DarkRP.createEntity("Crystal Exporter Console", {
 	cmd = "buycrystalexporterconsole",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "crystal_sale_console" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 /*
@@ -92,7 +92,7 @@ DarkRP.createEntity("Universal Tester", {
 	cmd = "buyuniversaltester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_universal" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 */
@@ -104,7 +104,7 @@ DarkRP.createEntity("Ballistic Tester", {
 	cmd = "buyballistictester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_bullet" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -116,7 +116,7 @@ DarkRP.createEntity("Force Tester", {
 	cmd = "buybluntforcetester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_melee" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -128,7 +128,7 @@ DarkRP.createEntity("Stability Tester", {
 	cmd = "buyexplosivetester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_explosion" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -140,7 +140,7 @@ DarkRP.createEntity("Gravity Tester", {
 	cmd = "buygravitytester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_gravity" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -152,7 +152,7 @@ DarkRP.createEntity("Laser Tester", {
 	cmd = "buylasertester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_burn" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -164,7 +164,7 @@ DarkRP.createEntity("Organic Tester", {
 	cmd = "buypersontester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_player" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -176,7 +176,7 @@ DarkRP.createEntity("Timed Tester", {
 	cmd = "buytimedtester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_think" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -188,7 +188,7 @@ DarkRP.createEntity("Water Tester", {
 	cmd = "buywatertester",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "tester_water" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_CRYSTALSSPECIALIST,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Research Equipment"
 })
 
@@ -201,7 +201,7 @@ DarkRP.createEntity("Guncrafting Machine", {
 	cmd = "buyguncraftingbench",
 	allowTools = true,
 	spawn = function(ply, tr, tblEnt) local entr = ents.Create( "guncrafting_bench" ) entr:CPPISetOwner(ply)entr.SID = ply.SID entr.OwnerID = ply:SteamID() entr:SetPos( tr.HitPos + tr.HitNormal * 16 ) entr:Spawn() entr:Activate() return entr end,
-	allowed = TEAM_WEAPONSDEVELOPMENT,
+	allowed = {TEAM_RESEARCH, TEAM_HEAD_SCIENTIST},
 	category = "Weapon Manufacturer"
 })
 
