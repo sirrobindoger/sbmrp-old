@@ -111,8 +111,8 @@ Functions to allow/disallow a spesific player to x location
 ---------------------------------------------------------------------------]]
 
 function ply:AllowToXen(bool)
-	if ply:IsAlien() then
-		Log("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s xen permissions when they are a xenian!")
+	if self:IsAlien() then
+		Log("Trying to override " .. self:GetName() .. "/" .. self:Team() .. "'s xen permissions when they are a xenian!")
 		return
 	end
 	if bool then
@@ -123,8 +123,8 @@ function ply:AllowToXen(bool)
 end
 
 function ply:AllowToEarth(bool)
-	if not ply:IsAlien() then
-		Log("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s earth permissions when they aren't a xenian!")
+	if not self:IsAlien() then
+		Log("Trying to override " .. self:GetName() .. "/" .. self:Team() .. "'s earth permissions when they aren't a xenian!")
 		return
 	end
 	if bool then
@@ -135,8 +135,8 @@ function ply:AllowToEarth(bool)
 end
 
 function ply:AllowToBMRF(bool)
-	if not ply:IsHECU() then
-		Log("Trying to override " .. ply:GetName() .. "/" .. ply:Team() .. "'s BMRF permissions when they aren't a HECU!")
+	if not self:IsHECU() then
+		Log("Trying to override " .. self:GetName() .. "/" .. self:Team() .. "'s BMRF permissions when they aren't a HECU!")
 		return
 	end
 	if bool then

@@ -169,20 +169,20 @@ function ulx.allowsinglexenian(calling_ply, target_ply, disallow)
 	end
 	local recepients = table.insert(player.GetAdmins(), target)
 	if not disallow then
-		ply:AllowToEarth(true)
+		target:AllowToEarth(true)
 		ulx.fancyLog( {unpack(player.GetAdmins()), target}, "#P gave #P permission go to earth.",calling_ply, target)
 	else
 		ulx.fancyLog({unpack(player.GetAdmins()), target}, "#P revoked #P's permission to go earth.",calling_ply, target)
-		ply:AllowToEarth(false)
+		target:AllowToEarth(false)
 	end
 
 	local function resetperms(ply)
-		ply:AllowToEarth(false)
-		for k,v in pairs("PlayerDeath", "OnPlayerChangedTeam") do
+		target:AllowToEarth(false)
+		for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
 			hook.Remove(k, "sBMRP.EarthRestrictPerms")
 		end
 	end
-	for k,v in pairs("PlayerDeath", "OnPlayerChangedTeam") do
+	for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
 		hook.Add(k, "sBMRP.EarthRestrictPerms", resetperms)
 	end
 end
@@ -203,20 +203,20 @@ function ulx.allowsinglehecu(calling_ply, target_ply, disallow)
 		return
 	end
 	if not disallow then
-		ply:AllowToBMRF(true)
+		target:AllowToBMRF(true)
 		ulx.fancyLog( {unpack(player.GetAdmins()), target}, "#P gave #P permission go to earth.",calling_ply, target)
 	else
 		ulx.fancyLog( {unpack(player.GetAdmins()), target}, "#P revoked #P's permission to go earth.",calling_ply, target)
-		ply:AllowToBMRF(false)
+		target:AllowToBMRF(false)
 	end
 
 	local function resetperms(ply)
-		ply:AllowToBMRF(false)
-		for k,v in pairs("PlayerDeath", "OnPlayerChangedTeam") do
+		target:AllowToBMRF(false)
+		for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
 			hook.Remove(k, "sBMRP.AllowToBMRF")
 		end
 	end
-	for k,v in pairs("PlayerDeath", "OnPlayerChangedTeam") do
+	for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
 		hook.Add(k, "sBMRP.AllowToBMRF", resetperms)
 	end
 end
