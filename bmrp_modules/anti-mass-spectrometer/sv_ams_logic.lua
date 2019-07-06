@@ -26,7 +26,7 @@ Delcaring a fuckton of varibles
 ---------------------------------------------------------------------------]]
 
 
-local TestingFunctions = {
+local MetaStates = {
     ["func_door"] = function( self )
         return ( self:GetSaveTable().m_toggle_state == 0 )
     end,
@@ -42,7 +42,7 @@ local TestingFunctions = {
 }
 
 function IsActivated( door ) -- this is pretty useful
-    local func = TestingFunctions[door:GetClass()]
+    local func = MetaStates[door:GetClass()]
     if func then
         return func( door )
     end
