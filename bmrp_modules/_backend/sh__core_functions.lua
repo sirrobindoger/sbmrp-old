@@ -88,6 +88,10 @@ if SERVER then
 			v:ChatPrint(text)
 		end
 	end
+	function EntID(ent)
+		if not IsValid(ents.GetMapCreatedEntity(ent)) then return end
+		return ents.GetMapCreatedEntity(ent)
+	end
 end
 
 
@@ -243,4 +247,14 @@ function GetLocationRaw(recpos)
 		end
 	end
 	return location
+end
+
+
+if SERVER then
+	function vaporize(ply)
+		local d = DamageInfo()
+		d:SetDamage( math.huge )
+		d:SetDamageType( DMG_DISSOLVE )
+		ply:TakeDamageInfo( d )
+	end
 end
