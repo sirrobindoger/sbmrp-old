@@ -46,6 +46,12 @@ function ply:IsBio()
 	else return false end
 end
 
+function ply:IsService()
+	if (self:getJobTable()["isservice"]) then
+		return true
+	else return false end
+end
+
 function ply:IsSecurity()
 	if (self:getJobTable()["issecurity"]) then
 		return true
