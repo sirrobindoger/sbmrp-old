@@ -78,7 +78,7 @@ if SERVER then
 	hook.Add("PlayerUse", "sirro_debug", function(ply, ent)
 		if not IsValid(ent) or not IsValid(ply) or not IsFirstTimePredicted() then return end
 		if sBMRP.Debug and ply:IsSirro() then
-			ply:ChatPrint(ent:MapCreationID() .. "\nName: " ..  ent:MapCreationID() .. "\nAngs:" .. util.TypeToString(ent:GetAngles()) .. "\nPOS:" .. util.TypeToString(ent:GetPos()) .. "\nMODEL:" .. ent:GetModel())
+			ply:ChatPrint(ent:GetName() .. "\nName: " ..  ent:MapCreationID() .. "\nAngs:" .. util.TypeToString(ent:GetAngles()) .. "\nPOS:" .. util.TypeToString(ent:GetPos()) .. "\nMODEL:" .. ent:GetModel())
 		end
 	end)
 end
