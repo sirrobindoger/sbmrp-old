@@ -61,6 +61,7 @@ if CLIENT then
 	end)
 end
 
+concommand.Add("animprop_selectname", function() return end)
 
 function ply:IsSirro()
 	return self:SteamID() == "STEAM_0:1:72140646"
