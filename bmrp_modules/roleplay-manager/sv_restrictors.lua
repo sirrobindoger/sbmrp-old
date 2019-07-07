@@ -49,9 +49,11 @@ hook.Add("PlayerChangedLocation", "bmrp_location", LocationChanged)
 function sBMRP.LocationScan()
 	for k,v in pairs(player.GetAll()) do
 		if v:IsAdmin() then continue end
+		local ply = v 
 		local new = GetLocation(ply)
 		if sBMRP.LocList.Xen[new] and not ply:IsAlien() and not ply:HasHEV() then
 			if not ply:IsAllowedXen() then
+
 				vaporize(ply)
 			end
 		elseif ply:IsAlien() and not sBMRP.LocList.Xen[new] then
