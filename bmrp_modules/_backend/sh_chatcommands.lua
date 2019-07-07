@@ -174,6 +174,7 @@ function ulx.allowsinglexenian(calling_ply, target_ply, disallow)
 	else
 		ulx.fancyLog({unpack(player.GetAdmins()), target}, "#P revoked #P's permission to go earth.",calling_ply, target)
 		target:AllowToEarth(false)
+		sBMRP.LocationScan()
 	end
 
 	local function resetperms(ply)
@@ -208,6 +209,7 @@ function ulx.allowsinglehecu(calling_ply, target_ply, disallow)
 	else
 		ulx.fancyLog( {unpack(player.GetAdmins()), target}, "#P revoked #P's permission to go earth.",calling_ply, target)
 		target:AllowToBMRF(false)
+		sBMRP.LocationScan()
 	end
 
 	local function resetperms(ply)
@@ -237,6 +239,9 @@ function ulx.AllowAllHECU(calling_ply)
 		ulx.fancyLog( player.GetAll(), "#P allowed HECU's entry into BMRF!",calling_ply)
 	else
 	    sBMRP.AllowHECUToBMRF = false
+	    for k,v in pairs(player.GetAll()) do
+	    	v:AllowToBMRF(false)
+	    end
 	    sBMRP.LocationScan()
 		ulx.fancyLog( player.GetAll(), "#P revoked HECU's entry into BMRF.",calling_ply)
 	end
@@ -246,11 +251,14 @@ AllowAllHECU:defaultAccess(ULib.ACCESS_ADMIN)
 AllowAllHECU:help("Enable or disable HECU's entry into BMRF.")
 
 function ulx.AllowAllXenians(calling_ply)	
-	if not sBMRP.ToEarthAllowAll then
-	    sBMRP.ToEarthAllowAll = true
+	if not sBMRP.AllowEarthToXen then
+	    sBMRP.AllowEarthToXen = true
 		ulx.fancyLog( player.GetAll(), "#P allowed Xenian's entry into Earth!",calling_ply)
 	else
-	    sBMRP.ToEarthAllowAll = false
+	    sBMRP.AllowEarthToXen = false 
+	    for k,v in pairs(player.GetAll()) do
+	    	v:AllowToEarth(false)
+	    end
 	    sBMRP.LocationScan()
 		ulx.fancyLog( player.GetAll(), "#P revoked Xenian's entry into Earth.",calling_ply)
 	end
@@ -437,6 +445,22 @@ gmantime:defaultAccess(ULib.ACCESS_ADMIN)
 gmantime:help("Is it really that time again?")
 
 --[[-------------------------------------------------------------------------
+Anti RDM
+---------------------------------------------------------------------------]]
+function ulx.antirdm(calling_ply)	
+	if not sBMRP.AntiRDM then
+	    sBMRP.AntiRDM = true
+		ulx.fancyLog( player.GetAll(), "#P enabled the AntiRDM Field.",calling_ply)
+	else
+	    sBMRP.AntiRDM = false
+		ulx.fancyLog( player.GetAll(), "#P disabled the AntiRDM Field.",calling_ply)
+	end
+end
+local antirdm = ulx.command(CATEGORY_NAME .. " - Players", "ulx antirdm", ulx.antirdm, "!antirdm", true, false)
+antirdm:defaultAccess(ULib.ACCESS_ADMIN)
+antirdm:help("Toggle AntiRDM.")
+
+--[[-------------------------------------------------------------------------
 Tram
 ---------------------------------------------------------------------------]]
 sBMRP.TramState = true
@@ -497,6 +521,59 @@ end
 ragdolls = ulx.command(CATEGORY_NAME .. " - Map", "ulx ragdolls", ulx.ragdolls, "!ragdolls", true, false)
 ragdolls:defaultAccess(ULib.ACCESS_ADMIN)
 ragdolls:help("Remove Ragdolls.")
+--[[-------------------------------------------------------------------------
+ClearFire
+---------------------------------------------------------------------------]]
+function ulx.clearfire(calling_ply)
+	RunConsoleCommand( "vfire_remove_all")
+
+	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P cleared all fire.",calling_ply)
+
+end
+clearfire = ulx.command(CATEGORY_NAME .. " - Map", "ulx clearfire", ulx.clearfire, "!clearfire", true, false)
+clearfire:defaultAccess(ULib.ACCESS_ADMIN)
+clearfire:help("Remove fire.")
+
+--[[-------------------------------------------------------------------------
+Lockdown
+---------------------------------------------------------------------------]]
+
+local goodgroups = table.ValuesToKeys({
+	"superadmin",
+	"staff",
+	"trialstaff",
+})
+function ulx.lockdown(calling_ply, shouldkick, unlockdown)
+	if shouldkick then
+		for k,v in pairs(player.GetAll()) do
+			if not v:IsAdmin() then 
+				v:Kick("Server is entering into a lockdown state.\nOnly admins may enter at this time.\nhttps://sbmrp.com/discord")
+			end
+		end
+	end
+	if not unlockdown then
+		--RunConsoleCommand("sv_password","Sirro2.0")
+		hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, clpass, name)
+			local steamid = util.SteamIDFrom64(steamid)
+			if not ULib.ucl.users[steamid] || not ULib.ucl.users[steamid].group || not goodgroups[ULib.ucl.users[steamid].group] then
+				Log("[" .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp ) .. "] " .. name .. "/" .. steamid .. " attempted to connect, but has invalid permissions. ")
+				return false, "--==Access Restricted: Unauthorized Usergroup.==--\n\nThe server is currently in lockdown.\nTo learn more please visit sbmrp.com/discord\n\nsCON | " .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp )
+			end
+		end)
+		ulx.fancyLog( player.GetAll(), "#P activated server lockdown.",calling_ply)
+	else
+		hook.Remove("CheckPassword", "bmrp_password-check")
+		--RunConsoleCommand("sv_password","")
+		ulx.fancyLog( player.GetAll(), "#P removed server lockdown.",calling_ply)
+	end
+
+end
+lockdown = ulx.command(CATEGORY_NAME .. " - Players", "ulx lockdown", ulx.lockdown, "!lockdown", true, false)
+lockdown:addParam{ type=ULib.cmds.BoolArg, hint="Kick non-admins?" }
+lockdown:addParam{ type=ULib.cmds.BoolArg, invisible=true}
+lockdown:defaultAccess(ULib.ACCESS_SUPERADMIN)
+lockdown:setOpposite( "ulx unlockdown", {_, _, true}, "!unlockdown" )
+lockdown:help("Locks down the server.")
 
 --[[-------------------------------------------------------------------------
 ADMIN HELP NOTIFER
@@ -584,9 +661,3 @@ local function ChatNotifier ( ply, txt, public )
 	end
 end
 hook.Add( "PlayerSay", "bmrp_chatnotifier", ChatNotifier)
-
-
-
-
-
-
