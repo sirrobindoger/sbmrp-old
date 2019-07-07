@@ -1,5 +1,5 @@
 sBMRP.NPCs = sBMRP.NPCs || {}
-sBMRP.NPCs.Population = 20
+sBMRP.NPCs.Population = 0
 sBMRP.NPCs.Behavior = D_LI
 sBMRP.NPCs.Spawnlist = {
 	Vector(6393,-3341,383),
@@ -142,6 +142,7 @@ end
 if CLIENT then
 	local NoUseNPCs = {
 		["cycler"] = true,
+		["animprop_generic"] = true,
 
 	}
 	local npchud = sBMRP.AppendFont("bossfight", ScreenScale(10))
