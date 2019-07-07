@@ -4,7 +4,7 @@ sBMRP -- Coded by Sirro, Fay and Creed et al.
 ---------------------------------------------------------------------------]]
 sBMRP = sBMRP || {}
 sBMRP.LoadedModules = sBMRP.LoadedModules || {}
-sBMRP.version = "2.0"
+sBMRP.version = "2.1"
 
 hook.Add("Initialize", "bmrp_core_init", function() -- Loads this code after DarkRP loads.
 	if SERVER then
