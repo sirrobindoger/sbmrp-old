@@ -170,8 +170,12 @@ local function OnLabBuy(ply, door)
 	if not sBMRP.Labs[door.LabName] then return end
 	if table.Count(ply:GetOwnedDoors()) > 0 then
 		return false, "You already own a lab!"
-	elseif !ply:IsScience() then
+	elseif !ply:IsScience() and !ply:IsBio() then
 		return false, "Only Scientists can own a lab!"
+	elseif not ply:IsBio() and sBMRP.LocList.Biosector[GetLocation(door:GetPos())] then
+		return false, "Only Bio Researchers can own these labs!"
+	elseif ply:IsBio() and not sBMRP.LocList.Biosector[GetLocation(door:GetPos())] then
+		return false, "You can only own a lab within the biosector!"
 	elseif ply:Team() == TEAM_ASSOCIATE then
 		if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
 			return false, "Interns cannot own a lab. You can co-own one with a scientist!"
