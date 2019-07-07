@@ -46,6 +46,7 @@ if game.GetMap() == "rp_sectorc_s" then
 	table.insert(sBMRP.locationnames,{"Topside Parking Lot",Vector(-6674.695313, -1600.678711, 486.844330),Vector(-3730.725098, -4524.578125, 997.631897)})
 	table.insert(sBMRP.locationnames,{"Sector H",Vector(-6044.6728515625,994.28479003906,1282.7595214844),Vector(-9646.9599609375,-426.29504394531,545.421875)})
 	table.insert(sBMRP.locationnames,{"Topside Tram Station",Vector(-413.104828, -2111.416748, 1381.952515),Vector(-2676.043213, -3573.435547, 50.428474)})
+
 	table.insert(sBMRP.locationnames,{"Topside Lobby",Vector(-10927.525391, -443.453094, 1080.224121),Vector(-9334.310547, -1456.305054, 283.680664)})
 	table.insert(sBMRP.locationnames,{"Parking Lot Elevator",Vector(-4774.485840, -3776.471680, 850.410217),Vector(-4964.471191, -3574.090576, -82.026550)})
 	table.insert(sBMRP.locationnames,{"Topside Underground",Vector(-4365.741699, -4053.309814, 50.468201),Vector(-5437.611816, -383.447540, 336.467896)})
@@ -95,8 +96,11 @@ if game.GetMap() == "rp_sectorc_s" then
 	table.insert(sBMRP.locationnames,{"Sector D Atrium",Vector(-6150.604004, -2202.554688, 457.409790),Vector(-7008.967773, -1441.504272, -400.323151)})
 	table.insert(sBMRP.locationnames,{"Sector D Conference Room",Vector(-7024.562012, -2200.279297, -128.316818),Vector(-7262.903809, -1437.356201, -291.812469)})
 	table.insert(sBMRP.locationnames,{"Sector D Tram Station",Vector(-5796.801270, -3291.895752, 304.328339),Vector(-7749.785156, -5058.060547, -368.289490)})
+	table.insert(sBMRP.locationnames,{"Sector D Silo",Vector(-8234.9296875,-5442.9111328125,228.21224975586),Vector(-7299.3432617188,-4890.89453125,-392.75390625)})
+
 	table.insert(sBMRP.locationnames,{"Sector D Elevator",Vector(-6405.660156, -5344.047852, -88.971130),Vector(-6747.342285, -5011.734863, -1165.615967)})
 	table.insert(sBMRP.locationnames,{"Old Storage Facility",Vector(-6460.409180, -1913.391846, -488.057251),Vector(-10313.464844, -6267.962402, -1796.778564)})
+	table.insert(sBMRP.locationnames,{"Cliff face",Vector(-6900,-4400.1127929688,1254.3145751953),Vector(-2998.5732421875,-6328.6396484375,-504.36749267578)})
 
 		table.insert(sBMRP.locationnames,{"Sector D",Vector(-5977.900879, -1426.087158, 470.736755),Vector(-7021.045410, -3295.386475, -255.406372)})
 	
