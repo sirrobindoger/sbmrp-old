@@ -181,8 +181,8 @@ if CLIENT then
 			if diff < 0 then
 				boxlength = boxlength + math.abs(diff)
 			end	
-			surface.SetTextPos(ScrW()*(753/1280), 0 )
-			surface.DrawText(textsize .. "(DEBUG)")
+--			surface.SetTextPos(ScrW()*(753/1280), 0 )
+--			surface.DrawText(textsize .. "(DEBUG)")
 			local healthpercent = npc:Health()/npc:GetMaxHealth()
 			-- Background	
 			surface.SetDrawColor( 0, 0, 0, 255 )
