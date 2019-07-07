@@ -28,7 +28,28 @@ function GetLocation(recpos)
 	end
 	return location
 end
-
+if SERVER then
+	hook.Add( "PlayerNoClip", "isInNoClip", function( ply, desiredNoClipState )
+	    if ply:IsAdmin() then
+	        if desiredNoClipState == true then
+	            ply:GodEnable()
+	            ply:SetNoTarget(true)
+	--            timer.Simple(.1, function() Zap(ply) end)
+	            RunConsoleCommand( "fadmin", "cloak", ply:SteamID())
+	            RunConsoleCommand("ulx","cloak", ply:GetName())
+	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Enabled")
+	        end
+	        if desiredNoClipState == false then
+	            ply:GodDisable()
+	--            timer.Simple(.1, function() Zap(ply) end)
+	            ply:SetNoTarget(false)
+	            RunConsoleCommand( "fadmin", "uncloak", ply:SteamID())
+	            RunConsoleCommand("ulx","uncloak", ply:GetName())
+	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Disabled")
+	        end
+	    end
+	end)
+end
 
 if SERVER then
 	hook.Add("PlayerChangedLocation", "ply_location-log", function(ply, old, new)
@@ -52,7 +73,7 @@ local goodgroups = table.ValuesToKeys({
 })
 
 
-
+--[[
 hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, clpass, name)
 	local steamid = util.SteamIDFrom64(steamid)
 	if not ULib.ucl.users[steamid] || not ULib.ucl.users[steamid].group || not goodgroups[ULib.ucl.users[steamid].group] then
@@ -60,7 +81,7 @@ hook.Add("CheckPassword", "bmrp_password-check", function(steamid, ip, svpass, c
 		return false, "--==Access Restricted: Unauthorized Usergroup.==--\n\nThe server is currently in closed development.\nTo learn more please visit sbmrp.com/discord\n\nsCON | " .. os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp )
 	end
 end)
-
+]]--
 timer.Create( "Tick1s", 1, 0, function()
 	pcall(function() hook.Call("Tick_1S") end)
 end)
