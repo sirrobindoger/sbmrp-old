@@ -779,7 +779,23 @@ TEAM_VISITOR = DarkRP.createJob("Visitor", {
 })
 
 
-
+TEAM_ADMIN = DarkRP.createJob("Unknown", {
+    color = Color(0, 0, 0, 255),
+    model = {"models/player/gman_high.mdl"},
+    description = [[sBMRP]],
+    weapons = {},
+    command = "admin",
+    max = 0,
+    salary = 0,
+    admin = 1,
+    vote = false,
+    hasLicense = true,
+    candemote = false,
+    customCheck = function(ply) return
+        ply:IsAdmin()
+    end,
+    CustomCheckFailMsg = "no",
+})
 
 
 --[[---------------------------------------------------------------------------
