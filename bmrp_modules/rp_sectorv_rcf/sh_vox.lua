@@ -113,7 +113,7 @@ if SERVER then
 			--end
 			local filter = RecipientFilter()
 			for k,v in pairs(player.GetAll()) do
-				if not sBMRP.VOX.LocationBlacklist[GetLocation(v)] then
+				if not sBMRP.LocList.Xen[GetLocation(v)] then
 					filter:AddPlayer(v)
 				end
 			end
