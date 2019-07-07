@@ -65,13 +65,16 @@ hook.Add("Think", "bmrp_security-engine", SuitChecker)
 Shipments
 ---------------------------------------------------------------------------]]
 
-local function playerboughtshipment(ent)
+local function playerboughtshipment(ply, weapon, ent)
 	if ent:GetClass() == "spawned_weapon" then
 		ent:Remove()
+
 	end
 end
 
-hook.Add("OnEntityCreated", "delete_shipment",playerboughtshipment)
+hook.Add("playerBoughtPistol", "delete_shipment",playerboughtshipment)
+
+
 --[[-------------------------------------------------------------------------
 Xenian capture/handcuffs
 ---------------------------------------------------------------------------]]
