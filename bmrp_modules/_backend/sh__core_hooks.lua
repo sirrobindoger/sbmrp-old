@@ -1,22 +1,24 @@
 --[[-------------------------------------------------------------------------
 Core Hooks 
 ---------------------------------------------------------------------------]]
+hook.Remove("Think", "player_location-process")
+if SERVER then
+	hook.Add("Think", "player_location-process", function()
+		for k,v in pairs(player.GetAll()) do
+			local plyloc = GetLocationRaw(v)
+			local currlocation = v:GetNWString("location", "Unknown")
+			if currlocation != plyloc then
+				v:SetNWString("location", plyloc)
+				hook.Run("PlayerChangedLocation", v, currlocation, plyloc)
+			end
 
-hook.Add("Think", "player_location-process", function()
-	for k,v in pairs(player.GetAll()) do
-		local plyloc = GetLocationRaw(v)
-		local currlocation = v.location
-		if v.location != plyloc then
-			v.location = plyloc
-			hook.Run("PlayerChangedLocation", v, currlocation, plyloc)
 		end
-
-	end
-end)
+	end)
+end
 
 function GetLocation(recpos)
 	if type(recpos) == "Player" then
-		return recpos.location
+		return recpos:GetNWString("location", "Unknown")
 	end
 	local location = DarkRP.getPhrase("gm_unknown")
 	for k,v in pairs(sBMRP.locationnames) do
@@ -259,7 +261,7 @@ if CLIENT then
 		RunConsoleCommand("studio_queue_mode", "1")
 		
 		hook.Remove("RenderScreenspaceEffects", "RenderColorModify")
-	        hook.Remove("RenderScreenspaceEffects", "RenderBloom")
+	    hook.Remove("RenderScreenspaceEffects", "RenderBloom")
 	 	hook.Remove("RenderScreenspaceEffects", "RenderToyTown")
 	 	hook.Remove("RenderScreenspaceEffects", "RenderTexturize")
 	 	hook.Remove("RenderScreenspaceEffects", "RenderSunbeams")
@@ -278,7 +280,7 @@ if CLIENT then
 	 	hook.Remove("RenderScreenspaceEffects", "RenderBokeh")
 	 	hook.Remove("NeedsDepthPass", "NeedsDepthPass_Bokeh")
 	 	hook.Remove("PostDrawEffects", "RenderWidgets")
-	 	hook.Remove("PostDrawEffects", "RenderHalos")
+	 	--hook.Remove("PostDrawEffects", "RenderHalos")
 	end
 	timer.Simple(0, antilagOn)
 end
