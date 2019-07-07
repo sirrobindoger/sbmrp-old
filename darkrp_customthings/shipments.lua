@@ -49,7 +49,6 @@ DarkRP.createShipment("P228", {
     noship = true,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 DarkRP.createShipment("Glock18", {
     model = "models/weapons/3_pist_glock18.mdl",
@@ -61,7 +60,6 @@ DarkRP.createShipment("Glock18", {
     noship = true,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("FiveseveN", {
@@ -74,7 +72,6 @@ DarkRP.createShipment("FiveseveN", {
 	noship = true,
 	allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 --[[-------------------------------------------------------------------------
 MED ARMS
@@ -89,7 +86,6 @@ DarkRP.createShipment(".357 Magnum", {
     noship = true,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("Desert Eagle", {
@@ -102,7 +98,6 @@ DarkRP.createShipment("Desert Eagle", {
     noship = true,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("HK USP", {
@@ -115,7 +110,6 @@ DarkRP.createShipment("HK USP", {
     noship = true,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("MAC 10", {
@@ -128,7 +122,6 @@ DarkRP.createShipment("MAC 10", {
     noship = true,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 --[[-------------------------------------------------------------------------
@@ -145,7 +138,6 @@ DarkRP.createShipment("SPAS-12", {
     noship = true, 
     allowed = {TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("MP5", {
@@ -158,7 +150,6 @@ DarkRP.createShipment("MP5", {
     noship = true,
     allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("M4", {
@@ -171,7 +162,6 @@ DarkRP.createShipment("M4", {
     noship = true,
     allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 DarkRP.createShipment("Xm1014", {
@@ -184,7 +174,6 @@ DarkRP.createShipment("Xm1014", {
     noship = true,
     allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
-    spawn = function() return end
 })
 
 --[[-------------------------------------------------------------------------
