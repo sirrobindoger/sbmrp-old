@@ -46,7 +46,7 @@ local function scanner(ply, ent)
 	local Team = ply:Team()
 	local name = ent:GetName()
 	local mapid = ent:MapCreationID()
-
+    
 	if ply.antispam_use == nil or ply.antispam_use == 0 then -- cBMRP antispam code
 		ply.antispam_use = 1
 		timer.Destroy("gm_"..ply:SteamID().."_antispam_use")
@@ -60,9 +60,8 @@ local function scanner(ply, ent)
 		end )
 		return false
 	end
-
 	if sciencedoors[mapid] then
-		if not ply:IsScience() and not ply:IsService()then
+		if not ply:IsScience() and not ply:IsService() and not ply:IsSecurity() and not ply:IsAdmin() then
 			ent:EmitSound("vox/access.wav", 45, 100)
 			ent:EmitSound("buttons/button2.wav", 80, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
@@ -72,7 +71,7 @@ local function scanner(ply, ent)
 		end
 	elseif blackmesadoors[mapid] then
 		if not ply:IsBlackMesa() then
-			if ply:IsHECU() and sBMRP.AllowHECUToBMRF then return end
+			if ply:IsHECU() and sBMRP.AllowHECUToBMRF and not ply:IsAdmin() then return end
 			ent:EmitSound("vox/access.wav", 45, 100)
 			ent:EmitSound("buttons/button2.wav", 80, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
@@ -81,7 +80,7 @@ local function scanner(ply, ent)
 			return false			
 		end
 	elseif securitydoors[mapid] then
-		if not ply:IsSecurity() then
+		if not ply:IsSecurity() and not ply:IsAdmin() then
 			ent:EmitSound("vox/access.wav", 45, 100)
 			ent:EmitSound("buttons/button2.wav", 80, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
@@ -90,7 +89,7 @@ local function scanner(ply, ent)
 			return false				
 		end
 	elseif hecudoors[mapid] then
-		if not ply:IsHECU() then
+		if not ply:IsHECU() and not ply:IsAdmin() then
 			ent:EmitSound("vox/access.wav", 45, 100)
 			ent:EmitSound("buttons/button2.wav", 80, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
@@ -100,7 +99,7 @@ local function scanner(ply, ent)
 		end
 	elseif name == "biosector-door" then	
 		
-		if not ply:IsBio() then
+		if not ply:IsBio() and not ply:IsAdmin() then
 			ply:EmitSound("vox/access.wav", 35, 100)
 			ply:EmitSound("buttons/button2.wav", 45, 100)
 			timer.Create( "VoxDeny2", 0.8, 1, function()
@@ -114,7 +113,7 @@ local function scanner(ply, ent)
 			timer.Simple(1, function() EntID(v):Fire("Lock") end)
 		end
 	elseif mapid == 1930 then
-		if Team != TEAM_BIO_HEAD then
+		if Team != TEAM_BIO_HEAD and not ply:IsAdmin() then
 			ply:EmitSound("buttons/button2.wav", 45, 100)
 			return false
 		end
