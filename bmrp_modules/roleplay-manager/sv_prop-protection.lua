@@ -143,4 +143,17 @@ local modelBlacklist = {
 	["models/props_combine/combine_train02a.mdl"] = true,
 }
 
---for k,v in pairs(modelBlacklist) do RunConsoleCommand("fpp_addblockedmodel", k) end
+local function PlayerHit( ent, dmginfo )
+	local inf = dmginfo:GetInflictor()
+	local att = dmginfo:GetAttacker()
+	if ent:IsPlayer() then
+		if inf == NULL or inf == nil or att == NULL or inf == nil or (inf:GetClass() == nil and not(att:IsPlayer())) then return end
+	    if (ent:IsAlien() and inf:GetClass() == "point_hurt") or inf:GetClass()== "entityflame" or inf:GetClass()=="prop_physics" or inf:GetClass()=="worldspawn" or inf:GetClass()=="func_movelinear" or inf:GetClass()=="prop_ragdoll" or dmginfo:GetDamageType() == 1 then
+			return true
+		elseif (inf:GetClass()=="gmod_wheel" or inf:GetClass()=="gmod_wire_turret" or inf:GetClass()=="gmod_wire_explosive" or inf:GetClass()=="gmod_wire_simple_explosive") then
+			return true
+		end
+	end
+	
+end
+hook.Add( "EntityTakeDamage", "PlayerHit", PlayerHit )
