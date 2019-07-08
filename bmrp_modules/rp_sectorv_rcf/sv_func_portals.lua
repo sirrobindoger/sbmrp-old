@@ -1,5 +1,5 @@
 function SpawnPortals()
-	for k,v in pairs({5290, 5286, 5284, 5290, 5286, 5284, 5283, 5142, 5141 }) do
+	for k,v in pairs({5120, 5261, 5262, 5263, 5264,5268,}) do
 		SafeRemoveEntity(ents.GetMapCreatedEntity(v))
 	end
 	

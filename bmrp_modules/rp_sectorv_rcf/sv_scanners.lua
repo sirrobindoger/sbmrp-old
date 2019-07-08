@@ -3,34 +3,34 @@ Retinal scanner processing
 ---------------------------------------------------------------------------]]
 
 local sciencedoors = {
-	[2202] = true, -- amsdoor 1
-	[2196] = true, -- amsdoor 2
-	[2216] = true, -- ams chamber door
-	[3515] = true, -- ams observ door 1
-	[3524] = true, -- ams observ door 2
-	[2209] = true, -- sectorc ams
-	[4583] = true,
+	[2207] = true, -- amsdoor 1
+	[2213] = true, -- amsdoor 2
+	[2227] = true, -- ams chamber door
+	[3502] = true, -- ams observ door 1
+	[3511] = true, -- ams observ door 2
+	[2220] = true, -- sectorc ams
+	[4561] = true, -- sectora portal
 
 }
 
 local blackmesadoors = {
-	[1924] = true, -- sectorc airlock
-	[1938] = true, -- sectorc airlock 2
-	[1933] = true, -- sectora airlock 1
-	[1927] = true, -- sectora airlock 2
-	[2236] = true, -- sectora enterence
-	[2270] = true, -- Black Mesa Lobby
-	[2316] = true, -- BLack Mesa Lobby 1
-	[3856] = true, -- topside lift
+	[1935] = true, -- sectorc airlock
+	[1949] = true, -- sectorc airlock 2
+	[1944] = true, -- sectora airlock 1
+	[1938] = true, -- sectora airlock 2
+	[2247] = true, -- sectora enterence
+	[2281] = true, -- Black Mesa Lobby
+	[2327] = true, -- BLack Mesa Lobby 1
+	[3839] = true, -- topside lift
 }
 
 local securitydoors = {
-	[2222] = true, -- sectorb enterance
-	[3274] = true, -- sectorb enterance 1
+	[2233] = true, -- sectorb enterance
+	[3269] = true, -- sectorb enterance 1
 }
 
 local hecudoors = {
-	[2998] = true, -- base enterance
+	[3003] = true, -- base enterance
 }
 
 local healthchargers = {
@@ -107,7 +107,7 @@ local function scanner(ply, ent)
 			end )
 			return false
 		end
-		for k,v in pairs({1902, 1901}) do		
+		for k,v in pairs({1912, 1913}) do		
 			EntID(v):Fire("Unlock")
 			EntID(v):Fire("Open")
 			timer.Simple(1, function() EntID(v):Fire("Lock") end)
@@ -157,7 +157,7 @@ local function scanner(ply, ent)
 			return false 
 		end
 	end
-	if healthchargers[mapid] then
+	if ent:GetClass() == "func_healthcharger" then
 		if ply:Health() != ply:GetMaxHealth() then
 			ply:SetHealth(ply:GetMaxHealth())
 			ent:EmitSound("items/smallmedkit1.wav")
@@ -168,18 +168,3 @@ local function scanner(ply, ent)
 end
 
 hook.Add("PlayerUse", "bmrp-scanner-logic", scanner)
-
-
-hook.Add("EntityEmitSound", "fucking-blastdoors", function(data)
-	local ent = data.Entity
-	if IsValid(ent) and ent:MapCreationID() == 2195 or ent:MapCreationID() == 3577 then
-		if IsActivated(ent) or ent.Mute then
-			return false
-		else
-			data.SoundName = "doors/heavy_metal_move1.wav"
-			ent.Mute = true
-			timer.Simple(2, function() ent.Mute = false end)
-			return true
-		end
-	end
-end)

@@ -19,6 +19,7 @@ sBMRP.LocList.Topside = {
 	["Topside Underground"] = true,
 	["Ventilation Shaft"] = true,
 	["Topside"] = true,
+	["Cliff face"] = true,
 }
 
 sBMRP.LocList.Biosector = {

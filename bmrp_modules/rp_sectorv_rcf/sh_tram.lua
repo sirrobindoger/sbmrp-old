@@ -3,7 +3,7 @@ TRAM Altercations
 ---------------------------------------------------------------------------]]
 if SERVER then
 
-    sBMRP.Tram =  ents.GetMapCreatedEntity(2215)
+    sBMRP.Tram =  ents.GetMapCreatedEntity(2226)
 	num = 1
 	goodsounds = table.ValuesToKeys({
 	"bmtram/ttrain_start1.wav", 
@@ -24,7 +24,7 @@ if SERVER then
 	hook.Add("EntityEmitSound", "bmrp_tram", function(data)
 	    ent = data.Entity
 	    if not IsValid(ent) then return end
-	    if (ent:MapCreationID() == 2215) then
+	    if (ent:MapCreationID() == 2226) then
             if sBMRP.TramBroken then print("FUCK") return false end
 	        if sBMRP.Disaster then
 				currentlist = creedsoundsbroken
