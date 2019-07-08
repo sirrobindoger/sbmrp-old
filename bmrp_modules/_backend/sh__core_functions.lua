@@ -151,6 +151,19 @@ if SERVER then
 		end)
 	end
 
+
+	function FindInVectors(vec1, vec2)
+		for k,v in pairs(ents.GetAll()) do
+			if v:GetPos():WithinAABox(vec1,vec2) then
+				print("-------------")
+				print("MAPID: " .. v:MapCreationID())
+				print("CLASS: " .. v:GetClass())
+				print("NAME: " .. v:GetName())
+				print("ENTID: " .. v:EntIndex())
+				print("-------------")
+			end
+		end
+	end
 end
 
 
