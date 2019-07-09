@@ -157,3 +157,249 @@ local function PlayerHit( ent, dmginfo )
 	
 end
 hook.Add( "EntityTakeDamage", "PlayerHit", PlayerHit )
+
+
+--[[-------------------------------------------------------------------------
+Anti crash
+---------------------------------------------------------------------------]]
+HPP = HPP or {}
+
+local entity = FindMetaTable("Entity")
+local PhysObj = FindMetaTable("PhysObj")
+local ply = FindMetaTable("Player")
+
+
+
+function HPP.Ghost(self) -- Ghosting the entities
+	if self.ghosted or self:IsPlayer() then return end
+
+	self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+
+	self.ghosted = true
+end
+function HPP.Unghost(self) -- Unghosting the entities
+	if not self.ghosted or self:IsPlayer()  then return end
+	self:SetCollisionGroup(COLLISION_GROUP_NONE)
+	self.ghosted = false
+end
+
+function HPP.CanUnghost(self)
+	if not IsValid(self) then return end
+	local PObj = self:GetPhysicsObject()
+	if IsValid(PObj) and !self:IsVehicle() then
+		if not PObj:GetVolume() then return true end
+		for k, v in pairs(ents.FindInSphere(self:GetPos(), PObj:GetVolume() / 10000 + 20 ) ) do
+			if v:IsPlayer() then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+
+function entity:Ghost()
+	return HPP.Ghost(self)
+end
+function entity:Unghost()
+	return HPP.Ghost(self)
+end
+function entity:GetPlayerOwner()
+	return HPP.GetPlayerOwner(self)
+end
+
+
+-- Server is dying, try to save it!
+local AntiSpamWarning = CurTime()
+function HPP.StopLag()
+	if CurTime() < AntiSpamWarning then return end
+    	
+	RunConsoleCommand( "phys_timescale", "0" )
+	for k,v in pairs(player.GetAll()) do
+		v:ChatPrint("Server physics have been frozen.")
+		if v:IsAdmin() then
+			v:ChatPrint("Server physics frozen! Type /tf to override!")
+		end
+	end
+	game.ConsoleCommand("darkrp admintellall Server physics have been frozen temporaraly.\n")
+	timer.Simple(30, function()
+		RunConsoleCommand( "phys_timescale", "1" )
+		for k, ent in pairs(ents.GetAll()) do
+			if IsValid(ent) and ent:isDoor() then
+					ent:Fire("Close")
+			end
+		end
+		for k,v in pairs(player.GetAll()) do
+			v:ChatPrint("Server physics have been unfrozen.")
+		end
+		game.ConsoleCommand("darkrp admintellall Server physics have been unfrozen.\n")		
+	end)
+	local admins = false
+	for k,v in pairs(player.GetAll()) do
+		if v:IsAdmin() then
+			admins = true
+		end
+	end
+	if not admins then 
+		for k,v in pairs(ents.GetAll()) do if v:IsNPC() and v.PrintName then v:Remove() end end
+		game.ConsoleCommand("say Cleared all NPC's due to extreme lag.\n")
+	end
+	for k, v in pairs(ents.GetAll()) do
+		local pobj = v:GetPhysicsObject()
+		if IsValid(pobj) then
+			pobj:EnableMotion(false)
+		end
+	end
+	AntiSpamWarning = CurTime() + 60
+end
+
+local BuildingEnts = {
+	["prop_physics"] = true,
+	["gmod_button"] = true,
+	["gmod_cameraprop"] = true,
+	["keypad"] = true,
+}
+
+function HPP.DeLag()
+	for k, v in pairs(ents.GetAll()) do
+		if BuildingEnts[v:GetClass()] then
+			local pobj = v:GetPhysicsObject()
+			if IsValid(pobj) then
+				pobj:EnableMotion(false)
+			end
+		end
+	end
+end
+
+
+-- Work out when the server is lagging
+hook.Add("Tick", "HPP.Tick", function()
+	local systime = SysTime()
+	if HPP.Delay and HPP.Delay > systime then return end
+
+	local realframetime = engine.RealFrameTime()
+	if realframetime >= 0.5 then -- We're seriously lagging
+		if !HPP.ClearCheck then
+			HPP.StopLag()
+		else
+			HPP.DeLag()
+		end
+		HPP.ClearCheck = false
+	elseif realframetime >= 0.3 then -- We're just lagging a bit
+		if !HPP.ClearCheck then
+			HPP.DeLag()
+		end
+		HPP.ClearCheck = false
+	else
+		HPP.ClearCheck = true
+	end
+
+	HPP.Delay = systime + 3
+end)
+
+hook.Add( "CanTool", "HPP.CanTool", function( ply, tr, tool ) -- Stop people fucking with tools
+    -- Advanced Dupe model scale exploit
+	local dupetab =
+		(tool == 'adv_duplicator' and ply:GetActiveWeapon():GetToolObject().Entities) or
+		(tool == 'advdupe2' and ply.AdvDupe2 and ply.AdvDupe2.Entities) or
+		(tool == 'duplicator' and ply.CurrentDupe and ply.CurrentDupe.Entities)
+
+	if dupetab then
+		for k, v in pairs(dupetab) do
+			if !v.ModelScale then continue end
+			if v.ModelScale > 10 then
+				return false
+			end
+			v.ModelScale = 1
+		end
+	end
+
+	if tool:lower() == "material" then -- blackscreen exploit
+        local tool = ply:GetActiveWeapon():GetToolObject()
+	local mat = string.lower(tool:GetClientInfo("override"))	
+        if string.StartWith(mat, "pp/") and string.EndsWith(mat, "/copy") then -- blackscreen exploit
+            return false
+        end
+    end
+end)
+
+-- Code below this stops collisions
+
+hook.Add("PlayerSpawnedProp", "HPP.PlayerSpawnedProp", function(ply, _, ent)
+	local mat = ent:GetMaterial()
+	if string.StartWith(mat, "pp/") and string.EndsWith(mat, "/copy") then -- blackscreen exploit
+        ent:Remove()
+    end
+end)
+
+
+hook.Add( "PhysgunPickup", "HPP.PhysgunPickup", function( ply, ent )
+	if ent:IsPlayer() then return end
+	local cantouch = ent:CPPICanPhysgun(ply)
+	if cantouch then
+		HPP.Ghost(ent)
+		if ent:IsConstrained() then
+			local tbl = constraint.GetAllConstrainedEntities(ent)
+			for k, v in pairs(tbl) do
+				if ent == k then continue end
+				HPP.Ghost(k)
+			end
+		end
+	else
+		return false
+	end
+end)
+
+hook.Add("PhysgunDrop", "HPP.PhysgunDrop", function(ply, ent)
+    if HPP.CanUnghost(ent, ply) then
+        HPP.Unghost(ent)
+        if ent:IsConstrained() then
+			local tbl = constraint.GetAllConstrainedEntities(ent)
+			for k, v in pairs(tbl) do
+				if ent == k then continue end
+				if HPP.CanUnghost(k, ply) then
+					HPP.Unghost(k)
+				end
+			end
+		end
+    end
+end)
+
+hook.Add("GravGunOnPickedUp", "bmrp_grav", function(ply, ent)
+		HPP.Ghost(ent)
+end)
+
+hook.Add("GravGunOnDropped", "bmrp_ghost_drop_grav", function(ply, ent)
+		HPP.Unghost(ent)
+end)
+
+
+
+--[[
+	<-- Overwriting the default setposition functions and clamping them.
+--	This shouldn't be needed however it could stop strange stuff happening. -->
+]]--
+if (entity.SetRealPos == nil) and (PhysObj.SetRealPos == nil) then
+	entity.SetRealPos = entity.SetPos
+	PhysObj.SetRealPos = PhysObj.SetPos
+end
+
+local Clamp = math.Clamp
+function entity.SetPos(ent, pos)
+    pos.x = Clamp(pos.x, -20000, 20000)
+    pos.y = Clamp(pos.y, -20000, 20000)
+    pos.z = Clamp(pos.z, -20000, 20000)
+    entity.SetRealPos(ent, pos) -- called with pos being nil? wtf
+end
+function PhysObj.SetPos(phys, pos)
+    pos.x = Clamp(pos.x, -20000, 20000)
+    pos.y = Clamp(pos.y, -20000, 20000)
+    pos.z = Clamp(pos.z, -20000, 20000)
+    PhysObj.SetRealPos(phys, pos)
+end
+
+
+
+
+
+
