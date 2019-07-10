@@ -27,7 +27,7 @@ local function mapinit()
 	timer.Create("ambience-sound_fix", 1, 0, function()
 		for k,v in pairs(ents.FindByName("amb")) do
 			local shouldplay = false
-			for k,ply in pairs(ents.FindInSphere(v:GetPos(),1000)) do
+			for k,ply in pairs(ents.FindInSphere(v:GetPos(),200)) do
 				if ply:IsPlayer() then
 					shouldplay = true
 					break

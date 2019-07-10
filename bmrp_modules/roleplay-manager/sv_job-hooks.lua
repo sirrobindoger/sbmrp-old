@@ -28,7 +28,7 @@ local function TeamChange(ply, before, after)
 		ply:SetNWString("teambefore",teambefore)
 	end)
 
-	if (ply:GetNWString( "teambefore" ) != ply:getJobTable().category) and not ply:GetNWBool("norespawn") then
+	if (ply:GetNWString( "teambefore" ) != ply:getJobTable().category) or after == TEAM_TESTSUBJECT then
 		ply:KillSilent()
 	end
 	if ply:GetNWBool("norespawn",true) then
@@ -50,7 +50,6 @@ local securityguard = table.ValuesToKeys({
 
 function SuitChecker()
 	for k,ply in pairs (player.GetAll()) do
-		if not IsValid(ply) or not ply:IsPlayer() then return end
 		if securityguard[ply:GetModel()] and ply:IsSecurity() and ply:Alive() and not ply:HasWeapon("stunstick") then
 			SuitUp(ply, "")
 		else if not securityguard[ply:GetModel()] and ply:IsSecurity() and ply:HasWeapon("stunstick") then
@@ -59,7 +58,7 @@ function SuitChecker()
 		end
 	end
 end
-hook.Add("Think", "bmrp_security-engine", SuitChecker)
+hook.Add("Tick1s", "bmrp_security-engine", SuitChecker)
 
 --[[-------------------------------------------------------------------------
 Shipments

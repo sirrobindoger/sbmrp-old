@@ -1,3 +1,4 @@
+require("fps")
 local modelBlacklist = { 
 	["models/props_vehicles/tanker001a.mdl"] = true,
 	["models/props_vehicles/apc001.mdl"] = true,
@@ -218,17 +219,13 @@ function HPP.StopLag()
 	for k,v in pairs(player.GetAll()) do
 		v:ChatPrint("Server physics have been frozen.")
 		if v:IsAdmin() then
-			v:ChatPrint("Server physics frozen! Type /tf to override!")
+			v:ChatPrint("Server physics frozen! Resuming in 30 seconds.")
 		end
 	end
 	game.ConsoleCommand("darkrp admintellall Server physics have been frozen temporaraly.\n")
 	timer.Simple(30, function()
 		RunConsoleCommand( "phys_timescale", "1" )
-		for k, ent in pairs(ents.GetAll()) do
-			if IsValid(ent) and ent:isDoor() then
-					ent:Fire("Close")
-			end
-		end
+
 		for k,v in pairs(player.GetAll()) do
 			v:ChatPrint("Server physics have been unfrozen.")
 		end

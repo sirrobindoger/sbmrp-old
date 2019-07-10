@@ -111,6 +111,7 @@ if SERVER then
 		return xenjobcount, surveycount, npccount
 	end
 	timer.Create("bmrp_xen-population", 1, 0, function()
+		if sBMRP.NPCs.Population <= 0 then return end 
 		local xenjobcount,surveycount,npccount = sBMRP.GetXenPopulation()
 		if (xenjobcount > 1 or surveycount > 1) and not sBMRP.NPCs.Sterile then
 			if npccount < sBMRP.NPCs.Population then

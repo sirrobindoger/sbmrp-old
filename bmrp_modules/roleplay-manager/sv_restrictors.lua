@@ -1,3 +1,4 @@
+sBMRP.LabPropProtection = true
 --[[-------------------------------------------------------------------------
 AntiRDM
 ---------------------------------------------------------------------------]]
@@ -228,7 +229,7 @@ end
 hook.Add("playerSellDoor", "bmrp_lab-functions", OnLabSell)
 
 local function LabBlockSpawning(ply)
-	if ply:IsAdmin() then return end
+	if ply:IsAdmin() or not sBMRP.LabPropProtection then return end
 	loc = GetLocation(ply)
 	if sBMRP.Labs[loc] then
 		for k,v in pairs(sBMRP.Labs[loc][1]) do
@@ -247,7 +248,7 @@ for k,v in pairs({"PlayerSpawnProp", "CanTool", "PlayerSpawnVehicle","PlayerSpaw
 end
 
 local function LabPlayerSpawn(ply)
-	if table.Count(ply:GetOwnedDoors()) > 0 then
+	if table.Count(ply:GetOwnedDoors()) > 0 and not ply:isArrested() then
 		for k,door in pairs(ply:GetOwnedDoors()) do
 			if sBMRP.Labs[door.LabName] then
 				timer.Simple(0, function()
