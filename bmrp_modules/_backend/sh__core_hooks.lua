@@ -36,14 +36,14 @@ if SERVER then
 	        if desiredNoClipState == true then
 	            ply:GodEnable()
 	            ply:SetNoTarget(true)
-	--            timer.Simple(.1, function() Zap(ply) end)
+	    --        timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
 	            RunConsoleCommand( "fadmin", "cloak", ply:SteamID())
 	            RunConsoleCommand("ulx","cloak", ply:GetName())
 	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Enabled")
 	        end
 	        if desiredNoClipState == false then
 	            ply:GodDisable()
-	--            timer.Simple(.1, function() Zap(ply) end)
+		--		timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
 	            ply:SetNoTarget(false)
 	            RunConsoleCommand( "fadmin", "uncloak", ply:SteamID())
 	            RunConsoleCommand("ulx","uncloak", ply:GetName())
