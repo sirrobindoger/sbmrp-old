@@ -69,7 +69,30 @@ AMSOperatormodels = {
 	"models/paynamia/bms/gordon_survivor_player.mdl"
 }
 
+Medicmodels = {
+    "models/vlrpgaming/hospitalfemale10.mdl",
+    "models/vlrpgaming/hospitalfemale09.mdl",
+    "models/vlrpgaming/hospitalfemale08.mdl",
+    "models/vlrpgaming/hospitalfemale07.mdl",
+    "models/vlrpgaming/hospitalfemale06.mdl",
+    "models/vlrpgaming/hospitalfemale05.mdl",
+    "models/vlrpgaming/hospitalfemale04.mdl",
+    "models/vlrpgaming/hospitalfemale03.mdl",
+    "models/vlrpgaming/hospitalfemale02.mdl",
+    "models/vlrpgaming/hospitalmale12.mdl",
+    "models/vlrpgaming/hospitalmale11.mdl",
+    "models/vlrpgaming/hospitalmale10.mdl",
+    "models/vlrpgaming/hospitalmale09.mdl",
+    "models/vlrpgaming/hospitalmale08.mdl",
+    "models/vlrpgaming/hospitalmale07.mdl",
+    "models/vlrpgaming/hospitalmale06.mdl",
+    "models/vlrpgaming/hospitalmale05.mdl",
+    "models/vlrpgaming/hospitalmale04.mdl",
+    "models/vlrpgaming/hospitalmale03.mdl",
+    "models/vlrpgaming/hospitalmale02.mdl",
+    "models/vlrpgaming/hospitalmale01.mdl",
 
+}
 
 --[[-------------------------------------------------------------------------
 Scientists 
@@ -293,6 +316,25 @@ TEAM_ITTECH = DarkRP.createJob("IT Technician", {
     ------------------
 })
 
+TEAM_MEDIC = DarkRP.createJob("Medical Operative", {
+    color = Color(34, 85, 85, 255),
+    model = Medicmodels,
+    description = [[Patch up wounds and keep the facility staff healthy.]],
+    weapons = {"med_kit",},
+    command = "medic",
+    max = 2,
+    salary = 120,
+    admin = 0,
+    vote = false,
+    hasLicense = false,
+    candemote = false,
+    category = "Black Mesa Faculty",
+    ------------------
+    rdmgroup = "BMRF",
+    isblackmesa = true
+    ------------------
+})
+
 
 TEAM_OFFICE = DarkRP.createJob("Office Employee", {
     color = Color(34, 85, 85, 255),
@@ -467,7 +509,7 @@ TEAM_BIO_HEAD = DarkRP.createJob("Head Bio Researcher", {
     description = [[You are the head of the Bio Sector, you have access to all the labs & can activate certain facility functions.]],
     weapons = {"taser","cage","weapon_leash_bio", "copsbracelet"},
     command = "headbioresearcher",
-    max = 4,
+    max = 1,
     admin = 0,
     salary = 75,
     rdmgroup = "BMRF",

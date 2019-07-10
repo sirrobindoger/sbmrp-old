@@ -20,6 +20,9 @@ sBMRP.LocList.Topside = {
 	["Ventilation Shaft"] = true,
 	["Topside"] = true,
 	["Cliff face"] = true,
+	["Sector H"] = true,
+	["Topside Lift"] = true,
+	["Topside Lift Enterance"] = true
 }
 
 sBMRP.LocList.Biosector = {
@@ -34,7 +37,7 @@ sBMRP.LocList.Biosector = {
 sBMRP Locations
 ---------------------------------------------------------------------------]]
 
-if game.GetMap() == "rp_sectorc_s" then
+if game.GetMap() == "rp_sectorc_s1" then
 	table.insert(sBMRP.locationnames,{"Rift",Vector(-12506.098632813,-989.16461181641,286.60958862305),Vector(-11933.997070313,-1150.001953125,-112.37423706055)})
 
 	table.insert(sBMRP.locationnames,{"Gonarch Lair",Vector(7098.5668945313,1623.1097412109,-271.58898925781),Vector(3751.6201171875,-1233.2895507813,1136.5404052734)})
