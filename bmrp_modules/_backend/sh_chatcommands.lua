@@ -8,21 +8,14 @@ DarkRP.removeChatCommand("addlaw")
 DarkRP.removeChatCommand("addjailpos")
 DarkRP.removeChatCommand("agenda")
 DarkRP.removeChatCommand("cr")
-DarkRP.removeChatCommand("demotelicense")
 DarkRP.removeChatCommand("disablestorm")
 DarkRP.removeChatCommand("enablestorm")
-DarkRP.removeChatCommand("givelicense")
-DarkRP.removeChatCommand("jailpos")
 DarkRP.removeChatCommand("hitprice")
 DarkRP.removeChatCommand("lottery")
 DarkRP.removeChatCommand("placelaws")
 DarkRP.removeChatCommand("removelaws")
 DarkRP.removeChatCommand("requesthit")
-DarkRP.removeChatCommand("requestlicense")
 DarkRP.removeChatCommand("resetlaws")
-DarkRP.removeChatCommand("setjailpos")
-DarkRP.removeChatCommand("warrant")
-DarkRP.removeChatCommand("wanted")
 DarkRP.removeChatCommand("buyradio")
 DarkRP.removeChatCommand("advert")
 
@@ -107,8 +100,8 @@ local function PlayerAnnounce(ply, args)
     return args, DoSay
 end
 if SERVER then
-	sBMRP.CreateChatCommand("announce", PlayerAnnounce, "Announce your message.", 10)
-	sBMRP.CreateChatCommand("advert", PlayerAnnounce, "Announce your message.", 10)
+	sBMRP.CreateChatCommand("announce", PlayerAnnounce, "Announce your message.", 4)
+	sBMRP.CreateChatCommand("advert", PlayerAnnounce, "Announce your message.", 4)
 end
 --[[-------------------------------------------------------------------------
 Disable Announce/Advert
@@ -228,6 +221,25 @@ allowsinglehecu:addParam{ type=ULib.cmds.BoolArg, invisible=true}
 allowsinglehecu:defaultAccess(ULib.ACCESS_ADMIN)
 allowsinglehecu:help("Allow the temporary access of a HECU player, will auto revoke on death/teamchange.")
 allowsinglehecu:setOpposite( "ulx unallowsinglehecu", {_, _, true}, "!unallowsinglehecu" )
+--[[-------------------------------------------------------------------------
+Lab prop spawning
+---------------------------------------------------------------------------]]
+
+function ulx.labprotection(calling_ply)	
+	if not sBMRP.LabPropProtection then
+	    sBMRP.LabPropProtection = true
+		ulx.fancyLog( player.GetAdmins(), "#P revoked player's rights to build in labs they do not own.",calling_ply)
+	else
+	    sBMRP.LabPropProtection = false
+
+		ulx.fancyLog( player.GetAdmins(), "#P granted player's rights to build in labs they do not own.",calling_ply)
+	end
+end
+local labprotection = ulx.command(CATEGORY_NAME .. " - Players", "ulx labprotection", ulx.labprotection, "!labprotection", true, false)
+labprotection:defaultAccess(ULib.ACCESS_ADMIN)
+labprotection:help("Toggle weather or not players are allowed to build in labs they do not own.")
+
+
 
 --[[-------------------------------------------------------------------------
 Allow ALL xenians/hecu
@@ -589,21 +601,12 @@ local function ChatNotifier ( ply, txt, public )
 	txts = string.gsub(txts,"/// ","")
 	--UNSTUCK--
 	if txt != "@/stuck" and not(string.find(txt, "still")) and string.find(txt, "stuck") and (string.find(txt, '^' .. "@") ~= nil or string.find(txt, '^' .. "///") ~= nil) then
-		if ply:GetPos():Distance(Vector(-10276.729492,-1333.907471,251.889832)) <= 800 then
-			timer.Simple(0.2,function() ply:Say( "@[sBMRP OVERRIDE]: Do not respond to this call") end)
-			ply:SetPos(DarkRP.findEmptyPos(Vector(-10288.088867,-1378.205200,-189.00775), {ent}, 600, 30, Vector(16, 16, 64)))
-			ply:ChatPrint("--IF YOU ARE STILL STUCK TYPE @still stuck--")
-		else
-			timer.Simple(0.2,function() ply:Say( "@[sBMRP OVERRIDE]: Do not respond to this call") end)
-			local pos = DarkRP.findEmptyPos(ply:GetPos(), {ply}, 600, 10, Vector(16, 16, 64))
-			ply:SetPos(pos)
-			if ply:GetPos()[3] > -146 and ply:GetPos()[3] < -144 then
-				pos[3] = pos[3] - 30
-				ply:SetPos(DarkRP.findEmptyPos(pos, {ply}, 600, 10, Vector(16, 16, 64)))
-			end
-			ply:ChatPrint("--IF YOU ARE STILL STUCK TYPE @still stuck--")
-			return ""
-		end
+		--timer.Simple(0.2,function() ply:Say( "@[sBMRP OVERRIDE]: Do not respond to this call") end)
+		local pos = DarkRP.findEmptyPos(ply:GetPos(), {ply}, 2000, 10, Vector(16, 16, 64))
+		ply:SetPos(pos)
+		ply:ChatPrint("--IF YOU ARE STILL STUCK TYPE @still stuck--")
+		return ""
+		/*
 	elseif txt != "@/stuck" and (string.find(txt, "still") and string.find(txt, "stuck")) and (string.find(txt, '^' .. "@") ~= nil or string.find(txt, '^' .. "///") ~= nil) then
 		timer.Simple(0.2,function() ply:Say( "@[sBMRP OVERRIDE]: Do not respond to this call") end)
 		local pos = {}
@@ -630,6 +633,7 @@ local function ChatNotifier ( ply, txt, public )
 		ply:ChatPrint("--SET POSITION TO "..curposname.."--")
 		ply:ChatPrint("--FOR FURTHER HELP TYPE @/stuck--")
 		--Antispam--
+		*/
 	elseif (txts == "to me" or txts == "sirro" or txts == "sirro cmere" or txts == "admin" or txts == "admin to me" or txts == "admin tp" or txts == "help" or txts == "tp to me" or txts == "come to me" or txts == "can a staff member come to me please" or txts == "staff tp to me" or txts=="can i please get an admin to me?" or txts=="c'mere" or txts == "admin to me please" or txts == "i need an admin" or txts == "i need a admin") then
 		if (string.find(txt, '^' .. "/ooc") ~= nil) or (string.find(txt, '^' .. "//") ~= nil) or (string.find(txt, '^' .. "/pm")) ~= nil then
 			ply:ChatPrint("--You are attempting to summon a staff member without a valid reason, in OOC or pms. Please ensure you include a valid reason in your request, and use '@' instead of '/ooc' or '//'--") 		
