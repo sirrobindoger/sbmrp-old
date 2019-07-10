@@ -24,7 +24,7 @@ function shakeytest(optional)
         end)
     end        
     timer.Simple(7, function()
-        if bmrpevent.powerout then
+        if sBMRP.powerout then
             engine.LightStyle(0, "b")
         else
             engine.LightStyle(0, "v")
