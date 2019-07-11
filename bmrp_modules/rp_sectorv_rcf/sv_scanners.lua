@@ -112,6 +112,20 @@ local function scanner(ply, ent)
 			EntID(v):Fire("Open")
 			timer.Simple(1, function() EntID(v):Fire("Lock") end)
 		end
+	elseif name == "hecu-door" then
+		if not ply:IsHECU() and not ply:IsAdmin() then
+			ply:EmitSound("vox/access.wav", 35, 100)
+			ply:EmitSound("buttons/button2.wav", 45, 100)
+			timer.Create( "VoxDeny2", 0.8, 1, function()
+				ply:EmitSound("vox/denied.wav", 35, 100)
+			end )
+			return false
+		end
+		ent:EmitSound("buttons/button5.wav", 75)
+		for k,v in pairs({2990}) do		
+			EntID(v):Fire("Unlock")
+			EntID(v):Fire("Open")
+		end
 	elseif mapid == 1930 then
 		if Team != TEAM_BIO_HEAD and not ply:IsAdmin() then
 			ply:EmitSound("buttons/button2.wav", 45, 100)

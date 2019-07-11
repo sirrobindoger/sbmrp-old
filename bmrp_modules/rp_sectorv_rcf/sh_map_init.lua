@@ -76,6 +76,38 @@ local function mapinit()
 	button_lighting:SetRenderMode(RENDERMODE_TRANSALPHA)
 	button_lighting:Spawn()
 
+	-- HECU Scanner
+	local button = ents.Create("gmod_button")
+	button:SetPos(Vector(-4931.60, -896.86, 642.72))
+	button:SetModel("models/hunter/blocks/cube05x05x025.mdl")
+	button:Spawn()
+	button:SetAngles(Angle(90,90,180))
+	button:SetName("hecu-door")
+	button:GetPhysicsObject():EnableMotion(false)
+	button:SetMaterial("!CUSTOMHLBUTTONTEXTURE3",true)
+	local button_lighting = ents.Create("prop_physics_nolighting")
+	button_lighting:SetPos(button:GetPos())
+	button_lighting:SetAngles(button:GetAngles())
+	button_lighting:SetModel(button:GetModel())
+	button_lighting:SetParent(button)
+	button_lighting:SetRenderMode(RENDERMODE_TRANSALPHA)
+	button_lighting:Spawn()
+
+	local button = ents.Create("gmod_button")
+	button:SetPos(Vector(-4911.11, -901.15, 642.28))
+	button:SetModel("models/hunter/blocks/cube05x05x025.mdl")
+	button:Spawn()
+	button:SetAngles(Angle(90.000, -90.000, 180.000))
+	button:SetName("hecu-door")
+	button:GetPhysicsObject():EnableMotion(false)
+	button:SetMaterial("!CUSTOMHLBUTTONTEXTURE3",true)
+	local button_lighting = ents.Create("prop_physics_nolighting")
+	button_lighting:SetPos(button:GetPos())
+	button_lighting:SetAngles(button:GetAngles())
+	button_lighting:SetModel(button:GetModel())
+	button_lighting:SetParent(button)
+	button_lighting:SetRenderMode(RENDERMODE_TRANSALPHA)
+	button_lighting:Spawn()
 
 	local button = ents.Create("gmod_button")
 	button:SetPos(Vector(-2342.83, -3110.97, -174.24))
@@ -178,3 +210,14 @@ if SERVER then
 	sBMRP.MapHook("map_init", mapinit)
 
 end
+
+
+
+hook.Add("PlayerUse", "ladder_ply", function(ply, ent)
+	if not IsFirstTimePredicted() then return end
+	if IsValid(ent) and ply:GetPos():WithinAABox(Vector(40.617343902588,-2494.8203125,-494.66076660156),Vector(-8.9349412918091,-2555.556640625,-623.42175292969)) then
+		ply:EmitSound("player/footsteps/ladder1.wav")
+		ply:SetPos(Vector(48.75016784668,-2521.4235839844,-442.96875))
+		ply:SetAngles(Angle(0,180,0))
+	end
+end)

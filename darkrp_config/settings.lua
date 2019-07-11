@@ -154,7 +154,7 @@ GM.Config.telefromjail                  = true
 -- teletojail - Enable/disable teleporting to jail.
 GM.Config.teletojail                    = true
 -- unlockdoorsonstart - Enable/Disable unlocking all doors on map start.
-GM.Config.unlockdoorsonstart            = false
+GM.Config.unlockdoorsonstart            = true
 -- voiceradius - Enable/disable local voice chat.
 GM.Config.voiceradius                   = true
 -- tax - Whether players pay taxes on their wallets.
