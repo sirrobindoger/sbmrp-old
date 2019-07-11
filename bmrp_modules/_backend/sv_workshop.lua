@@ -54,3 +54,7 @@ function UpdateWorkshop()
 		end)
 	end)
 end
+concommand.Add("updateworkshop", function(ply)
+	if IsValid(ply) then return end
+	UpdateWorkshop()
+end)
