@@ -370,7 +370,8 @@ hook.Add("GravGunOnDropped", "bmrp_ghost_drop_grav", function(ply, ent)
 		HPP.Unghost(ent)
 end)
 
-
+hook.Add("CanProperty", "bmrp_fireblock", function(ply, ent) 
+	if (!ply:IsAdmin() and ent == "ignite") then return false end end)
 
 --[[
 	<-- Overwriting the default setposition functions and clamping them.
@@ -394,9 +395,6 @@ function PhysObj.SetPos(phys, pos)
     pos.z = Clamp(pos.z, -20000, 20000)
     PhysObj.SetRealPos(phys, pos)
 end
-
-
-
 
 
 
