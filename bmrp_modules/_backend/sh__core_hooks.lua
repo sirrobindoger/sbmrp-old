@@ -98,10 +98,18 @@ end)
 
 -- Debug
 if SERVER then
-	hook.Add("PlayerUse", "sirro_debug", function(ply, ent)
-		if not IsValid(ent) or not IsValid(ply) or not IsFirstTimePredicted() then return end
-		if sBMRP.Debug and ply:IsSirro() then
-			ply:ChatPrint(ent:MapCreationID() .. "\nName: " ..  ent:GetName() .. "\nAngs:" .. util.TypeToString(ent:GetAngles()) .. "\nPOS:" .. util.TypeToString(ent:GetPos()) .. "\nMODEL:" .. ent:GetModel() /*.. "\nCLASS:" .. ent:GetClass()*/)
+	hook.Add("PlayerSay", "sirro_debug", function(ply, text)
+		if not IsValid(ply) or not IsFirstTimePredicted() and not sBMRP.Debug then return end
+		if text == "/getinfo" and ply:Alive() then
+			if IsValid(ply:GetEyeTrace().Entity) then
+				local ent = ply:GetEyeTrace().Entity
+				ply:ChatPrint("-----------------------")
+				ply:ChatPrint(ent:MapCreationID() .. "\nName: " ..  ent:GetName() .. "\nAngs:" .. util.TypeToString(ent:GetAngles()) .. "\nPOS:" .. util.TypeToString(ent:GetPos()) .. "\nMODEL:" .. ent:GetModel() .. "\nCLASS:" .. ent:GetClass())
+				ply:ChatPrint("-----------------------")
+			else
+				ply:ChatPrint("Couldn't find the entity you were looking at!")
+			end
+			return ""
 		end
 	end)
 end
