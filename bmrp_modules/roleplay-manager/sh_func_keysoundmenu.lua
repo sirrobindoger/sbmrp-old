@@ -261,11 +261,12 @@ end
 
 hook.Add("KeyPress", "bmrp_chatphrases", function(ply, key)
 	if not IsValid(ply:GetActiveWeapon()) or IsFirstTimePredicted() then return end
-	if IsValid(ply:GetEyeTrace().Entity) then
-		if ply:GetEyeTrace().Entity:GetClass() == "func_door" and ply:GetEyeTrace().Entity:GetPos():Distance(ply:GetPos()) > 100 then return end
-	end
-		
+	
     if (key == 2048) and (ply:GetActiveWeapon():GetClass() == "keys") then
+		if IsValid(ply:GetEyeTrace().Entity) then
+			if ply:GetEyeTrace().Entity:GetClass() == "func_door" and ply:GetEyeTrace().Entity:GetPos():DistToSqr(ply:GetPos()) < 15000 then return end
+			if ply:IsSirro() then ply:ChatPrint(ply:GetEyeTrace().Entity:GetPos():DistToSqr(ply:GetPos())) end
+		end
         if (ply:IsScience() or ply:IsSurvey() or ply:IsBio()) then
             ply:ConCommand("SciencePhrases")
         elseif ply:IsSecurity() then

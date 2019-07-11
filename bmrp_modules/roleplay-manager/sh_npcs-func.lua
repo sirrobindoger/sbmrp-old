@@ -157,7 +157,7 @@ if CLIENT then
 					foundnpc = v
 					continue
 				end
-				if (foundnpc:GetPos():Distance(LocalPlayer():GetPos())) > (v:GetPos():Distance(LocalPlayer():GetPos())) and IsValid(foundnpc) then
+				if (foundnpc:GetPos():DistToSqr(LocalPlayer():GetPos())) > (v:GetPos():DistToSqr(LocalPlayer():GetPos())) and IsValid(foundnpc) then
 					LocalPlayer():SetNWEntity("bossfight",v)
 					foundnpc = v
 				end
