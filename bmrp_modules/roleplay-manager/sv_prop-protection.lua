@@ -33,7 +33,7 @@ local LagCheck = 3 -- the delay at which the server checks if it is lagging
 
 -- This is the same as the last setting, expect that it is for props being duped in, recommend that this is higher
 -- as props being duped in are most likely not going to crash the server
-	sPP.PropPrecentageDupe = 60
+--	sPP.PropPrecentageDupe = 60 (This setting is now deprecated.)
 
 
 
@@ -214,6 +214,8 @@ hook.Add("PlayerSpawnedProp", "sPP.PlayerSpawnedProp", function(ply, _, ent)
 	if string.StartWith(mat, "pp/") and string.EndsWith(mat, "/copy") then -- blackscreen exploit
         ent:Remove()
     end
+    if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
+    ent:GetPhysicsObject():EnableMotion(false)
 end)
 
 
@@ -287,6 +289,7 @@ end
 
 hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
 	if model then
+		if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
 		local prop = ents.Create("prop_dynamic")
 		prop:SetPos(ply:GetEyeTrace().HitPos)
 		prop:SetModel(model)
@@ -307,18 +310,20 @@ hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
 		end
 		local precentageoutside = math.Round(numoutside/totalmesh*100)
 
-		if ply.AdvDupe2 and ply.AdvDupe2.Pasting then
+		--[[if ply.AdvDupe2 and ply.AdvDupe2.Pasting then
 			if precentageoutside >= sPP.PropPrecentageDupe then
 				ply:ChatPrint("[sPP - AdvDupe2]: " .. prop:GetModel() .. " was removed for being " .. precentageoutside .. "% outside the world.")
+				Log(ply:GetName() .. " tried to spawn in " .. model .. " while duping. [" .. precentageoutside .. "% outside map.]")
 				prop:Remove()
 				return false
 			else
-				ply:ChatPrint(precentageoutside)
 				prop:Remove()
 				return
 			end
-		elseif precentageoutside >= sPP.PropPrecentage then
+		else]]--
+		if precentageoutside >= sPP.PropPrecentage then
 			ply:Notify("[sPP]: This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
+			Log(ply:GetName() .. " tried to spawn in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 			prop:Remove()
 			return false
 		end
