@@ -99,7 +99,7 @@ Scientists
 ---------------------------------------------------------------------------]]
 
 TEAM_RESEARCH = DarkRP.createJob("Research Personnel", {
-	color = Color(0, 86, 247, 255),
+	color = Color(0, 195, 255, 255),
 	model = Scientistmodels,
 	description = [[An accomplished scientist at the BMRF, you get to own a Lab and conduct experiments with the help of your associates.]],
 	weapons = {},
@@ -745,7 +745,7 @@ TEAM_HECUMED = DarkRP.createJob("HECU Medic", {
 
     },
     description = [[You make sure everyone in the H.E.C.U force is in tip-top shape. Listen to your sergeant]],
-    weapons = {"weapon_medkit","tfa_bms_mp5","weapon_knife","itemstore_pickup"},
+    weapons = {"weapon_medkit","weapon_knife","itemstore_pickup"},
     command = "hecumedic",
     max = 4,
     admin = 0,
@@ -822,7 +822,7 @@ TEAM_VISITOR = DarkRP.createJob("Visitor", {
 
 
 TEAM_ADMIN = DarkRP.createJob("Unknown", {
-    color = Color(0, 0, 0, 255),
+    color = Color(255, 255, 255, 255),
     model = {"models/player/gman_high.mdl"},
     description = [[sBMRP]],
     weapons = {},
