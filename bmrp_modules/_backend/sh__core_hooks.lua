@@ -3,18 +3,36 @@ Core Hooks
 ---------------------------------------------------------------------------]]
 hook.Remove("Think", "player_location-process")
 if SERVER then
+	local nextprocess = os.time() + .4
 	hook.Add("Think", "player_location-process", function()
-		for k,v in pairs(player.GetAll()) do
-			local plyloc = GetLocationRaw(v)
-			local currlocation = v:GetNWString("location", "Unknown")
-			if currlocation != plyloc then
-				v:SetNWString("location", plyloc)
-				hook.Run("PlayerChangedLocation", v, currlocation, plyloc)
+		if nextprocess < os.time() then
+			for k,v in pairs(player.GetAll()) do
+				local plyloc = GetLocationRaw(v)
+				local currlocation = v:GetNWString("location", "Unknown")
+				if currlocation != plyloc then
+					v:SetNWString("location", plyloc)
+					hook.Run("PlayerChangedLocation", v, currlocation, plyloc)
+				end
 			end
-
+			nextprocess = os.time() + .4
 		end
 	end)
 end
+
+hook.Add("PlayerInitialSpawn", "is_active", function(ply)
+	timer.Simple(1, function() 
+		if not IsValid(ply) or ply:IsBot() then return end
+	    ply.IsActive = ply:GetPos()
+	    timer.Create("is_active-process_"..ply:UniqueID(), 1, 0, function()
+	    if ply.IsActive and not ply.IsActive == true and isvector(ply.IsActive) then
+	            ply.IsActive = true
+	            hook.Run("OnPlayerIsActive", ply)
+	            ply:SetNWBool("isactive",true)
+	            timer.Remove("is_active-process_"..ply:UniqueID())
+	        end
+	    end)
+	end)
+end)
 
 function GetLocation(recpos)
 	if type(recpos) == "Player" then
@@ -38,7 +56,7 @@ if SERVER then
 	            ply:SetNoTarget(true)
 	    --        timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
 	            RunConsoleCommand( "fadmin", "cloak", ply:SteamID())
-	            RunConsoleCommand("ulx","cloak", ply:GetName())
+	--            RunConsoleCommand("ulx","cloak", ply:GetName())
 	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Enabled")
 	        end
 	        if desiredNoClipState == false then
@@ -46,7 +64,7 @@ if SERVER then
 		--		timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
 	            ply:SetNoTarget(false)
 	            RunConsoleCommand( "fadmin", "uncloak", ply:SteamID())
-	            RunConsoleCommand("ulx","uncloak", ply:GetName())
+	 --           RunConsoleCommand("ulx","uncloak", ply:GetName())
 	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Disabled")
 	        end
 	    end
@@ -128,6 +146,7 @@ end
 if CLIENT then
 	hook.Add( "InitPostEntity", "PlayerFullyLoaded_cl", function()
 		hook.Remove("InitPostEntity","PlayerFullyLoaded_cl")
+		LocalPlayer().loaded = true
 		net.Start("PlayerFullyLoaded_net")
 			net.WriteEntity(LocalPlayer())
 		net.SendToServer()
