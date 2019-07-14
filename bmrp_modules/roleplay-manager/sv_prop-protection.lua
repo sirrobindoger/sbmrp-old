@@ -1,5 +1,5 @@
 require("fps")
-
+sPP = sPP or {}
 --[[-------------------------------------------------------------------------
 CONFIG
 ---------------------------------------------------------------------------]]
@@ -29,7 +29,7 @@ local LagCheck = 3 -- the delay at which the server checks if it is lagging
 
 -- The precentage at which if a prop exceeds at on being outside the world, is blocked from being spawned
 -- Ex. Spawning a massive prop in a small room will result in most of the prop being outside the world
-	sPP.PropPrecentage = 40
+	sPP.PropPrecentage = 60
 
 -- This is the same as the last setting, expect that it is for props being duped in, recommend that this is higher
 -- as props being duped in are most likely not going to crash the server
@@ -55,7 +55,6 @@ hook.Add( "EntityTakeDamage", "PlayerHit", PlayerHit )
 --[[-------------------------------------------------------------------------
 Anti crash
 ---------------------------------------------------------------------------]]
-sPP = sPP or {}
 
 local entity = FindMetaTable("Entity")
 local PhysObj = FindMetaTable("PhysObj")
@@ -134,6 +133,7 @@ function sPP.StopLag()
 		game.ConsoleCommand("say Cleared all NPC's due to extreme lag.\n")
 	end
 	for k, v in pairs(ents.GetAll()) do
+		if v:MapCreationID() != -1 then continue end
 		local pobj = v:GetPhysicsObject()
 		if IsValid(pobj) then
 			pobj:EnableMotion(false)
@@ -147,6 +147,7 @@ end
 function sPP.DeLag()
 	for k, v in pairs(ents.GetAll()) do
 		if BuildingEnts[v:GetClass()] then
+			if v:MapCreationID() != -1 then continue end
 			local pobj = v:GetPhysicsObject()
 			if IsValid(pobj) then
 				pobj:EnableMotion(false)
@@ -330,7 +331,7 @@ hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
 		
 		
 
-		--timer.Simple(1, function() ply:SetPos(pos) end)
+		Log(ply:GetName() .. " spawned in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 		prop:Remove()
 	end
 end)
