@@ -36,6 +36,10 @@ local function TeamChange(ply, before, after)
 			ply:SetNWBool("norespawn",false)
 		end)
 	end
+
+	if not ply:IsScience() then
+		ply:Say("/unownalldoors")
+	end
 end
 hook.Add("OnPlayerChangedTeam", "bmrp_jobchange", TeamChange)
 
