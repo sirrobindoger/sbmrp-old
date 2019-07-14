@@ -317,7 +317,8 @@ local function AntiPropSpawn(ply, model, entity)
 	elseif sBMRP.DisablePropsSpawn and not ply:IsAdmin() then
 		ply:ChatPrint("Prop Spawning has been disabled by staff.")
 		entity:Remove()
-	elseif not ply:IsAdmin() or not ply:GetUserGroup() == "supporter" then
+	elseif not ply:IsAdmin() or not ply:GetUserGroup() == "supporter" or not ply.AdvDupe2.Pasting then
+		if tonumber(ply:getDarkRPVar("money")) <= 0 then return end
 		ply:addMoney(-1)
 	end
 end
