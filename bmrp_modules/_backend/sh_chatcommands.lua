@@ -103,6 +103,28 @@ if SERVER then
 	sBMRP.CreateChatCommand("announce", PlayerAnnounce, "Announce your message.", 4)
 	sBMRP.CreateChatCommand("advert", PlayerAnnounce, "Announce your message.", 4)
 end
+
+--[[-------------------------------------------------------------------------
+it/who
+---------------------------------------------------------------------------]]
+local function it(ply, args)
+    if args == "" then
+        DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+        return ""
+    end
+    local DoSay = function(text)
+        if text == "" then
+            DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+            return
+        end
+			DarkRP.talkToRange(ply, text, "", 250)
+    end
+    return args, DoSay
+end
+if SERVER then
+	sBMRP.CreateChatCommand("it", it)
+	sBMRP.CreateChatCommand("who", it)
+end
 --[[-------------------------------------------------------------------------
 Disable Announce/Advert
 ---------------------------------------------------------------------------]]
@@ -148,6 +170,8 @@ end
 local DisableBuilding = ulx.command(CATEGORY_NAME .. " - Map", "ulx disablebuilding", ulx.DisableBuilding, "!disablebuilding", true, false)
 DisableBuilding:defaultAccess(ULib.ACCESS_ADMIN)
 DisableBuilding:help("Enable or disable propspawing and toolgun usage.")
+
+
 
 --[[-------------------------------------------------------------------------
 Xenian Toggle
