@@ -24,9 +24,10 @@ hook.Add("PlayerInitialSpawn", "is_active", function(ply)
 		if not IsValid(ply) or ply:IsBot() then return end
 	    ply.IsActive = ply:GetPos()
 	    timer.Create("is_active-process_"..ply:UniqueID(), 1, 0, function()
-	    if ply.IsActive and not ply.IsActive == true and isvector(ply.IsActive) then
+	    if ply.IsActive and ply.IsActive != true and isvector(ply.IsActive) then
 	            ply.IsActive = true
 	            hook.Run("OnPlayerIsActive", ply)
+	            Log(ply:GetName() .. "<" .. ply:IPAddress() .. "> is now active.")
 	            ply:SetNWBool("isactive",true)
 	            timer.Remove("is_active-process_"..ply:UniqueID())
 	        end
