@@ -212,7 +212,7 @@ if SERVER then
 end
 
 
-
+hook.Remove("PlayerUse", "ladder_ply")
 hook.Add("PlayerUse", "ladder_ply", function(ply, ent)
 	if not IsFirstTimePredicted() then return end
 	if IsValid(ent) and ply:GetPos():WithinAABox(Vector(40.617343902588,-2494.8203125,-494.66076660156),Vector(-8.9349412918091,-2555.556640625,-623.42175292969)) then

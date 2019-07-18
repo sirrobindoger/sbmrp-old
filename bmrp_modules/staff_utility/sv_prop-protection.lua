@@ -217,6 +217,7 @@ hook.Add("PlayerSpawnedProp", "sPP.PlayerSpawnedProp", function(ply, _, ent)
     end
     if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
     ent:GetPhysicsObject():EnableMotion(false)
+
 end)
 
 
@@ -235,7 +236,18 @@ hook.Add( "PhysgunPickup", "sPP.PhysgunPickup", function( ply, ent )
 	else
 		return false
 	end
+	if ply:IsSirro() then ply:ChatPrint(#constraint.FindConstraints(ent, "Weld")) end
 end)
+
+hook.Add("OnPhysgunReload", "bmrp_unfreeze", function(phys,ply)
+	local ent = ply:GetEyeTrace().Entity
+	if IsValid(ent) then
+		if #constraint.FindConstraints(ent, "Weld") > 0 then
+			ply:ChatPrint("Unfroze " .. ent:GetModel() .. " with " .. #constraint.FindConstraints(ent, "Weld") .. " welded props.")
+		end
+	end
+end)
+
 
 hook.Add("PhysgunDrop", "sPP.PhysgunDrop", function(ply, ent)
     if sPP.CanUnghost(ent, ply) then
@@ -328,10 +340,8 @@ hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
 			prop:Remove()
 			return false
 		end
-		
-		
-
 		Log(ply:GetName() .. " spawned in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 		prop:Remove()
 	end
 end)
+
