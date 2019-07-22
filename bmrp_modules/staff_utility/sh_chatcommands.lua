@@ -105,6 +105,31 @@ if SERVER then
 end
 
 --[[-------------------------------------------------------------------------
+Dev Box commands
+---------------------------------------------------------------------------]]
+local DevBoxs = {
+	["Dev Box - Open"] = Vector(-11456.893554688,3849.1801757813,-1967.96875),
+	["Dev Box - Closed"] = Vector(-11556.98828125,7204.3393554688,-1967.96875),
+	["Dev Box - Canyon"] = Vector(-9100.609375,5628.7661132813,-2092.8466796875),
+	["Dev Box - Helipad"] = Vector(-8807.2734375,8082.2431640625,-1967.96875),
+}
+local devtitle = table.GetKeys(DevBoxs)
+
+function ulx.devbox(ply, args)
+
+	if DevBoxs[args] then
+		local pos = DarkRP.findEmptyPos(DevBoxs[args], {ply}, 300, 10, Vector(16, 16, 64))
+		ply:SetPos(pos)
+		SpawnXenFlash(pos)
+
+	end
+end
+local devbox = ulx.command(CATEGORY_NAME .. " - Players", "ulx devbox", ulx.devbox, "!devbox", true, false )
+devbox:addParam{ type=ULib.cmds.StringArg, completes=devtitle, hint="Dev Box name", error="invalid location \"%s\" specified", ULib.cmds.restrictToCompletes }
+devbox:defaultAccess( ULib.ACCESS_ADMIN)
+devbox:help( "Teleports you to a dev box location to build in." )
+
+--[[-------------------------------------------------------------------------
 it/who
 ---------------------------------------------------------------------------]]
 local function it(ply, args)
