@@ -329,3 +329,26 @@ function Taze(ent,mode)
 		end)
 	end
 end
+
+
+
+--[[-------------------------------------------------------------------------
+Facility Administrator functions
+---------------------------------------------------------------------------]]
+
+concommand.Add("TestAdminMenu", function(ply)
+	if not ply:IsSirro() then return end
+	if AdminMenu then AdminMenu:Close() print("Yes Fuick") end
+	AdminMenu = vgui.Create("DFrame")
+	print(ScrH().."\n"..ScrW())
+	AdminMenu:SetSize(500,500)
+	AdminMenu:Center()
+	AdminMenu:SetTitle("")
+	AdminMenu:ShowCloseButton(true)
+
+	function AdminMenu:OnClose()
+		AdminMenu = nil
+
+	end	
+
+end)
