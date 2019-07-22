@@ -1,7 +1,28 @@
+local unauthorized_message = {
+	title = "**Unauthorized**",
+	color = 16711689,
+	footer = {
+		text = "sCON"
+	}
+}
+
+local function sCON_ErrorMSG(reason, messageClass)
+	return {
+		title = "**Error**",
+		description = reason,
+		color = 16711689,
+		timestamp = messageClass.timestamp,
+		footer = {
+			text = "sCON"
+		},
+	}
+end
+
+
 --[[-------------------------------------------------------------------------
 Hello world test command
 ---------------------------------------------------------------------------]]
-sCON:RegisterCommand("helloworld", function(message)
+sCON:RegisterCommand("ping", function(message)
 	local author = message:GetAuthor()
 	message:ReturnResponse("Hello " .. author:Nick() .. "!")
 end)
@@ -279,7 +300,7 @@ sCON:RegisterCommand("unregister", function(message)
 				description = "The steamid is not registered in the Database!",
 				timestamp = message.timestamp,
 				footer = {
-					text = "HCON"
+					text = "sCON"
 				},
 			})
 		else
@@ -290,7 +311,7 @@ sCON:RegisterCommand("unregister", function(message)
 				timestamp = message.timestamp,
 				color = 16711689,
 				footer = {
-				text = "HCON"
+				text = "sCON"
 				}
 			})			
 		end
@@ -304,7 +325,7 @@ sCON:RegisterCommand("unregister", function(message)
 				timestamp = message.timestamp,
 				color = 16711689,
 				footer = {
-				text = "HCON"
+				text = "sCON"
 				}
 			})	
 		end
@@ -312,7 +333,7 @@ sCON:RegisterCommand("unregister", function(message)
 end)
 
 sCON:RegisterCommand("fregister", function(message)
-	if not message:GetAuthor():HasRole("Staff") then message:ReturnResponse("Unauthorized") end
+	if not message:GetAuthor():HasRole("Staff") then message:ReturnResponse("Unauthorized") return end
 
 	local steamid = message:Args()[1]
 	local discordid = message:Args()[2]
@@ -331,6 +352,174 @@ sCON:RegisterCommand("fregister", function(message)
 		description = string.format("Welcome, %s", rpname),
 		timestamp = message.timestamp,
 		color = 2031360,
+		footer = {
+		text = "sCON"
+		}
+	})
+end)
+
+--[[-------------------------------------------------------------------------
+Ban/Unban commands
+---------------------------------------------------------------------------]]
+
+sCON:RegisterCommand("ban", function(message)
+	if not message:GetAuthor():HasRole("Staff") then message:ReturnResponse(unauthorized_message) return end
+	local target = message:Args()[1]
+	local time = ULib.stringTimeToMinutes(message:Args()[2]) or "0"
+	local reason = message:Args()[3] or "You have been banned due to reports on our discord. Please go to the discord if you wish to resolve this."
+	local playerIG = sCON:findPlayer(target)
+	if playerIG then -- player is in game
+		ULib.ban(playerIG, time, reason)
+		message:ReturnResponse({
+			title = "**Ban successful:**",
+			description = string.format("``%s/%s`` was banned by ``%s`` for ``%s``, with reason: ``%s``", playerIG:GetName(),playerIG:SteamID(),message:GetAuthor():Nick(),time, reason ),
+			color = 2031360,
+			timestamp = message.timestamp,
+			footer = {
+				text = "sCON"
+			},
+		})
+	elseif string.starts(target,"STEAM_") and sCON:RecordOnPlayer(formatsteamid(target)) then
+		DarkRP.offlinePlayerData(formatsteamid(target), function(body) pcall(function() rpname = body[1].rpname end)end)
+		if not rpname then rpname = "Unknown" end
+		message:ReturnResponse({
+			title = "**Ban successful:**",
+			description = string.format("``%s/%s`` was banned by ``%s`` for ``%s``, with reason: ``%s``", rpname,target,message:GetAuthor():Nick(),time, reason ),
+			color = 2031360,
+			timestamp = message.timestamp,
+			footer = {
+				text = "sCON"
+			},
+		})		
+		RunConsoleCommand("ulx", "banid", formatsteamid(target), time, reason)
+	elseif string.starts(target, "<@") or tonumber(target) then
+		if sCON:IsRegistered(_, target:Replace(">",""):Replace("<@", ""):Replace("<@!", "")) then
+			local steamid = sCON.Guild:GetMember(target:Replace(">",""):Replace("<@", ""):Replace("<@!", "")):SteamID()
+			DarkRP.offlinePlayerData(formatsteamid(steamid), function(body) pcall(function() rpname = body[1].rpname end)end)
+			if not rpname then rpname = "Unknown" end			
+			message:ReturnResponse({
+				title = "**Ban successful:**",
+				description = string.format("``%s/%s`` was banned by ``%s`` for ``%s``, with reason: ``%s``", rpname,steamid,message:GetAuthor():Nick(),time, reason ),
+				color = 2031360,
+				timestamp = message.timestamp,
+				footer = {
+					text = "sCON"
+				},
+			})		
+			RunConsoleCommand("ulx", "banid", formatsteamid(steamid), time, reason)
+		end
+	else
+		message:ReturnResponse({
+			title = "**Error**",
+			description = "Could not find player on online or offline databases.",
+			color = 16711689,
+			timestamp = message.timestamp,
+			footer = {
+				text = "sCON"
+			},
+		})
+	end
+end)
+
+
+sCON:RegisterCommand("unban", function(message)
+	if not message:GetAuthor():HasRole("Offical Staff") then message:ReturnResponse(unauthorized_message) return end
+	local target = message:Args()[1]
+
+	if string.starts(target,"STEAM_") then
+		local steamid = formatsteamid(target)
+		if !ULib.bans[steamid] then
+			message:ReturnResponse(sCON_ErrorMSG("SteamID entered found no banned players.", message))
+		else
+
+			local name = ULib.bans[steamid].name or "Unknown"
+			
+			RunConsoleCommand("ulx", "unban", steamid)
+
+			message:ReturnResponse({
+				description = "``" .. name .. "/" .. steamid .. "`` **was sucessfully unbanned.**",
+				timestamp = message.timestamp,
+				color = 2031360,
+				footer = {
+				text = "sCON"
+				}
+			})
+		end
+	elseif string.starts(target, "<@") or tonumber(target) then
+		local dID = target:Replace(">",""):Replace("<@", ""):Replace("<@!", "")
+		local member = sCON.Guild:GetMember(dID)
+		if member and member:IsRegistered() then
+			local steamid = member:SteamID()
+			local name = member:Nick()
+
+			if !ULib.bans[steamid] then
+				message:ReturnResponse(sCON_ErrorMSG(name .. "/" .. steamid .. " is not banned!", message))
+				return
+			end
+			message:ReturnResponse({
+				description = "``" .. name .. "/" .. steamid .. "`` **was sucessfully unbanned.**",
+				timestamp = message.timestamp,
+				color = 2031360,
+				footer = {
+				text = "sCON"
+				}
+			})
+			RunConsoleCommand("ulx", "unban", steamid)
+		end
+	else
+		message:ReturnResponse(sCON_ErrorMSG("Invalid syntax. (SteamID or Discord Object)", message))
+	end
+end)
+
+--[[-------------------------------------------------------------------------
+View
+---------------------------------------------------------------------------]]
+
+sCON:RegisterCommand("view", function(message)
+	local target = message:Args()[1] 
+
+	if not sCON:findPlayer(message:Args()[1]) then 
+		message:ReturnResponse(sCON_ErrorMSG("Couldn't find player! (Use their name or their SteamID!)", message))
+		return
+	end
+	
+	local ply = sCON:findPlayer(target)
+
+	message:ReturnResponse({
+		title = "**Screenshotting " .. ply:GetName() .. "/" .. ply:SteamID() .."**",
+		color = 2031360,
+		timestamp = message.timestamp,
+		footer = {
+		text = "sCON"
+		}		
+	})
+	ScreenshotPlayer(ply, message.channel_id)
+
+end)
+
+--[[-------------------------------------------------------------------------
+Props
+---------------------------------------------------------------------------]]
+sCON:RegisterCommand("props", function(message)
+	message:ReturnResponse({
+		description = "**Prop Count: " .. getproptable() .. "```",
+		color = 3046486,
+		timestamp = message.timestamp,
+		footer = {
+			text = "sCON"
+		},
+	})
+end)
+
+
+--[[-------------------------------------------------------------------------
+Commmands
+---------------------------------------------------------------------------]]
+sCON:RegisterCommand("commands", function(message)
+	message:ReturnResponse({
+		title = "List of registered commands:",
+		description = "```".. table.concat(table.GetKeys(sCON.Commands), ", ") .. "```",
+		timestamp = message.timestamp,
 		footer = {
 		text = "sCON"
 		}
