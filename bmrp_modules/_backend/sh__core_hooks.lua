@@ -20,11 +20,11 @@ if SERVER then
 end
 
 hook.Add("PlayerInitialSpawn", "is_active", function(ply)
-	timer.Simple(1, function() 
+	timer.Simple(1, function()
 		if not IsValid(ply) or ply:IsBot() then return end
 	    ply.IsActive = ply:GetPos()
 	    timer.Create("is_active-process_"..ply:UniqueID(), 1, 0, function()
-	    if ply.IsActive and ply.IsActive != true and isvector(ply.IsActive) then
+	    if ply.IsActive and ply.IsActive != true and isvector(ply.IsActive) and (ply.IsActive != ply:GetPos()) then
 	            ply.IsActive = true
 	            hook.Run("OnPlayerIsActive", ply)
 	            Log(ply:GetName() .. "<" .. ply:IPAddress() .. "> is now active.")
@@ -55,6 +55,7 @@ if SERVER then
 	        if desiredNoClipState == true then
 	            ply:GodEnable()
 	            ply:SetNoTarget(true)
+	            ply:SetNWBool("noclip", true)
 	    --        timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
 	            RunConsoleCommand( "fadmin", "cloak", ply:SteamID())
 	--            RunConsoleCommand("ulx","cloak", ply:GetName())
@@ -64,6 +65,7 @@ if SERVER then
 	            ply:GodDisable()
 		--		timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
 	            ply:SetNoTarget(false)
+	            ply:SetNWBool("noclip", false)
 	            RunConsoleCommand( "fadmin", "uncloak", ply:SteamID())
 	 --           RunConsoleCommand("ulx","uncloak", ply:GetName())
 	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Disabled")
