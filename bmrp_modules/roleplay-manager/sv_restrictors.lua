@@ -29,7 +29,7 @@ local xenlocations = {
 local function LocationChanged(ply, old, new)
 	if ply:IsAdmin() then return end 
 	if old == "Unknown" or new == "Unknown" then return end
-	if new == "Rift" and not ply:IsAlien() and not ply:HasHEV() then
+	if sBMRP.LocList.Xen[new] and not ply:IsAlien() and not ply:HasHEV() then
 		if not ply:IsAllowedXen() then
 			vaporize(ply)
 		end
@@ -41,6 +41,9 @@ local function LocationChanged(ply, old, new)
 		if not ply:IsAllowedBMRF() then
 			vaporize(ply)
 		end
+	elseif new == "Admin Room" and not ply:IsAdmin() then
+		RunConsoleCommand("ulx", "banid", ply:SteamID(), "1d", "Attemping to exploit into the Admin Room.")
+		for k,v in pairs(player.GetAll()) do v:ChatPrint(ply:GetName() .. " attempted to explot their way into the admin room.\nThey are now being banned.") end
 	end
 end
 
@@ -309,6 +312,15 @@ local function AntiVehicleSpawn(ply, model, class, info)
 		return false
 	end
 end
+
+local function cantool(ply, tr,tool)
+	if tool == "witchergate" then
+		if !ply:IsAdmin() and ply:GetUserGroup() != "supporter" then 
+			return false
+		end
+	end
+end
+hook.Add("CanTool","BMRP_cantool", cantool)
 
 local function AntiPropSpawn(ply, model, entity)
 	if ply:Team() == TEAM_VISITOR and not ply:IsAdmin() then
