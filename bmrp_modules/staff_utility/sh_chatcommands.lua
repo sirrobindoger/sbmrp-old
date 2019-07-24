@@ -637,6 +637,79 @@ lockdown:setOpposite( "ulx unlockdown", {_, _, true}, "!unlockdown" )
 lockdown:help("Locks down the server.")
 
 --[[-------------------------------------------------------------------------
+Pac Commands
+---------------------------------------------------------------------------]]
+local function sCONGivePac(targ, bool)
+	if not isstring(targ) then return end
+	local method = (bool and "DELETE") or nil
+	if sCON:IsRegistered(targ) then
+		local member = sCON.Guild:GetMember(targ)
+		if bool then
+			member:EditRole("542120309210218508", "DELETE")
+		else
+			member:EditRole("542120309210218508")
+		end
+	else
+		print(targ .. "gay")
+	end
+end
+
+local function playernames() local playernames = {} for k,v in pairs(player.GetAll()) do table.insert(playernames, v:GetName()) end return playernames end
+
+function ulx.unpac(ply, target_ply)
+   local target = target_ply[1] or false
+   
+    if target then
+       ulx.fancyLog( player.GetAdmins(), "[Staff]: #P forcefully unweared #P PAC Outfit",ply, target)
+        target:ConCommand("pac_clear_parts;pac_wear_parts")
+        target:ChatPrint("Your pac outfit has been forcefully removed by staff.\nConsider re-thinking your pac outfit.")
+    end
+end
+local unpac = ulx.command(CATEGORY_NAME .. " - PAC3", "ulx unpac", ulx.unpac, "!unpac", true, false)
+unpac:addParam{ type=ULib.cmds.PlayersArg }
+unpac:defaultAccess(ULib.ACCESS_ADMIN)
+unpac:help("Forefully make a player unwear their current PAC outfit.")
+
+function ulx.grantpac(ply, targ)
+	local target = sCON:findPlayer(targ) or targ or false
+	if target and not isstring(target) and target:IsPlayer() then
+		ulx.fancyLog(player.GetAll(), "#P granted PAC3 permissions to #P.", ply, target)
+		sCONGivePac(target:SteamID())
+		target:ConCommand("pac_clear_parts;pac_wear_parts")
+		target:SetPData("PAC3", true)
+	elseif isstring(target) and target:find("STEAM_") and tobool(util.GetPData(target, "scon",false)) then
+		ulx.fancyLog(player.GetAll(), "#P granted PAC3 permissions to STEAMID: #s.", ply, targ)
+		sCONGivePac(target)
+		util.SetPData(target, "PAC3", true)
+	else
+		ULib.tsayError(ply, "Invalid playername/steamid!")
+	end
+end
+local grantpac = ulx.command(CATEGORY_NAME .. " - PAC3", "ulx grantpac", ulx.grantpac, "!grantpac", true, false)
+grantpac:addParam{ type=ULib.cmds.StringArg, completes=playernames(), hint="Name or Steamid",}
+grantpac:defaultAccess( ULib.ACCESS_ADMIN)
+grantpac:help( "Grants the target player or steamid PAC3 permissions." )
+
+
+function ulx.removepac(ply, targ)
+	local target = sCON:findPlayer(targ) or targ or false
+	if target and not isstring(target) and target:IsPlayer() then
+		ulx.fancyLog(player.GetAll(), "#P revoked PAC3 permissions to #P.", ply, target)
+		target:SetPData("PAC3", false)
+		sCONGivePac(target:SteamID())
+	elseif isstring(target) and target:find("STEAM_") and tobool(util.GetPData(target, "scon",false)) then
+		ulx.fancyLog(player.GetAll(), "#P revoked PAC3 permissions to STEAMID: #s.", ply, targ)
+		sCONGivePac(target)
+		util.SetPData(target, "PAC3", false)
+	else
+		ULib.tsayError(ply, "Invalid playername/steamid!")
+	end
+end
+local removepac = ulx.command(CATEGORY_NAME .. " - PAC3", "ulx removepac", ulx.removepac, "!removepac", true, false)
+removepac:addParam{ type=ULib.cmds.StringArg, completes=playernames(), hint="Name or Steamid",}
+removepac:defaultAccess( ULib.ACCESS_ADMIN)
+removepac:help( "Grants the target player or steamid PAC3 permissions." )
+--[[-------------------------------------------------------------------------
 ADMIN HELP NOTIFER
 ---------------------------------------------------------------------------]]
 local function ChatNotifier ( ply, txt, public )
