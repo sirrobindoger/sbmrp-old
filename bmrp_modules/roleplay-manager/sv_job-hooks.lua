@@ -62,7 +62,7 @@ function SuitChecker()
 		end
 	end
 end
-hook.Add("Tick1s", "bmrp_security-engine", SuitChecker)
+timer.Create("secu-suitup", .5, 0, SuitChecker)
 
 --[[-------------------------------------------------------------------------
 Shipments
@@ -135,6 +135,9 @@ function supporterinv(ply)
 		if ply:IsBlackMesa() then
 			timer.Simple(2, function() ply:Give("itemstore_pickup") end)
 		end
+	end
+	if ply:IsService() then
+		ply:Give("tfa_bms_crowbar")
 	end
 end
 
