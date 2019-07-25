@@ -77,6 +77,18 @@ end
 
 hook.Add("playerBoughtPistol", "delete_shipment",playerboughtshipment)
 
+--[[-------------------------------------------------------------------------
+Can change playermodel (for the closet addon)
+---------------------------------------------------------------------------]]
+
+local function CanChangePlayermodel(ply)
+	if ply:IsSecurity() and GetLocation(ply) != "Sector B" then
+		sBMRP.ChatNotify({ply}, "Error", "You can only equip your security vest in Sector B closets!")
+		return true
+	end
+end
+hook.Add("CanEditPlayermodel", "bmrp_playermodel", CanChangePlayermodel)
+
 
 --[[-------------------------------------------------------------------------
 Xenian capture/handcuffs
