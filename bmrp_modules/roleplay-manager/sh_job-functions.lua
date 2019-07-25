@@ -112,10 +112,7 @@ Functions to allow/disallow a spesific player to x location
 ---------------------------------------------------------------------------]]
 
 function ply:AllowToXen(bool)
-	if self:IsAlien() then
-		Log("Trying to override " .. self:GetName() .. "/" .. self:Team() .. "'s xen permissions when they are a xenian!")
-		return
-	end
+
 	if bool then
 		self:SetNWBool("XenAllowed", true)
 	else
@@ -124,10 +121,7 @@ function ply:AllowToXen(bool)
 end
 
 function ply:AllowToEarth(bool)
-	if not self:IsAlien() then
-		Log("Trying to override " .. self:GetName() .. "/" .. self:Team() .. "'s earth permissions when they aren't a xenian!")
-		return
-	end
+
 	if bool then
 		self:SetNWBool("EarthAllowed", true)
 	else
@@ -136,10 +130,7 @@ function ply:AllowToEarth(bool)
 end
 
 function ply:AllowToBMRF(bool)
-	if not self:IsHECU() then
-		Log("Trying to override " .. self:GetName() .. "/" .. self:Team() .. "'s BMRF permissions when they aren't a HECU!")
-		return
-	end
+
 	if bool then
 		self:SetNWBool("IsAllowedBMRF", true)
 	else
@@ -203,7 +194,7 @@ function SuitUp( ply, args)
 		if ply:Team() != TEAM_SECURITYRECRUIT then
 			ply:Give( "arrest_stick" )
 		end
-		DarkRP.notify(ply, 7, 3, "You have put on your vest and are now on-duty.")	
+		sBMRP.ChatNotify({ply}, "Info", "You have put on your vest and are now on-duty.")	
 	end
 	return ""
 end
@@ -222,7 +213,7 @@ function SuitDown(ply)
 		ply:EmitSound("npc/combine_soldier/zipline_clothing1.wav")
 		ply:EmitSound("npc/metropolice/vo/off2.wav")
 		ply:SetModel("models/player/office1/male_08.mdl")
-		DarkRP.notify(ply, 6, 3, "You have taken off your vest and are now off-duty.")
+		sBMRP.ChatNotify({ply}, "Info", "You have removed your vest and are now off duty.")
 	end
 end
 
