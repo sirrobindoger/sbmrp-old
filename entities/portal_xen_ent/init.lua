@@ -31,7 +31,7 @@ function ENT:StartTouch(ent)
 	if self:GetPlayersOnly() and not(ent:IsPlayer()) then return end
 	if self:GetSafeMode() and (ent:GetClass() == "physgun_beam" or ent:GetClass() =="sammyservers_textscreen" or ent:IsWorld() or ent:GetClass() == "prop_dynamic" or ent:IsConstrained() or ent:MapCreationID() != -1) then return end
 	if table.HasValue(self.Blacklist,ent:GetModel()) or table.HasValue(self.Blacklist,ent:GetClass()) then return end
-	if self:GetHumanOrEventOnly() and ent:IsPlayer() and ent:IsAlien() and not ent:IsAllowedEarth() then ent:ChatPrint(self.AlienBlockMsg) return end
+	if self:GetHumanOrEventOnly() and ent:IsPlayer() and ent:IsAlien() and not ent:IsAllowedEarth() then sBMRP.ChatNotify({ent}, "Error",self.AlienBlockMsg) return end
 	
 	if self:GetTeleSound() then 
 		local telesound = self.TeleportSounds[math.random(1,#self.TeleportSounds )]
@@ -48,7 +48,7 @@ function ENT:StartTouch(ent)
 		ent:SetGravity(self.DestinationGravity)
 		ent:SetEyeAngles(dest[2])
 		if self:GetArrivalText() != "" then
-			ent:ChatPrint(self:GetArrivalText())
+			sBMRP.ChatNotify({ent}, "Info",self:GetArrivalText())
 		end
 	end
 end

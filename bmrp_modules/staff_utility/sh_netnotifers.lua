@@ -14,6 +14,16 @@ sBMRP_Notify["Error"] = {
 	[2] = {255, 0, 13}
 }
 
+sBMRP_Notify["Security"] = {
+	[1] = {0, 213, 255},
+	[2] = {40, 160, 184}
+}
+
+sBMRP_Notify["VOX"] = {
+	[1] = {27, 158, 62},
+	[2] = {4, 217, 61}	
+}
+
 if SERVER then
 	local ply = FindMetaTable("Player")
 	util.AddNetworkString("sBMRP.Notifers")
