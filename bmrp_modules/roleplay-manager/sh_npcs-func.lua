@@ -1,6 +1,6 @@
 sBMRP.NPCs = sBMRP.NPCs || {}
 sBMRP.NPCs.Population = 0
-sBMRP.NPCs.Behavior = D_LI
+sBMRP.NPCs.Behavior = D_HT
 sBMRP.NPCs.Spawnlist = {
 	Vector(6393,-3341,383),
 	Vector(4109,-4067,110),
@@ -135,7 +135,6 @@ if SERVER then
 			npcent:SetPos(DarkRP.findEmptyPos(table.Random(sBMRP.NPCs.Spawnlist),{},600, 30, Vector(34, 34, 64)))
 			npcent:Spawn()
 			SpawnXenFlash(npcent:GetPos())
-			npcent:Fire("startpatrolling")
 		end
 	end
 end
@@ -144,6 +143,7 @@ if CLIENT then
 	local NoUseNPCs = {
 		["cycler"] = true,
 		["animprop_generic"] = true,
+		["npc_quest-dealer"] = true,
 
 	}
 	local npchud = sBMRP.AppendFont("bossfight", ScreenScale(10))

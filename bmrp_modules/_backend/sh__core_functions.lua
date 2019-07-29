@@ -82,6 +82,22 @@ function player.GetAdmins()
 	return admins
 end
 
+
+function player.InLocation(loc)
+	local entry = {}
+	local istrue = false
+	for k,v in pairs(player.GetAll()) do
+		if GetLocation(v) == loc then
+			table.insert(entry, v)
+			istrue = true
+		end
+	end
+	return istrue, entry
+end
+
+
+
+
 if SERVER then
 	function adminchatall(text)
 		for k,v in pairs(player.GetAll()) do
@@ -165,6 +181,50 @@ if SERVER then
 		end
 	end
 end
+
+if SERVER then
+	util.AddNetworkString("sBMRP.HighlightEnts")
+
+	function ply:AddHighlightEnt(ent, append)
+		if !istable( ent )  then return end
+		self.highlightedents = ( self.highligthedents and append and table.Add(self.highligthedents, ent) ) or ent
+		net.Start("sBMRP.HighlightEnts")
+			net.WriteCompressedTable(self.highlightedents)
+		net.Send(self)
+	end
+
+	function ply:HasHightedEnts()
+		if #self.highlightedents > 0 then
+			return true, self.highlightedents
+		end
+	end
+
+	function ply:ClearHighlightEnts()
+		net.Start("sBMRP.HighlightEnts")
+			net.WriteCompressedTable({-1})
+		net.Send(self)
+	end
+end
+
+
+if CLIENT then
+	local highlightents = highlightents || false
+
+	net.Receive("sBMRP.HighlightEnts", function(len)
+		local netents = net.ReadCompressedTable()
+
+		if netents[1] == -1 then highlightents = false return end
+		PrintTable(netents)
+		highlightents = netents
+
+	end)
+
+	hook.Add( "PreDrawHalos", "bmrp_halodraw", function()
+		if not highlightents then return end
+		halo.Add( highlightents, Color( 255, 0, 0 ), 5, 5, 1 )
+	end )
+end
+
 
 
 function timeToStr( time )

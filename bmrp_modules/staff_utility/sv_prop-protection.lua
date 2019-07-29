@@ -45,6 +45,8 @@ local function PlayerHit( ent, dmginfo )
 		if inf == NULL or inf == nil or att == NULL or inf == nil or (inf:GetClass() == nil and not(att:IsPlayer())) then return end
 	    if nodamageclass[inf:GetClass()] or dmginfo:GetDamageType() == 1 then
 			return true
+		elseif inf:GetClass() == "trigger_hurt" and (ent:IsOnFire() and ent:Team() == TEAM_GARGA) then
+			return true
 		end
 	end
 	
@@ -286,6 +288,7 @@ end
 
 local Clamp = math.Clamp
 function entity.SetPos(ent, pos)
+	if not IsValid(ent) then return end
     pos.x = Clamp(pos.x, -20000, 20000)
     pos.y = Clamp(pos.y, -20000, 20000)
     pos.z = Clamp(pos.z, -20000, 20000)
@@ -301,47 +304,84 @@ end
 
 
 hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
-	if model then
-		if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
-		local prop = ents.Create("prop_dynamic")
-		prop:SetPos(ply:GetEyeTrace().HitPos)
-		prop:SetModel(model)
-		prop:Spawn()
-		
-		local vec1, vec2 = prop:GetModelBounds()
-		prop:SetPos(prop:GetPos() + Vector(0,0,math.abs(vec1.z*2)))
-		prop:DropToFloor()
-		local propphys = prop:GetPhysicsObject()
-		local propmesh = propphys:GetMesh()
-		local numoutside = 0
-		local totalmesh = 0
-		for k,vec in pairs(propmesh) do
-			totalmesh = totalmesh + 1
-			if not util.IsInWorld(propphys:LocalToWorld(vec.pos)) then
-				numoutside = numoutside + 1
-			end
-		end
-		local precentageoutside = math.Round(numoutside/totalmesh*100)
 
-		--[[if ply.AdvDupe2 and ply.AdvDupe2.Pasting then
-			if precentageoutside >= sPP.PropPrecentageDupe then
-				ply:ChatPrint("[sPP - AdvDupe2]: " .. prop:GetModel() .. " was removed for being " .. precentageoutside .. "% outside the world.")
-				Log(ply:GetName() .. " tried to spawn in " .. model .. " while duping. [" .. precentageoutside .. "% outside map.]")
-				prop:Remove()
-				return false
-			else
-				prop:Remove()
-				return
-			end
-		else]]--
-		if precentageoutside >= sPP.PropPrecentage then
-			ply:Notify("[sPP]: This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
-			Log(ply:GetName() .. " tried to spawn in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
+	if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
+	local prop = ents.Create("prop_dynamic")
+	prop:SetPos(ply:GetEyeTrace().HitPos)
+	prop:SetModel(model)
+	prop:Spawn()
+	
+	local vec1, vec2 = prop:GetModelBounds()
+	prop:SetPos(prop:GetPos() + Vector(0,0,math.abs(vec1.z*2)))
+	prop:DropToFloor()
+	local propphys = prop:GetPhysicsObject()
+	local propmesh = propphys:GetMesh()
+	local numoutside = 0
+	local totalmesh = 0
+	for k,vec in pairs(propmesh) do
+		totalmesh = totalmesh + 1
+		if not util.IsInWorld(propphys:LocalToWorld(vec.pos)) then
+			numoutside = numoutside + 1
+		end
+	end
+	local precentageoutside = math.Round(numoutside/totalmesh*100)
+
+	--[[if ply.AdvDupe2 and ply.AdvDupe2.Pasting then
+		if precentageoutside >= sPP.PropPrecentageDupe then
+			ply:ChatPrint("[sPP - AdvDupe2]: " .. prop:GetModel() .. " was removed for being " .. precentageoutside .. "% outside the world.")
+			Log(ply:GetName() .. " tried to spawn in " .. model .. " while duping. [" .. precentageoutside .. "% outside map.]")
 			prop:Remove()
 			return false
+		else
+			prop:Remove()
+			return
 		end
-		Log(ply:GetName() .. " spawned in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
+	else]]--
+	if precentageoutside >= sPP.PropPrecentage then
+		ply:Notify("[sPP]: This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
+		Log(ply:GetName() .. " tried to spawn in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 		prop:Remove()
+		return false
 	end
+	Log(ply:GetName() .. " spawned in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
+	prop:Remove()
+
 end)
 
+--[[-------------------------------------------------------------------------
+Collision timeouts
+---------------------------------------------------------------------------]]
+--[[
+hook.Add("PlayerSpawnedProp", "collision_timeout-init", function(ply,model, ent)
+	--ent:SetCustomCollisionCheck(false)
+	--ent:CollisionRulesChanged()
+end)
+
+hook.Add("ShouldCollide", "collision_timeout", function(ent1,ent2)
+	/*
+	if (ent1:CPPIGetOwner() != ent2:CPPIGetOwner()) or not IsValid(ent1:CPPIGetOwner()) or not ent1:CPPIGetOwner():IsPlayer() or (ent1:GetPos():DistToSqr(ent2:GetPos()) < 2000) then return true end
+	local ply = ent1:CPPIGetOwner() -- they both have the same owner so it doesn't matter
+	if not ply.propcollision then ply.propcollision = 0 end
+	ply.propcollision = ply.propcollision + 1
+	*/
+	return true
+end)
+
+timer.Create("collision_rate-print", 5, 0, function()
+	if not sBMRP.Debug then return end
+	print("------------")
+	for k,v in pairs(player.GetAll()) do
+		if not v.propcollision then continue end
+		print(v.propcollision)
+		v.propcollision = 0
+	end
+	print("------- END -------")
+end)
+
+
+for k,v in pairs(ents.FindByClass("prop_physics")) do
+	if IsValid(v:CPPIGetOwner()) and v:CPPIGetOwner():IsPlayer() then
+		ent:SetCustomCollisionCheck(true)
+		ent:CollisionRulesChanged()	
+	end
+end]]--
