@@ -109,7 +109,17 @@ if SERVER then
 end
 
 
-
+function minvalue(ints)
+	local smallest = math.huge
+	for k,v in pairs(ints) do
+		if v <= 0 then return false end
+		
+		if v < smallest then
+			smallest = v
+		end
+	end
+	return smallest
+end
 
 
 
