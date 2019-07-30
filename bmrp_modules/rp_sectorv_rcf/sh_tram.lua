@@ -111,7 +111,7 @@ if SERVER then
     physics/metal/metal_sheet_impact_hard8.wav
 
     vehicles/v8/v8_turbo_on_loop1.wav
-    ---------------------------------------------------------------------------]]
+    
     hook.Add("LerpMovementEnded", "tram_slam-loop", function(ent)
         if not IsValid(sBMRP.BrokeTramArm) or not IsValid( sBMRP.BrokeTram) then return end
         if ent:GetPos():Round() == Vector(-6350.84, -3795.70, -260.03):Round() then
@@ -132,6 +132,7 @@ if SERVER then
             end)
         end
     end)
+    ---------------------------------------------------------------------------]]
     
 
     --[[

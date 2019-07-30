@@ -261,9 +261,6 @@ local function LabPlayerSpawn(ply)
 			end
 		end
 	end
-	if ply:IsAdmin() then
-		ply:Give("gas_log_scanner")
-	end
 end
 hook.Add("PlayerSpawn", "lab_rp-spawn", LabPlayerSpawn)
 
