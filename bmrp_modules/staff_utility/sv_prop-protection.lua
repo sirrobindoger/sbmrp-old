@@ -29,7 +29,7 @@ local LagCheck = 3 -- the delay at which the server checks if it is lagging
 
 -- The precentage at which if a prop exceeds at on being outside the world, is blocked from being spawned
 -- Ex. Spawning a massive prop in a small room will result in most of the prop being outside the world
-	sPP.PropPrecentage = 60
+	sPP.PropPrecentage = 50
 
 -- This is the same as the last setting, expect that it is for props being duped in, recommend that this is higher
 -- as props being duped in are most likely not going to crash the server

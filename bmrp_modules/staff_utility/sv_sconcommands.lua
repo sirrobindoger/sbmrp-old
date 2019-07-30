@@ -366,7 +366,7 @@ sCON:RegisterCommand("ban", function(message)
 	if not message:GetAuthor():HasRole("Staff") then message:ReturnResponse(unauthorized_message) return end
 	local target = message:Args()[1]
 	local time = ULib.stringTimeToMinutes(message:Args()[2]) or "0"
-	local reason = message:Args()[3] or "You have been banned due to reports on our discord. Please go to the discord if you wish to resolve this."
+	local reason = message:Args()[3] and table.concat(message:Args(), " "):Replace(target, ""):Replace(time, "") or "You have been banned due to reports on our discord. Please go to the discord if you wish to resolve this."
 	local playerIG = sCON:findPlayer(target)
 	if playerIG then -- player is in game
 		ULib.ban(playerIG, time, reason)

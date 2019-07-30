@@ -108,10 +108,10 @@ end
 Dev Box commands
 ---------------------------------------------------------------------------]]
 local DevBoxs = {
-	["Dev Box - Open"] = Vector(-11456.893554688,3849.1801757813,-1967.96875),
-	["Dev Box - Closed"] = Vector(-11556.98828125,7204.3393554688,-1967.96875),
-	["Dev Box - Canyon"] = Vector(-9100.609375,5628.7661132813,-2092.8466796875),
-	["Dev Box - Helipad"] = Vector(-8807.2734375,8082.2431640625,-1967.96875),
+	["Open"] = Vector(-11456.893554688,3849.1801757813,-1967.96875),
+	["Closed"] = Vector(-11556.98828125,7204.3393554688,-1967.96875),
+	["Canyon"] = Vector(-9100.609375,5628.7661132813,-2092.8466796875),
+	["Helipad"] = Vector(-8807.2734375,8082.2431640625,-1967.96875),
 }
 local devtitle = table.GetKeys(DevBoxs)
 
@@ -309,7 +309,7 @@ function ulx.AllowAllHECU(calling_ply)
 end
 local AllowAllHECU = ulx.command(CATEGORY_NAME .. " - Players", "ulx allowallhecu", ulx.AllowAllHECU, "!allowallhecu", true, false)
 AllowAllHECU:defaultAccess(ULib.ACCESS_ADMIN)
-AllowAllHECU:help("Enable or disable HECU's entry into BMRF.")
+AllowAllHECU:help("Enable or disable HECU's entry into BMRF. Revoking entry will also reset all allowsinglehecu to their default value.")
 
 function ulx.AllowAllXenians(calling_ply)	
 	if not sBMRP.AllowEarthToXen then
@@ -326,7 +326,7 @@ function ulx.AllowAllXenians(calling_ply)
 end
 local AllowAllXenians = ulx.command(CATEGORY_NAME .. " - Players", "ulx allowallxenians", ulx.AllowAllXenians, "!allowallxenians", true, false)
 AllowAllXenians:defaultAccess(ULib.ACCESS_ADMIN)
-AllowAllXenians:help("Enable or disable Xenian's entry into Earth.")
+AllowAllXenians:help("Enable or disable Xenian's entry into Earth. Revoking entry will also reset all allowsinglexenian to their default value.")
 
 
 --[[-------------------------------------------------------------------------

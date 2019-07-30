@@ -24,6 +24,7 @@ sBMRP_Notify["VOX"] = {
 	[2] = {4, 217, 61}	
 }
 
+
 if SERVER then
 	local ply = FindMetaTable("Player")
 	util.AddNetworkString("sBMRP.Notifers")
