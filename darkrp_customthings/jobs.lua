@@ -703,7 +703,7 @@ TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
     admin = 0,
     salary = 85,
     PlayerSpawn = function(ply) ply:SetArmor(100) end,
-    rdmgroup = "HECU",
+    rdmgroup = "BMRF",
     ishecu = true,
     category = "Government"
 })
@@ -715,8 +715,8 @@ TEAM_HECU = DarkRP.createJob("HECU Grunt", {
         "models/player/gasmask_hecu.mdl",
         "models/player/gasmask_hecu2.mdl",
         "models/player/gasmask_hecu3.mdl",
-        "models/hgrunt4.mdl",
-        "models/hgrunt5.mdl",
+ --       "models/hgrunt4.mdl",
+  --      "models/hgrunt5.mdl",
         --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
 
     },
@@ -727,7 +727,7 @@ TEAM_HECU = DarkRP.createJob("HECU Grunt", {
     admin = 0,
     salary = 85,
     PlayerSpawn = function(ply) ply:SetArmor(100) end,
-    rdmgroup = "HECU",
+    rdmgroup = "BMRF",
     ishecu = true,
     category = "Government"
 })
@@ -739,8 +739,8 @@ TEAM_HECUMED = DarkRP.createJob("HECU Medic", {
         "models/player/gasmask_hecu.mdl",
         "models/player/gasmask_hecu2.mdl",
         "models/player/gasmask_hecu3.mdl",
-        "models/hgrunt4.mdl",
-        "models/hgrunt5.mdl",
+--        "models/hgrunt4.mdl",
+--        "models/hgrunt5.mdl",
         --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
 
     },
@@ -751,7 +751,7 @@ TEAM_HECUMED = DarkRP.createJob("HECU Medic", {
     admin = 0,
     salary = 90,
     PlayerSpawn = function(ply) ply:SetArmor(100) end,
-    rdmgroup = "HECU",
+    rdmgroup = "BMRF",
     ishecu = true,
     category = "Government"
 })
@@ -763,7 +763,7 @@ TEAM_HECUCOMMAND = DarkRP.createJob("HECU Sergeant", {
         "models/player/gasmask_hecu.mdl",
         "models/player/gasmask_hecu2.mdl",
         "models/player/gasmask_hecu3.mdl",
-        "models/hgrunt3.mdl",
+--        "models/hgrunt3.mdl",
         --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
     },
     description = [[You are the head of the onsight millitary; H.E.C.U. Lead the main force of security of BMRF, and to make sure that all unauthorized personnel are taken care of.]],
@@ -775,7 +775,7 @@ TEAM_HECUCOMMAND = DarkRP.createJob("HECU Sergeant", {
     admin = 0,
     vote = true,
     PlayerSpawn = function(ply) ply:SetArmor(100) end,
-    rdmgroup = "HECU",
+    rdmgroup = "BMRF",
     ishecu = true,
     category = "Government"
 })
