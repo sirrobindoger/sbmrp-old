@@ -50,15 +50,15 @@ local function mapinit()
 	suitthree:SetPos( Vector(-6565.922852,182.081421,-292.046753)) 
 	suitthree:Spawn()
 
-	EntID(3879):SetName("biolab1")
-	EntID(3894):SetName("biolab2")
-	EntID(3862):SetName("biolab3")
+	EntID(3788):SetName("biolab1")
+	EntID(3801):SetName("biolab2")
+	EntID(3771):SetName("biolab3")
 
 	--[[-------------------------------------------------------------------------
 	Custom buttons yo
 	---------------------------------------------------------------------------]]
-	EntID(1913):Fire("Lock")
-	EntID(1912):Fire("Lock")
+	EntID(1889):Fire("Lock")
+	EntID(1888):Fire("Lock")
 
 	local button = ents.Create("gmod_button")
 	button:SetPos(Vector(-2171.19, -3168.60, -177.48))
@@ -138,12 +138,12 @@ local function mapinit()
 	function button:Use( activator, caller )
 		if IsValid( caller ) and caller:IsPlayer() then
 			self:EmitSound( "buttons/button3.wav" )
-			if ents.GetMapCreatedEntity(2586):GetPos()[3] == -157 then
-				ents.GetMapCreatedEntity(2586):EmitSound("doors/doormove2.wav")
-			elseif ents.GetMapCreatedEntity(2586):GetPos()[3] == -238 then
-				ents.GetMapCreatedEntity(2586):EmitSound("doors/doormove6.wav",150)
+			if ents.GetMapCreatedEntity(2522):GetPos()[3] == -157 then
+				ents.GetMapCreatedEntity(2522):EmitSound("doors/doormove2.wav")
+			elseif ents.GetMapCreatedEntity(2522):GetPos()[3] == -238 then
+				ents.GetMapCreatedEntity(2522):EmitSound("doors/doormove6.wav",150)
 			end
-			ents.GetMapCreatedEntity(2586):Fire("Toggle")
+			ents.GetMapCreatedEntity(2522):Fire("Toggle")
 		end
 	end
 	--Biolabs container gas buton
@@ -158,9 +158,9 @@ local function mapinit()
 	button:GetPhysicsObject():EnableMotion(false)
 	function button:Use( activator, caller )
 		if IsValid( caller ) and caller:IsPlayer() then
-			if ents.GetMapCreatedEntity(2586):GetPos()[3] == -157 then
+			if ents.GetMapCreatedEntity(2522):GetPos()[3] == -157 then
 				self:EmitSound( "buttons/button3.wav" )
-				ents.GetMapCreatedEntity(2586):EmitSound("ambient/machines/steam_release_2.wav")
+				ents.GetMapCreatedEntity(2522):EmitSound("ambient/machines/steam_release_2.wav")
 				local d = DamageInfo()
 				d:SetDamageType( DMG_SLOWBURN )
 				local smoke= ents.Create("env_smoketrail")
@@ -182,11 +182,64 @@ local function mapinit()
 					d:SetDamage( v:GetMaxHealth()/4)
 					v:TakeDamageInfo( d )
 				end
-			elseif ents.GetMapCreatedEntity(2586):GetPos()[3] == -238 then
+			elseif ents.GetMapCreatedEntity(2522):GetPos()[3] == -238 then
 				self:EmitSound("buttons/button11.wav",150)
 			end
 		end
 	end
+
+	local button = ents.Create("gmod_button")
+	button:SetPos(Vector(-7423.00, -250.51, -200.95))
+	button:SetModel("models/hunter/blocks/cube05x05x025.mdl")
+	button:Spawn()
+	button:SetAngles(Angle(90.000, -90.000, 180.000))
+	button:SetName("secalarglab-door")
+	button:GetPhysicsObject():EnableMotion(false)
+	button:SetMaterial("!CUSTOMHLBUTTONTEXTURE3",true)
+
+	local button_lighting = ents.Create("prop_physics_nolighting")
+	button_lighting:SetPos(button:GetPos())
+	button_lighting:SetAngles(button:GetAngles())
+	button_lighting:SetModel(button:GetModel())
+	button_lighting:SetParent(button)
+	button_lighting:SetRenderMode(RENDERMODE_TRANSALPHA)
+	button_lighting:Spawn()
+
+	local button = ents.Create("gmod_button")
+	button:SetPos(Vector(-7423.29, -237.72, -203.46))
+	button:SetModel("models/hunter/blocks/cube05x05x025.mdl")
+	button:Spawn()
+	button:SetAngles(Angle(90.000, 90.000, 180.000))
+	button:SetName("secalarglab-door2")
+	button:GetPhysicsObject():EnableMotion(false)
+	button:SetMaterial("!CUSTOMHLBUTTONTEXTURE3",true)
+
+	local button_lighting = ents.Create("prop_physics_nolighting")
+	button_lighting:SetPos(button:GetPos())
+	button_lighting:SetAngles(button:GetAngles())
+	button_lighting:SetModel(button:GetModel())
+	button_lighting:SetParent(button)
+	button_lighting:SetRenderMode(RENDERMODE_TRANSALPHA)
+	button_lighting:Spawn()
+	for k,v in pairs({5385, 5384, 5386, 5383}) do
+		ents.GetMapCreatedEntity(v):Fire("Lock")
+	end
+	hook.Add("PlayerUse", "sector_large-lab", function(ply, ent)
+		if not IsFirstTimePredicted() then return end
+		if ent:GetName() == "secalarglab-door" then
+			if table.HasValue(ply:GetOwnedDoors(), ents.GetMapCreatedEntity(5384)) then
+				for k,v in pairs({5385, 5384, 5386, 5383}) do
+					ents.GetMapCreatedEntity(v):Fire("Unlock")
+					ents.GetMapCreatedEntity(v):Fire("Open")
+					ents.GetMapCreatedEntity(v):Fire("Lock")
+				end
+				ent:EmitSound("buttons/button5.wav")
+			else
+				ent:EmitSound("buttons/button2.wav")
+			end
+		end
+
+	end)
 
 	local button_lighting = ents.Create("prop_physics_nolighting")
 	button_lighting:SetPos(button:GetPos())
@@ -221,3 +274,5 @@ hook.Add("PlayerUse", "ladder_ply", function(ply, ent)
 		ply:SetAngles(Angle(0,180,0))
 	end
 end)
+
+
