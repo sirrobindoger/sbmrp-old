@@ -37,7 +37,7 @@ sBMRP.LocList.Biosector = {
 sBMRP Locations
 ---------------------------------------------------------------------------]]
 
-if game.GetMap() == "rp_sectorc_s1" then
+
 	table.insert(sBMRP.locationnames,{"Rift",Vector(-12506.098632813,-989.16461181641,286.60958862305),Vector(-11933.997070313,-1150.001953125,-112.37423706055)})
 	table.insert(sBMRP.locationnames,{"Admin Room",Vector(-2502.4763183594,-4293.1240234375,-983.39428710938),Vector(-1667.861328125,-4647.3579101563,-1471.1868896484)})
 
@@ -127,6 +127,6 @@ if game.GetMap() == "rp_sectorc_s1" then
 		table.insert(sBMRP.locationnames,{"Tram",Vector(-7339.092285, 1985.572998, 598.660583),Vector(-579.495972, 1056.513428, -769.497528)})
 		table.insert(sBMRP.locationnames,{"Tram",Vector(6069.286133,239.049194,-373.228607),Vector(-8454.666016,-3010.634277,175.476715)})
 
-end
+
 
 

@@ -16,15 +16,15 @@ sBMRP Job Info func's
 function ply:CanHurt(ent)
 	local damageoverride = hook.Run("AntiRDMOverride", self, ent)
 	-- If the target is not marked "anything can hurt this target", and (the ply in questions is marked "cannot give damage" or the rdmgroup of the target and ply are the same)
-	if not(ent:getJobTable()["rdmnoblockingdamage"]) and (self:getJobTable()["rdmnogivingdamage"] or self:getJobTable()["rdmgroup"] == ent:getJobTable()["rdmgroup"]) and sBMRP.AntiRDM and not damageoverride == true then
+	if not(ent:getJobTable()["rdmnoblockingdamage"]) and (self:getJobTable()["rdmnogivingdamage"] or self:getJobTable()["rdmgroup"] == ent:getJobTable()["rdmgroup"]) and sBMRP.AntiRDM and damageoverride != true then
 		return false --Say no, we cannot hurt this ent
-	else 
+	else
 		return true --Otherwise fuck it yeah damage it
-	end 
+	end
 end
 
 function ply:IsAlien()
-	if(self:getJobTable()["isalien"]) then --We need to build a wall
+	if (self:getJobTable()["isalien"]) then --We need to build a wall
 		return true
 	else return false end
 end
