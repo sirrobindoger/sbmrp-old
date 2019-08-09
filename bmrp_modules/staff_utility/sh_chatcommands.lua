@@ -167,11 +167,195 @@ local toggleannounce = ulx.command(CATEGORY_NAME .. " - Chat", "ulx toggleannoun
 toggleannounce:defaultAccess(ULib.ACCESS_ADMIN)
 toggleannounce:help("Disable or enable the announcement system.")
 
+
+
+--[[-------------------------------------------------------------------------
+Create custom job 
+
+TEAM_CONTROLLER = DarkRP.createJob("Xenian Controller", {
+    color = Color(234, 0, 255, 255),
+    model = {"models/player/bms_controller.mdl"},
+    description = You are a species of Xenian that can control the lesser minds of the creatures that inhabit Xen. ,
+    weapons = {"weapon_possessor", "weapon_sporelauncher"},
+    command = "controller",
+    max = 2,
+    salary = 250,
+    admin = 0,
+    vote = true,
+    hasLicense = false,
+    candemote = false,
+    category = "Xenians",
+    rdmgroup = "Xenian",
+    noradio = true,
+    isalien = true,
+})
+---------------------------------------------------------------------------]]
+if SERVER then
+	util.AddNetworkString("ulx.job")
+end
+
+local function getJobCategories() -- Getting all the job categories in DarkRP because falco couldn't have made it any fucking easier.
+	local c = {}
+	local j = table.Copy(DarkRP.getCategories())
+	for k, v in pairs(j) do
+		if k != "jobs" then
+			continue
+		end
+		for _,l in pairs(v) do
+			if !c[l.name] then
+				c[l.name] = true
+			end
+		end
+	end
+	return table.GetKeys(c)
+end
+
+function getJobs(keys, command) -- Getting all the job categories in DarkRP because falco couldn't have made it any fucking easier.
+	local c = {}
+	local j = table.Copy(DarkRP.getCategories())
+	for k, v in pairs(j) do
+		if k != "jobs" then
+			continue
+		end
+		for _,l in pairs(v) do
+			for x,o in pairs(l.members) do
+				if !select(1, DarkRP.getJobByCommand(o.command)) then continue end
+				c[o.name] = !command and o.team or o.command
+			end
+		end
+	end
+	if keys then
+		return table.GetKeys(c)
+	else
+		return c
+	end
+end
+
+
+local rdmGroups = {
+	"BMRF",
+	"Xenian",
+	"None",
+}
+
+local factions = {
+	"Security",
+	"Black Mesa (not scientist or security)",
+	"Scientist",
+	"Xenians",
+	"HECU",
+	"None"
+}
+
+function ulx.CreateJob(ply, name, desc, color, model, weapons, command, max, rdmgroup, canannounce, category, hide, faction)
+	ply:AddText(Color(255,255,255), "Compiling job...")
+	print(faction)
+	local ctab = string.Explode(",", color:Replace(" ", ""))
+	local wtab = string.Explode(",", weapons:Replace(" ", ""))
+	local mtab = string.Explode(",", model:Replace(" ", ""))
+	local job_struct = {
+		color = Color( ctab[1] and tonumber(ctab[1]) or 255,ctab[2] and tonumber(ctab[2]) or 255, ctab[3] and tonumber(ctab[3]) or 255),
+		model = mtab,
+		description = desc,
+		weapons = wtab,
+		command = command,
+		max = max,
+		salary = 0,
+		admin = hide and 1 or 0,
+		vote = false,
+		hasLicence = false,
+		candemote = false,
+		isblackmesa = true,
+		category = category,
+		rdmgroup = rdmgroup != "None" and rdmgroup or false,
+		isblackmesa = faction != "Xenians" and faction != "HECU" and faction != "None",
+		isscience = faction == "Scientist",
+		isalien = faction == "Xenians",
+		issecurity = faction == "Security",
+		ishecu = faction == "HECU",
+	}
+    job_struct.name = name
+    job_struct.default = DarkRP.DARKRP_LOADING
+	local valid, err, hints = DarkRP.validateJob(job_struct)
+	if not valid then
+		ply:AddText(Color(255,0,0), "Compilation failed, check console!")
+		DarkRP.error(string.format("Failed creating custom team! %s!\n%s", job_struct.name or "", err), 2, hints) 
+		return
+	end
+	ply:AddText(Color(0,255,0), "Compilation successfull!")
+	DarkRP.createJob(job_struct.name, job_struct)
+	net.Start("ulx.job")
+		net.WriteBool(false)
+		net.WriteTable(job_struct)
+	net.Broadcast()
+	ulx.fancyLog( player.GetAll(), "#P created the job #s.",ply, job_struct.name)
+end
+local CreateJob = ulx.command(CATEGORY_NAME .. " - Jobs", "ulx createjob", ulx.CreateJob, nil, false, false )
+CreateJob:addParam{ type=ULib.cmds.StringArg, hint="Name of the job."}
+CreateJob:addParam{ type=ULib.cmds.StringArg, hint="Description of the job."}
+CreateJob:addParam{ type=ULib.cmds.StringArg, hint='255,255,255'}
+CreateJob:addParam{ type=ULib.cmds.StringArg, hint='models/player/gman_high.mdl'}
+CreateJob:addParam{ type=ULib.cmds.StringArg, hint='weapon_crowbar,weapon_fists'}
+CreateJob:addParam{ type=ULib.cmds.StringArg, hint='Job Command'}
+CreateJob:addParam{type=ULib.cmds.NumArg, min=0, max=48,default=1,hint="Job Slot Count (0=infinte)", ULib.cmds.round}
+CreateJob:addParam{ type=ULib.cmds.StringArg, completes=rdmGroups, hint="RDM Group", ULib.cmds.restrictToCompletes }
+CreateJob:addParam{ type=ULib.cmds.BoolArg, hint ="'/announce?'", default=false}
+CreateJob:addParam{ type=ULib.cmds.StringArg, completes=getJobCategories(), hint="Job Category", ULib.cmds.restrictToCompletes }
+CreateJob:addParam{ type=ULib.cmds.BoolArg, hint ="Staff only?"}
+CreateJob:addParam{ type=ULib.cmds.StringArg, completes=factions, hint="Job Faction", ULib.cmds.restrictToCompletes }
+CreateJob:defaultAccess(ULib.ACCESS_ADMIN)
+CreateJob:help("Create a custom job for events. You can add more than one weapon/model to the job by seperating them with commas. eg. model1,model2")
+
+
+function ulx.removeJob(ply, job)
+	local jobindex = select(2, DarkRP.getJobByCommand(job))
+	if not jobindex then
+		ULib.tsayError( calling_ply, "Job index is nil! (Job doesn't exist)", true )
+		return
+	end
+	for k,ply in pairs(player.GetAll()) do
+		if ply:Team() == jobindex then
+			ply:changeTeam(TEAM_VISITOR, true)
+			sBMRP.ChatNotify({ply}, "Info", "The job you are in is being removed, so you are being moved to visitor.")
+		end
+	end
+	net.Start("ulx.job")
+		net.WriteBool(true)
+		net.WriteInt(jobindex, 7)
+	net.Broadcast()
+	DarkRP.removeJob(jobindex)
+	ulx.fancyLog( player.GetAll(), "#P removed the job #s.",ply, job)
+end
+
+
+local removeJob = ulx.command(CATEGORY_NAME .. " - Jobs", "ulx removejob", ulx.removeJob, "!removejob", true, false )
+removeJob:addParam{ type=ULib.cmds.StringArg, hint="jobcommand" }
+removeJob:defaultAccess(ULib.ACCESS_ADMIN)
+removeJob:help("Remove custom created job by using its command. If you don't know what its command is; use the console command 'getjobcommands' for reference.")
+
+concommand.Add("getjobcommands", function()
+	PrintTable(getJobs(false, true))
+end)
+
+net.Receive("ulx.job", function(len)
+	local remove = net.ReadBool()
+	if !remove then
+		local job_struct = net.ReadTable()
+		PrintTable(job_struct)
+		DarkRP.createJob(job_struct.name, job_struct)
+	else
+		local job = net.ReadInt(7)
+
+		DarkRP.removeJob(job)
+	end
+end)
+
+
 --[[-------------------------------------------------------------------------
 Building toggle
 ---------------------------------------------------------------------------]]
 sBMRP.DisableBuilding = false
-function ulx.DisableBuilding(calling_ply)	
+function ulx.DisableBuilding(calling_ply)
 	if not sBMRP.DisableBuilding then
 	    sBMRP.DisableBuilding = true
 		ulx.fancyLog( player.GetAll(), "#P disabled building for players.",calling_ply)
