@@ -1,5 +1,6 @@
+
 function SpawnPortals()
-	for k,v in pairs({5120, 5261, 5262, 5263, 5264,5268,}) do
+	for k,v in pairs({5008, 5149, 5150, 5152, 5156,5268,}) do
 		SafeRemoveEntity(ents.GetMapCreatedEntity(v))
 	end
 	
@@ -83,6 +84,7 @@ function SpawnPortals()
 		end
 	end)
 end
+
 SpawnPortals()
 hook.Add("PostCleanupMap", "gm_mapcleanup_portals", SpawnPortals)
 hook.Add("InitPostEntity", "gm_mapinitialization_portals", function() timer.Simple(1,function() SpawnPortals();print("--Initial Portals!--") end) end)

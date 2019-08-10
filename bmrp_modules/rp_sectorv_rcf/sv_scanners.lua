@@ -3,42 +3,42 @@ Retinal scanner processing
 ---------------------------------------------------------------------------]]
 
 local sciencedoors = {
-	[2207] = true, -- amsdoor 1
-	[2213] = true, -- amsdoor 2
-	[2227] = true, -- ams chamber door
-	[3502] = true, -- ams observ door 1
-	[3511] = true, -- ams observ door 2
-	[2220] = true, -- sectorc ams
+	[2156] = true, -- amsdoor 1
+	[3427] = true, -- amsdoor 2
+	[2170] = true, -- ams chamber door
+	[3427] = true, -- ams observ door 1
+	[3427] = true, -- ams observ door 2
+	[2163] = true, -- sectorc ams
 	[4561] = true, -- sectora portal
 
 }
 
 local blackmesadoors = {
-	[1935] = true, -- sectorc airlock
-	[1949] = true, -- sectorc airlock 2
-	[1944] = true, -- sectora airlock 1
-	[1938] = true, -- sectora airlock 2
-	[2247] = true, -- sectora enterence
-	[2281] = true, -- Black Mesa Lobby
-	[2327] = true, -- BLack Mesa Lobby 1
-	[3839] = true, -- topside lift
+	[1911] = true, -- sectorc airlock
+	[1925] = true, -- sectorc airlock 2
+	[1920] = true, -- sectora airlock 1
+	[1914] = true, -- sectora airlock 2
+	[2190] = true, -- sectora enterence
+	[2269] = true, -- Black Mesa Lobby
+	[2224] = true, -- BLack Mesa Lobby 1
+	[3748] = true, -- topside lift
 }
 
 local securitydoors = {
-	[2233] = true, -- sectorb enterance
-	[3269] = true, -- sectorb enterance 1
+	[2176] = true, -- sectorb enterance
+	[3192] = true, -- sectorb enterance 1
 }
 
 local hecudoors = {
-	[3003] = true, -- base enterance
+	[2936] = true, -- base enterance
 }
 
 local healthchargers = {
-	[3075] = true,
-	[3079] = true,
-	[3266] = true,
-	[1823] = true,
-	[3084] = true
+	[3008] = true,
+	[3012] = true,
+	[3017] = true,
+	[4498] = true,
+	[1809] = true
 }
 
 local function scanner(ply, ent)
