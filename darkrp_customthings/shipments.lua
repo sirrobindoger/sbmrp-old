@@ -77,8 +77,8 @@ DarkRP.createShipment("FiveseveN", {
 MED ARMS
 ---------------------------------------------------------------------------]]
 DarkRP.createShipment(".357 Magnum", {
-    model = "models/weapons/3_pist_deagle.mdl",
-    entity = "tfa_bms_357",
+    model = "models/bms/weapons/w_357.mdl",
+    entity = "weapon_bms_357",
     price = 750,
     amount = 1,
     separate = true,
@@ -129,8 +129,8 @@ HEAVY ARMS
 ---------------------------------------------------------------------------]]
 
 DarkRP.createShipment("SPAS-12", {
-    model = "models/weapons/3_shot_xm1014.mdl",
-    entity = "tfa_bms_shotgun",
+    model = "models/bms/weapons/w_shotgun.mdl",
+    entity = "weapon_bms_shotgun",
     price = 1500,
     amount = 1,
     separate = true,
@@ -141,8 +141,8 @@ DarkRP.createShipment("SPAS-12", {
 })
 
 DarkRP.createShipment("MP5", {
-    model = "models/weapons/3_smg_mp5.mdl",
-    entity = "tfa_bms_mp5",
+    model = "models/bms/weapons/w_mp5.mdl",
+    entity = "weapon_bms_mp5",
     price = 1100,
     amount = 1,
     separate = true,

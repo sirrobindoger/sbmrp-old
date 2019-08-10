@@ -316,7 +316,7 @@ TEAM_ITTECH = DarkRP.createJob("IT Technician", {
     ------------------
 })
 
-TEAM_MEDIC = DarkRP.createJob("Medical Operative", {
+/*TEAM_MEDIC = DarkRP.createJob("Medical Operative", {
     color = Color(34, 85, 85, 255),
     model = Medicmodels,
     description = [[Patch up wounds and keep the facility staff healthy.]],
@@ -333,7 +333,7 @@ TEAM_MEDIC = DarkRP.createJob("Medical Operative", {
     rdmgroup = "BMRF",
     isblackmesa = true
     ------------------
-})
+})*/
 
 
 TEAM_OFFICE = DarkRP.createJob("Office Employee", {
@@ -635,7 +635,7 @@ TEAM_GRUNT = DarkRP.createJob("Alien Grunt", {
 })
 
 
-TEAM_GARGA = DarkRP.createJob("Baby Gargantua", {
+/*TEAM_GARGA = DarkRP.createJob("Baby Gargantua", {
     color = Color(101, 0, 201, 255),
     model = {"models/bm/gargantua.mdl"},
     description = [[You'll soon grow to be the big scary fire-shooting alien that everyone loathes to encounter.]],
@@ -666,7 +666,7 @@ TEAM_GARGA = DarkRP.createJob("Baby Gargantua", {
     noradio = true,
     isalien = true,
     category = "Xenians",
-})
+})*/
 
 
 --[[-------------------------------------------------------------------------
@@ -721,7 +721,7 @@ TEAM_HECU = DarkRP.createJob("HECU Grunt", {
 
     },
     description = [[You are the firepower for the onsight military. Listen to your sergeant]],
-    weapons = {"tfa_bms_mp5", "weapon_knife","itemstore_pickup"},
+    weapons = {"weapon_bms_mp5", "weapon_knife","itemstore_pickup"},
     command = "hecu",
     max = 6,
     admin = 0,
@@ -767,7 +767,7 @@ TEAM_HECUCOMMAND = DarkRP.createJob("HECU Sergeant", {
         --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
     },
     description = [[You are the head of the onsight millitary; H.E.C.U. Lead the main force of security of BMRF, and to make sure that all unauthorized personnel are taken care of.]],
-    weapons = {"tfa_bms_shotgun","tfa_bms_mp5","itemstore_pickup"},
+    weapons = {"weapon_bms_shotgun","weapon_bms_mp5","itemstore_pickup"},
     command = "hecucommander",
     max = 1,
     admin = 0,
