@@ -20,24 +20,28 @@ local HECU_Codes = {
 		text = "Active Threat(s)",
 		canenterbmrf = true,
 		candamage = 2,
+		order = 3,
 	},
 	["Green"] = {
 		color = {0,150,0, 156},
 		text = "No Active Threat(s)",
 		canenterbmrf = false,
 		candamage = 0,
+		order = 1,
 	},
 	["Black"] = {
 		color = {0,0,0, 156},
-		text = "Lethal Force On Hostile(s)",
+		text = "Deadly Force Authorized",
 		canenterbmrf = true,
-		candamage = 0,
+		candamage = 2,
+		order = 4,
 	},
 	["Yellow"] = {
 		color = {212, 184, 28, 156},
 		text = "Potential Active Threat(s)",
 		cantenterbmrf = false,
 		candamage = 1,
+		order = 2,
 	},
 }
 
@@ -59,9 +63,10 @@ if SERVER then
 
 	local function HECUAntiRDM(att, targ)
 		if att:IsHECU() and !targ:IsHECU() then
-			if sBMRP.LocList.Topside[targ] and sBMRP.GetHECUCode() >= 1 then
+			local codeint = HECU_Codes[sBMRP.GetHECUCode()].candamage
+			if sBMRP.LocList.Topside[targ] and codeint == 1 then
 				return true
-			elseif sBMRP.GetHECUCode() == 2 then
+			elseif codeint == 2 then
 				return true
 			end
 		end
@@ -77,6 +82,8 @@ if SERVER then
 		for k,v in pairs(player.GetAll()) do
 			v:AddText(Color(27, 158, 62),"[Vox]", Color(4, 217, 61), " The HECU Code has been updated from code ", Color(unpack(oldcodetbl.color)), oldcode, Color(4, 217, 61), " to " , Color(unpack(newcodetbl.color)), newcode,Color(4, 217, 61), "! [" .. newcodetbl.text .. "]")
 		end
+		RunConsoleCommand("vox", newcodetbl.canenterbmrf and "buzwarn" or "deeoo", "alert", "code", oldcode:lower(), "is", "now", "on", "code", newcode:lower())
+		--sBMRP.VOX.Play("hecu_code/code_" .. oldcode:lower() .. "_to_" .. newcode:lower() .. ".wav")
 		-- if the old code can enter BMRF and the new code can't, update permissions
 		if oldcodetbl.canenterbmrf and not newcodetbl.canenterbmrf then
 			sBMRP.HECUAllowAll(false)
@@ -100,9 +107,59 @@ if SERVER then
 			sBMRP.ChatNotify({ply}, "Error", "You job is not qualified to use this command!")
 			return ""
 		end
+		if !HECU_Codes[ args ] or args == "Black" and not ply:IsAdmin() then
+			sBMRP.ChatNotify({ply}, "Error", "Invalid code! Valid codes are: Green, Yellow, Red (case sensitive!).")
+			return ""
+		end
 
-		
+		--if not ply:IsAdmin() then
+			if ply:Team() == TEAM_HECUCOMMAND then
+				for k,rec in pairs(player.GetAll()) do
+					if rec:Team() == TEAM_ADMINISTRATOR then
+						sBMRP.ChatNotify({ply}, "Info", "Sent code request to the Administrator!")
+
+						sBMRP.ChatNotify({rec}, "Info", "The HECU Commander has requested a code change to code " .. args .. ".\nTo confirm, please type /confirmcode.")
+						timer.Create("confirmcode", 15, 1, function()
+							sBMRP.ChatNotify({rec, ply}, "Info", "Code request expired. Cancelling code change.")
+						end)
+						return ""
+					end
+				end
+			else
+				for k,rec in pairs(player.GetAll()) do
+					if rec:Team() == TEAM_HECUCOMMAND then
+						sBMRP.ChatNotify({ply}, "Info", "Sent code request to the HECU Commander!")
+						rec.codereq = args
+						sBMRP.ChatNotify({rec}, "Info", "The Facility Administartor has requested a code change to code " .. args .. ".\nTo confirm, please type /confirmcode.")
+						timer.Create("confirmcode", 15, 1, function()
+							sBMRP.ChatNotify({rec, ply}, "Info", "Code request expired. Cancelling code change.")
+							rec.codereq = nil
+						end)
+						return ""
+					end
+				end				
+			end
+			sBMRP.ChatNotify({ply}, "Error", "Missing Administrator/HECU Commander player!")
+			return ""
+		--end
 	end
+	sBMRP.CreateChatCommand("coderequest", RequestCodeChange, "Request a code change.", 10)
+
+	local function ConfirmCodeChange(ply, args)
+		if ply:Team() != TEAM_HECUCOMMAND and ply:Team() != TEAM_ADMINISTRATOR and not ply:IsAdmin() then
+			sBMRP.ChatNotify({ply}, "Error", "You job is not qualified to use this command!")
+			return ""
+		end
+		if !timer.Exists("confirmcode") then
+			sBMRP.ChatNotify({ply}, "Error", "No codes to confirm right now!")
+
+		else
+			sBMRP.SetHECUCode(ply.codereq or "Green")
+			ply.codereq = nil
+			timer.Remove("confirmcode")
+		end
+	end
+	sBMRP.CreateChatCommand("confirmcode", ConfirmCodeChange, "Confirm a code change", 10)
 end
 
 
