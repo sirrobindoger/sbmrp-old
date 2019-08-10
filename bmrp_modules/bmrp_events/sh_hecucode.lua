@@ -3,26 +3,41 @@ HECU Code
 ---------------------------------------------------------------------------]]
 SetGlobalString("HECUCode", "Green")
 
+--[[-------------------------------------------------------------------------
+Code declarlations
+
+Flags:
+color = Color() (the color of the code on the HUD in RGB)
+text = string (What the subtext will appear as on the HUD)
+canenterbmrf = bool (if the hecu are allowed to enter BMRF at that stage)
+candamage = int (0 if they can't, 1 they are allowed to damage only on topside, 2 they can damage any team)
+---------------------------------------------------------------------------]]
+
+
 local HECU_Codes = {
 	["Red"] = {
 		color = {255,0,0, 156},
-		text = "Evacuate Facility",
+		text = "Active Threat(s)",
 		canenterbmrf = true,
+		candamage = 2,
 	},
 	["Green"] = {
 		color = {0,150,0, 156},
-		text = "No Active Threats",
-		canenterbmrf = false
+		text = "No Active Threat(s)",
+		canenterbmrf = false,
+		candamage = 0,
 	},
 	["Black"] = {
 		color = {0,0,0, 156},
-		text = "Kill On Sight",
+		text = "Lethal Force On Hostile(s)",
 		canenterbmrf = true,
+		candamage = 0,
 	},
 	["Yellow"] = {
 		color = {212, 184, 28, 156},
-		text = "On Alert",
+		text = "Potential Active Threat(s)",
 		cantenterbmrf = false,
+		candamage = 1,
 	},
 }
 
@@ -41,6 +56,17 @@ if SERVER then
 	function sBMRP.GetHECUCode()
 		return GetGlobalString("HECUCode", "Green")
 	end
+
+	local function HECUAntiRDM(att, targ)
+		if att:IsHECU() and !targ:IsHECU() then
+			if sBMRP.LocList.Topside[targ] and sBMRP.GetHECUCode() >= 1 then
+				return true
+			elseif sBMRP.GetHECUCode() == 2 then
+				return true
+			end
+		end
+	end
+	hook.Add("AntiRDMOverride", "sBMRP_HECUDamage", HECUAntiRDM)
 	--[[-------------------------------------------------------------------------
 	Logic processing
 	---------------------------------------------------------------------------]]
@@ -49,22 +75,34 @@ if SERVER then
 		local newcodetbl = HECU_Codes[ newcode ]
 		ulx.logString("HECU Code Updated: " .. oldcode .. " --> " .. newcode .. "\n")
 		for k,v in pairs(player.GetAll()) do
-			v:AddText(Color(27, 158, 62),"[Vox]", Color(4, 217, 61), " The HECU Code has been updated from code ", Color(unpack(oldcodetbl.color)), oldcode, Color(4, 217, 61), " to " , Color(unpack(newcodetbl.color)), newcode,Color(4, 217, 61), "!")
+			v:AddText(Color(27, 158, 62),"[Vox]", Color(4, 217, 61), " The HECU Code has been updated from code ", Color(unpack(oldcodetbl.color)), oldcode, Color(4, 217, 61), " to " , Color(unpack(newcodetbl.color)), newcode,Color(4, 217, 61), "! [" .. newcodetbl.text .. "]")
 		end
 		-- if the old code can enter BMRF and the new code can't, update permissions
 		if oldcodetbl.canenterbmrf and not newcodetbl.canenterbmrf then
-			sBMRP.HECUAllowAll(false) 
+			sBMRP.HECUAllowAll(false)
 			sBMRP.LocationScan()
 			sBMRP.ChatNotify( player.GetAdmins(),"Info", "Automatically removed the HECU to BMRF entry. (only admins can see this)")
 		elseif not oldcodetbl.canenterbmrf and newcodetbl.canenterbmrf then -- the new code can enter BMRF
-			sBMRP.HECUAllowAll(true) 
+			sBMRP.HECUAllowAll(true)
 			sBMRP.LocationScan()
 			sBMRP.ChatNotify( player.GetAdmins(),"Info", "Automatically gave the HECU entry to BMRF. (only admins can see this)")
 
 		end
-
 	end
 	hook.Add("OnHECUCodeChanged","bmrp_announcecode", OnHECUCodeChanged)
+
+	--[[-------------------------------------------------------------------------
+	Chat Commands
+	---------------------------------------------------------------------------]]
+
+	local function RequestCodeChange(ply, args)
+		if ply:Team() != TEAM_HECUCOMMAND and ply:Team() != TEAM_ADMINISTRATOR and not ply:IsAdmin() then
+			sBMRP.ChatNotify({ply}, "Error", "You job is not qualified to use this command!")
+			return ""
+		end
+
+		
+	end
 end
 
 

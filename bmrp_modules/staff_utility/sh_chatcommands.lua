@@ -18,6 +18,10 @@ DarkRP.removeChatCommand("requesthit")
 DarkRP.removeChatCommand("resetlaws")
 DarkRP.removeChatCommand("buyradio")
 DarkRP.removeChatCommand("advert")
+DarkRP.removeChatCommand("a")
+DarkRP.removeChatCommand("/")
+DarkRP.removeChatCommand("ooc")
+
 
 
 --[[-------------------------------------------------------------------------
@@ -57,20 +61,20 @@ Advert/Announce
 ---------------------------------------------------------------------------]]
 sBMRP.AnnounceState = true
 local function PlayerAnnounce(ply, args)
-    if args == "" then
-        DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
-        return ""
-    end
+	if args == "" then
+		DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+		return ""
+	end
 	
 	local Team = ply:Team()
 	if ( Team == TEAM_VISITOR or  Team == TEAM_TESTSUBJECT or  Team == TEAM_HEADCRAB ) then
-        DarkRP.notify(ply, 1, 4, "You do not have a radio")
-        return ""
-    end
+		DarkRP.notify(ply, 1, 4, "You do not have a radio")
+		return ""
+	end
 	
 	if !sBMRP.AnnounceState then
 		ply:ChatPrint("You try to send the message, but all you can hear is static on the other end. You assume no one heard it.")
-        return ""
+		return ""
 	end
 	if ply:IsAlien() then
 		DoSay = function(text)
@@ -97,12 +101,75 @@ local function PlayerAnnounce(ply, args)
 			end
 		end
 	end
-    return args, DoSay
+	return args, DoSay
 end
 if SERVER then
 	sBMRP.CreateChatCommand("announce", PlayerAnnounce, "Announce your message.", 4)
 	sBMRP.CreateChatCommand("advert", PlayerAnnounce, "Announce your message.", 4)
 end
+
+--[[-------------------------------------------------------------------------
+OOC
+---------------------------------------------------------------------------]]
+local rankTitles = {
+	["superadmin"] = "Administrator",
+	["eventcoordinator"] = "Event Co-Ordinator",
+	["supporter"] = "Supporter",
+	["staff"] = "Staff",
+	["trialstaff"] = "Trial Staff",
+}
+local steamTitles = {}
+
+sBMRP.OOCState = true
+local function OOC(ply, args)
+	if not GAMEMODE.Config.ooc then
+		DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("disabled", DarkRP.getPhrase("ooc"), ""))
+		return ""
+	end
+	if !sBMRP.OOCState and !ply:IsAdmin() then
+		DarkRP.notify(ply, 1, 4, "OOC is currently disabled.")
+		return ""
+	end
+
+	local DoSay = function(text)
+		if text == "" then
+			DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+			return ""
+		end
+		local col = team.GetColor(ply:Team())
+		local col2 = Color(255,255,255,255)
+		local title = steamTitles[ply:SteamID()] or rankTitles[ply:GetUserGroup()] or "Player"
+		if not ply:Alive() then
+			col2 = Color(255,200,200,255)
+			col = col2
+		end
+
+		for k,v in pairs(player.GetAll()) do
+			DarkRP.talkToPerson(v, col, "("..title..") (" .. DarkRP.getPhrase("ooc") .. ") " .. ply:Name(), col2, text, ply)
+		end
+	end
+	return args, DoSay
+end
+if SERVER then
+	sBMRP.CreateChatCommand("/", OOC, "Global Out-of-character chat.", 1.5)
+	sBMRP.CreateChatCommand("a", OOC, "Global Out-of-character chat.", 1.5)
+	sBMRP.CreateChatCommand("ooc", OOC, "Global Out-of-character chat.", 1.5)
+end
+
+function ulx.DisableOOC(ply, args)
+	sBMRP.OOCState = !sBMRP.OOCState
+	if sBMRP.OOCState == false then
+		ulx.fancyLog( player.GetAll(), "#P disabled the OOC Chat.",ply)
+	else
+		ulx.fancyLog( player.GetAll(), "#P enabled the OOC Chat.",ply)
+	end
+end
+local DisableOOC = ulx.command(CATEGORY_NAME .. " - Chat", "ulx disableooc", ulx.DisableOOC, "!disableooc", true, false )
+DisableOOC:defaultAccess(ULib.ACCESS_ADMIN)
+DisableOOC:help("Disable or enable OOC.")
+
+
+
 
 --[[-------------------------------------------------------------------------
 Dev Box commands
@@ -133,18 +200,18 @@ devbox:help( "Teleports you to a dev box location to build in." )
 it/who
 ---------------------------------------------------------------------------]]
 local function it(ply, args)
-    if args == "" then
-        DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
-        return ""
-    end
-    local DoSay = function(text)
-        if text == "" then
-            DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
-            return
-        end
+	if args == "" then
+		DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+		return ""
+	end
+	local DoSay = function(text)
+		if text == "" then
+			DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+			return
+		end
 			DarkRP.talkToRange(ply, text, "", 250)
-    end
-    return args, DoSay
+	end
+	return args, DoSay
 end
 if SERVER then
 	sBMRP.CreateChatCommand("it", it)
@@ -156,10 +223,10 @@ Disable Announce/Advert
 function ulx.toggleannounce(calling_ply, args)
 
 	if sBMRP.AnnounceState then
-	    sBMRP.AnnounceState = false
+		sBMRP.AnnounceState = false
 		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P disabled the announcement system.",calling_ply)
 	else
-	    sBMRP.AnnounceState = true
+		sBMRP.AnnounceState = true
 		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P enabled the announcement system.",calling_ply)
 	end
 end
@@ -173,21 +240,21 @@ toggleannounce:help("Disable or enable the announcement system.")
 Create custom job 
 
 TEAM_CONTROLLER = DarkRP.createJob("Xenian Controller", {
-    color = Color(234, 0, 255, 255),
-    model = {"models/player/bms_controller.mdl"},
-    description = You are a species of Xenian that can control the lesser minds of the creatures that inhabit Xen. ,
-    weapons = {"weapon_possessor", "weapon_sporelauncher"},
-    command = "controller",
-    max = 2,
-    salary = 250,
-    admin = 0,
-    vote = true,
-    hasLicense = false,
-    candemote = false,
-    category = "Xenians",
-    rdmgroup = "Xenian",
-    noradio = true,
-    isalien = true,
+	color = Color(234, 0, 255, 255),
+	model = {"models/player/bms_controller.mdl"},
+	description = You are a species of Xenian that can control the lesser minds of the creatures that inhabit Xen. ,
+	weapons = {"weapon_possessor", "weapon_sporelauncher"},
+	command = "controller",
+	max = 2,
+	salary = 250,
+	admin = 0,
+	vote = true,
+	hasLicense = false,
+	candemote = false,
+	category = "Xenians",
+	rdmgroup = "Xenian",
+	noradio = true,
+	isalien = true,
 })
 ---------------------------------------------------------------------------]]
 if SERVER then
@@ -274,8 +341,8 @@ function ulx.CreateJob(ply, name, desc, color, model, weapons, command, max, rdm
 		issecurity = faction == "Security",
 		ishecu = faction == "HECU",
 	}
-    job_struct.name = name
-    job_struct.default = DarkRP.DARKRP_LOADING
+	job_struct.name = name
+	job_struct.default = DarkRP.DARKRP_LOADING
 	local valid, err, hints = DarkRP.validateJob(job_struct)
 	if not valid then
 		ply:AddText(Color(255,0,0), "Compilation failed, check console!")
@@ -308,6 +375,10 @@ CreateJob:help("Create a custom job for events. You can add more than one weapon
 
 
 function ulx.removeJob(ply, job)
+	if job == "visitor" then
+		ULib.tsayError( calling_ply, "Removing the vistior job would fuck everything up. Nice try though.", true )
+		return
+	end
 	local jobindex = select(2, DarkRP.getJobByCommand(job))
 	if not jobindex then
 		ULib.tsayError( calling_ply, "Job index is nil! (Job doesn't exist)", true )
@@ -357,7 +428,7 @@ Building toggle
 sBMRP.DisableBuilding = false
 function ulx.DisableBuilding(calling_ply)
 	if not sBMRP.DisableBuilding then
-	    sBMRP.DisableBuilding = true
+		sBMRP.DisableBuilding = true
 		ulx.fancyLog( player.GetAll(), "#P disabled building for players.",calling_ply)
 		local function blockspawning(ply)
 			if not ply:IsAdmin() then
@@ -369,7 +440,7 @@ function ulx.DisableBuilding(calling_ply)
 		end
 
 	else
-	    sBMRP.DisableBuilding = false
+		sBMRP.DisableBuilding = false
 		ulx.fancyLog( player.GetAll(), "#P enabled building for players.",calling_ply)
 		for k,v in pairs({"PlayerSpawnProp", "CanTool", "PlayerSpawnVehicle","PlayerSpawnRagdoll", "PlayerSpawnEffect"}) do
 			hook.Remove(v, "sBMRP.BlockSpawning")
@@ -460,10 +531,10 @@ Lab prop spawning
 
 function ulx.labprotection(calling_ply)	
 	if not sBMRP.LabPropProtection then
-	    sBMRP.LabPropProtection = true
+		sBMRP.LabPropProtection = true
 		ulx.fancyLog( player.GetAdmins(), "#P revoked player's rights to build in labs they do not own.",calling_ply)
 	else
-	    sBMRP.LabPropProtection = false
+		sBMRP.LabPropProtection = false
 
 		ulx.fancyLog( player.GetAdmins(), "#P granted player's rights to build in labs they do not own.",calling_ply)
 	end
@@ -480,14 +551,14 @@ Allow ALL xenians/hecu
 
 function ulx.AllowAllHECU(calling_ply)	
 	if not sBMRP.AllowHECUToBMRF then
-	    sBMRP.AllowHECUToBMRF = true
+		sBMRP.AllowHECUToBMRF = true
 		ulx.fancyLog( player.GetAll(), "#P allowed HECU's entry into BMRF!",calling_ply)
 	else
-	    sBMRP.AllowHECUToBMRF = false
-	    for k,v in pairs(player.GetAll()) do
-	    	v:AllowToBMRF(false)
-	    end
-	    sBMRP.LocationScan()
+		sBMRP.AllowHECUToBMRF = false
+		for k,v in pairs(player.GetAll()) do
+			v:AllowToBMRF(false)
+		end
+		sBMRP.LocationScan()
 		ulx.fancyLog( player.GetAll(), "#P revoked HECU's entry into BMRF.",calling_ply)
 	end
 end
@@ -497,14 +568,14 @@ AllowAllHECU:help("Enable or disable HECU's entry into BMRF. Revoking entry will
 
 function ulx.AllowAllXenians(calling_ply)	
 	if not sBMRP.AllowEarthToXen then
-	    sBMRP.AllowEarthToXen = true
+		sBMRP.AllowEarthToXen = true
 		ulx.fancyLog( player.GetAll(), "#P allowed Xenian's entry into Earth!",calling_ply)
 	else
-	    sBMRP.AllowEarthToXen = false 
-	    for k,v in pairs(player.GetAll()) do
-	    	v:AllowToEarth(false)
-	    end
-	    sBMRP.LocationScan()
+		sBMRP.AllowEarthToXen = false 
+		for k,v in pairs(player.GetAll()) do
+			v:AllowToEarth(false)
+		end
+		sBMRP.LocationScan()
 		ulx.fancyLog( player.GetAll(), "#P revoked Xenian's entry into Earth.",calling_ply)
 	end
 end
@@ -574,19 +645,19 @@ xenbehavior:help( "Sets the xenian NPC's behavior towards humans." )
 LOOC
 ---------------------------------------------------------------------------]]
 local function LOOC(ply, args)
-    if args == "" then
-        DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
-        return ""
-    end
+	if args == "" then
+		DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+		return ""
+	end
 
-    local DoSay = function(text)
-        if text == "" then
-            DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
-            return ""
-        end
-            DarkRP.talkToRange(ply, "(LOOC) " .. ply:Nick(), text, 250)
-    end
-    return args, DoSay
+	local DoSay = function(text)
+		if text == "" then
+			DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+			return ""
+		end
+			DarkRP.talkToRange(ply, "(LOOC) " .. ply:Nick(), text, 250)
+	end
+	return args, DoSay
 end
 if SERVER then
 	sBMRP.CreateChatCommand("looc", LOOC, "Local OOC", 1.5)
@@ -597,10 +668,10 @@ local function LOOCCustom(ply, txt, public)
 		args = string.gsub(txt,".// ","")
 		args = string.gsub(args,".//","")
 		if args == "" then
-            DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
-            return ""
-        else
-           DarkRP.talkToRange(ply, "(LOOC) " .. ply:Nick(), args, 250)
+			DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("invalid_x", "argument", ""))
+			return ""
+		else
+		   DarkRP.talkToRange(ply, "(LOOC) " .. ply:Nick(), args, 250)
 		   return ""
 		end
 	end
@@ -694,10 +765,10 @@ Anti RDM
 ---------------------------------------------------------------------------]]
 function ulx.antirdm(calling_ply)	
 	if not sBMRP.AntiRDM then
-	    sBMRP.AntiRDM = true
+		sBMRP.AntiRDM = true
 		ulx.fancyLog( player.GetAll(), "#P enabled the AntiRDM Field.",calling_ply)
 	else
-	    sBMRP.AntiRDM = false
+		sBMRP.AntiRDM = false
 		ulx.fancyLog( player.GetAll(), "#P disabled the AntiRDM Field.",calling_ply)
 	end
 end
@@ -843,11 +914,11 @@ local function playernames() local playernames = {} for k,v in pairs(player.GetA
 function ulx.unpac(ply, target_ply)
    local target = target_ply[1] or false
    
-    if target then
-       ulx.fancyLog( player.GetAdmins(), "[Staff]: #P forcefully unweared #P PAC Outfit",ply, target)
-        target:ConCommand("pac_clear_parts;pac_wear_parts")
-        target:ChatPrint("Your pac outfit has been forcefully removed by staff.\nConsider re-thinking your pac outfit.")
-    end
+	if target then
+	   ulx.fancyLog( player.GetAdmins(), "[Staff]: #P forcefully unweared #P PAC Outfit",ply, target)
+		target:ConCommand("pac_clear_parts;pac_wear_parts")
+		target:ChatPrint("Your pac outfit has been forcefully removed by staff.\nConsider re-thinking your pac outfit.")
+	end
 end
 local unpac = ulx.command(CATEGORY_NAME .. " - PAC3", "ulx unpac", ulx.unpac, "!unpac", true, false)
 unpac:addParam{ type=ULib.cmds.PlayersArg }
