@@ -635,6 +635,34 @@ TEAM_GRUNT = DarkRP.createJob("Alien Grunt", {
 })
 
 
+TEAM_HOUNDEYE = DarkRP.createJob("Houndeye", {
+    color = Color(160, 150, 190, 255),
+    model = "models/half-life/houndeye.mdl",
+    description = [[You are a Houndeye, a strangely cute but dangerous creature.]],
+    weapons = {},
+    command = "houndeye",
+    admin = 0,
+    max = 2,
+    salary = 30,
+    PlayerSpawn = function(ply) ply:JobPill("hl1_houndeye") end,
+    category = "Xenians",
+    viewPos = {Vector(45, 55, 32), Vector(0, 0, 32)}
+})
+
+TEAM_BULLSQUID = DarkRP.createJob("Bullsquid", {
+    color = Color(219, 141, 0, 255),
+    model = "models/half-life/bullsquid.mdl",
+    description = [[You are a Bullsquid, a strong aggressive creature that is able to survive very toxic enviroments.]],
+    weapons = {},
+    admin = 0,
+    command = "bullsquid",
+    max = 2,
+    salary = 30,
+    PlayerSpawn = function(ply) ply:JobPill("hl1_bullsquid") end,
+    category = "Xenians",
+    viewPos = {Vector(45, 55, 32), Vector(0, 0, 32)}
+})
+
 /*TEAM_GARGA = DarkRP.createJob("Baby Gargantua", {
     color = Color(101, 0, 201, 255),
     model = {"models/bm/gargantua.mdl"},

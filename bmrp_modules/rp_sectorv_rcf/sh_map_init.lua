@@ -264,8 +264,17 @@ if SERVER then
 
 end
 
+--3497
+hook.Add("EntityTakeDamage", "breakable_forcegod", function(ent, data)
+	local inf = data:GetInflictor()
+	local att = data:GetAttacker()
 
-hook.Remove("PlayerUse", "ladder_ply")
+	if ent:MapCreationID() == 3497 && !sBMRP.Cascade then
+		return true
+	end
+end)
+
+
 hook.Add("PlayerUse", "ladder_ply", function(ply, ent)
 	if not IsFirstTimePredicted() then return end
 	if IsValid(ent) and ply:GetPos():WithinAABox(Vector(40.617343902588,-2494.8203125,-494.66076660156),Vector(-8.9349412918091,-2555.556640625,-623.42175292969)) then

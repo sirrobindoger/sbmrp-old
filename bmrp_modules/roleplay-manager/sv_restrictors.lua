@@ -38,7 +38,6 @@ local function LocationChanged(ply, old, new)
 		end
 	elseif new == "Admin Room" and not ply:IsAdmin() then
 		RunConsoleCommand("ulx", "banid", ply:SteamID(), "1d", "Attemping to exploit into the Admin Room.")
-		for k,v in pairs(player.GetAll()) do v:ChatPrint(ply:GetName() .. " attempted to explot their way into the admin room.\nThey are now being banned.") end
 	end
 end
 

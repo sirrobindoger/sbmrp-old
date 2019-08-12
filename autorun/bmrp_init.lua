@@ -4,7 +4,7 @@ sBMRP -- Coded by Sirro, Fay and Creed et al.
 ---------------------------------------------------------------------------]]
 sBMRP = sBMRP || {}
 sBMRP.LoadedModules = sBMRP.LoadedModules || {}
-sBMRP.version = "2.1"
+sBMRP.version = "2.3 - Events"
 
 --[[-------------------------------------------------------------------------
 Localazing varibles

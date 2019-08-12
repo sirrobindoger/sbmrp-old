@@ -24,6 +24,11 @@ sBMRP_Notify["VOX"] = {
 	[2] = {4, 217, 61}	
 }
 
+sBMRP_Notify["VOX"] = {
+	[1] = {201, 168, 0},
+	[2] = {255, 213, 0}	
+}
+
 
 if SERVER then
 	local ply = FindMetaTable("Player")

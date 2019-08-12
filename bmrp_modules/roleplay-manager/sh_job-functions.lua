@@ -92,6 +92,21 @@ function ply:HasHEV()
 	return false
 end
 
+
+--[[-------------------------------------------------------------------------
+Pill functions 
+---------------------------------------------------------------------------]]
+
+function ply:JobPill(pill)
+	if not (pk_pills or self.PillActive) and (not ply:Alive()) then return end
+	ply.PillActive = true
+	pk_pills.apply(self, pill, "lock-life")
+end
+
+
+
+
+
 --[[-------------------------------------------------------------------------
 Retreive job functions
 ---------------------------------------------------------------------------]]
@@ -377,3 +392,4 @@ if CLIENT then
 
 	end)
 end
+

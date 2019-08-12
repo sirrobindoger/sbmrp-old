@@ -122,7 +122,7 @@ local function scanner(ply, ent)
 			return false
 		end
 		ent:EmitSound("buttons/button5.wav", 75)
-		for k,v in pairs({2990}) do		
+		for k,v in pairs({2923}) do		
 			EntID(v):Fire("Unlock")
 			EntID(v):Fire("Open")
 		end

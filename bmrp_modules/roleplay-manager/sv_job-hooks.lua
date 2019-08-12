@@ -40,8 +40,33 @@ local function TeamChange(ply, before, after)
 	if not ply:IsScience() then
 		ply:Say("/unownalldoors")
 	end
+
+	if ply.PillActive then
+		ply:Kill()
+		ply.PillActive = nil
+	end
 end
 hook.Add("OnPlayerChangedTeam", "bmrp_jobchange", TeamChange)
+
+--[[-------------------------------------------------------------------------
+Team Radio
+---------------------------------------------------------------------------]]
+sBMRP.Radio = sBMRP.Radio or true
+local function teamRadio(ply, text, teamc)
+	if not teamc or not ply:Alive() then return end
+	local recpcateg = ply:IsBlackMesa() and ply:getJobTable().category  --and not ply:getJobTable().noradio
+	if recpcateg then
+		for k,v in pairs(player.GetAll()) do
+			if v:getJobTable().category == recpcateg then
+				v:AddText(team.GetColor(v:Team()), "(Radio - " .. recpcateg .. ") " .. ply:GetName() .. ": " .. text)
+			end
+		end
+		return ""
+	end
+end
+hook.Add("PlayerSay", "BMRP_RADIOCHAT", teamRadio)
+
+
 
 --[[-------------------------------------------------------------------------
 Security Stuff
@@ -124,20 +149,7 @@ timer.Create("bmrp_xen_capture", .25, 0, function()
 		end
 	end
 end)
-	for k,door in pairs(ents.GetAll()) do
-		if door:isDoor() then
-			for k,ply in pairs(player.GetAll()) do
-				ply.Doors = {}
-				
-				if door:getDoorOwner() == ply or (door:getKeysCoOwners() and door:getKeysCoOwners()[ply:UserID()]) then
-					ply.Doors = {}
-					ply.Doors[door] = true
 
-				end
-				PrintTable(ply.Doors)
-			end
-		end
-	end
 
 --[[-------------------------------------------------------------------------
 Donator Stuff
@@ -159,7 +171,7 @@ hook.Add("PlayerSpawn", "bmrp_donate_hoook", supporterinv)
 --[[-------------------------------------------------------------------------
 Addon rewrite
 ---------------------------------------------------------------------------]]
-
+/*
 function CheckForENVExplosion()
 	
 	local env_explosion = ents.FindByClass("env_explosion") 
@@ -187,4 +199,4 @@ function CheckForENVExplosion()
 	end
 
 end
-hook.Add("Think", "CheckForENVExplosion", CheckForENVExplosion)
+hook.Add("Think", "CheckForENVExplosion", CheckForENVExplosion)*/
