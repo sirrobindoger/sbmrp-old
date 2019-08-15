@@ -108,8 +108,6 @@ function SWEP:PrimaryAttack()
 				if ent:Team() == TEAM_TESTSUBJECT or ent:IsAlien() then
 					self:DoTaze(ent)
 				end
-			else
-				self:DoTaze(ent)
 			end
 		end
 	end

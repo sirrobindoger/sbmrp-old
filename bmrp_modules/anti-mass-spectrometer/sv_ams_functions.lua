@@ -11,7 +11,7 @@ function GetLocationEnt(recpos)
     return location
 end
 
-function shakeytest(optional)
+function sBMRP.ShakeMap(optional)
     if optional == 1 then
         engine.LightStyle(0,"vvvcvvvpvpsvvvvcvd")
         timer.Simple(2, function()
@@ -30,7 +30,7 @@ function shakeytest(optional)
             engine.LightStyle(0, "v")
         end
         for k,v in pairs(player.GetAll()) do
-        v:SendLua([[render.RedownloadAllLightmaps(true)]])
+            v:SendLua([[render.RedownloadAllLightmaps(true)]])
         end
     end)
     if optional == 1 then
@@ -46,4 +46,11 @@ function shakeytest(optional)
                 util.ScreenShake( Vector( 0, 0, 0 ), 5, 5, 7, 5000 )]])
         end
     end
+end
+
+--[[-------------------------------------------------------------------------
+Rotor speed
+---------------------------------------------------------------------------]]
+function sBMRP.AMS.SetRotorSpeed(speed)
+    ents.GetMapCreatedEntity(5369):SetKeyValue("speed",speed)
 end

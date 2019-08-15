@@ -246,6 +246,14 @@ function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
 
+if SERVER then
+	function sBMRP.MapFire(entid, fire)
+		local ent = tonumber(entid) and IsValid(ents.GetMapCreatedEntity(entid)) and ents.GetMapCreatedEntity(entid) or IsValid(entid) and IsEntity(entid) or false
+		if ent then 
+			ent:Fire(fire)
+		end
+	end
+end
 
 function SetAllDoorsUnownable()
 	for k,ent in pairs(ents.GetAll()) do
@@ -312,6 +320,85 @@ if CLIENT then
 		sBMRP.Fonts[name] = true
 		return "sBMRP." .. name
 	end
+end
+
+--[[-------------------------------------------------------------------------
+Skybox
+---------------------------------------------------------------------------]]
+
+if CLIENT then
+	sBMRP.Default = sBMRP.Default || GetConVar("sv_skyname"):GetString()
+    net.Receive( "BMRP_Skybox", function( len, ply )
+        local netstr = net.ReadString()
+        local skyboxname = netstr != "default" and netstr or sBMRP.Default
+        print(skyboxname)
+        local SourceSkyname = GetConVar("sv_skyname"):GetString()
+        print(SourceSkyname)
+        local SourceSkyPre  = {"lf","ft","rt","bk","dn","up",}
+        local SourceSkyMat  = {
+            Material("skybox/"..SourceSkyname.."lf"),
+            Material("skybox/"..SourceSkyname.."ft"),
+            Material("skybox/"..SourceSkyname.."rt"),
+            Material("skybox/"..SourceSkyname.."bk"),
+            Material("skybox/"..SourceSkyname.."dn"),
+            Material("skybox/"..SourceSkyname.."up"),
+        }
+        for i = 1,6 do
+            local D = Material("skybox/"..skyboxname..SourceSkyPre[i]):GetTexture("$basetexture")
+            print(D)
+            print(SourceSkyMat[i])
+            SourceSkyMat[i]:SetTexture("$basetexture",D)
+        end
+    end)
+else
+	util.AddNetworkString( "BMRP_Skybox" )
+    function sBMRP.ChangeSkybox(skyboxname)
+        Log("sending skybox change attempt...")
+        net.Start( "BMRP_Skybox" )
+        	net.WriteString(skyboxname || "default")
+        net.Broadcast()
+    end
+end
+
+
+
+--[[-------------------------------------------------------------------------
+Engine Lightstyle
+---------------------------------------------------------------------------]]
+
+if SERVER then
+	util.AddNetworkString("sBMRP.enginelight")
+
+	function sBMRP.UpdateEngineLight(lightstyle, doStaticProps)
+		engine.LightStyle(0, lightstyle)
+		timer.Simple(0.5, function()
+
+			net.Start("sBMRP.enginelight")
+				net.WriteBool(doStaticProps or false)
+			net.Broadcast()
+
+
+		end)
+	end
+else
+	sBMRP.RedownloadAllLightmaps = sBMRP.RedownloadAllLightmaps or render.RedownloadAllLightmaps
+	sBMRP.ClearToRedownload = sBMRP.ClearToRedownload or true
+	function render.RedownloadAllLightmaps(doStaticProps)
+		if !sBMRP.ClearToRedownload then return end
+		
+		sBMRP.RedownloadAllLightmaps(doStaticProps)
+		timer.Simple(0.1, function()
+			sBMRP.RedownloadAllLightmaps(doStaticProps)
+			sBMRP.ClearToRedownload = false
+		end)
+		
+	end
+
+	net.Receive("sBMRP.enginelight", function(len)
+		local staticProps = net.ReadBool()
+		sBMRP.ClearToRedownload = true
+		render.RedownloadAllLightmaps(staticProps)
+	end)
 end
 
 

@@ -156,20 +156,7 @@ if CLIENT then
 	end)
 end
 
-if CLIENT then
-	function sBMRP.SetColTab(tab)
-		LocalPlayer().coltab = tab
-	end
-	LocalPlayer().coltab = {
-		[ "$pp_colour_colour" ] = 1.2,
-		[ "$pp_colour_contrast" ] = 1,
-	}
-	hook.Add( "RenderScreenspaceEffects", "ext_c", function()
 
-		DrawColorModify( LocalPlayer().coltab )
-
-	end )
-end
 
 if SERVER then
 	local function PlayerInitStartConvars(ply)

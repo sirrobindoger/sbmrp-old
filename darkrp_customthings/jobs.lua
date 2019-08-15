@@ -118,7 +118,7 @@ TEAM_RESEARCH = DarkRP.createJob("Research Personnel", {
 	CustomCheckFailMsg = "You need at least 3 hours to play as this job!"
 })
 
-TEAM_ASSOCIATE = DarkRP.createJob("Research Assistant", {
+/*TEAM_ASSOCIATE = DarkRP.createJob("Research Assistant", {
 	color = Color(0, 86, 247, 255),
 	model = Scientistmodels,
 	description = [[You're a new worker at BMRF, you are here to help the Research Staff with their experiments.]],
@@ -136,7 +136,7 @@ TEAM_ASSOCIATE = DarkRP.createJob("Research Assistant", {
 	rdmgroup = "BMRF",
 	-----------------
 	category = "Science Personnel",
-})
+})*/
 
 TEAM_HEAD_SCIENTIST = DarkRP.createJob("Head Researcher", {
 	color = Color(0, 86, 247, 255),
@@ -155,8 +155,8 @@ TEAM_HEAD_SCIENTIST = DarkRP.createJob("Head Researcher", {
 	isscience = true,
 	rdmgroup = "BMRF",
 	-----------------
-	customCheck = function(ply) return ply:GetUtimeTotalHours() >= 6 end,
-	CustomCheckFailMsg = "You need at least 6 hours to play as this job!",
+	--customCheck = function(ply) return ply:GetUtimeTotalHours() >= 6 end,
+	--CustomCheckFailMsg = "You need at least 6 hours to play as this job!",
 	category = "Science Personnel",
 	NeedToChangeFrom = TEAM_RESEARCH,
 })
@@ -169,7 +169,7 @@ Survey
 TEAM_SURVEY_MINER = DarkRP.createJob("Anomoulous Materials Extractor",{
 	color = Color(255, 153, 0, 255),
 	model = Scientistmodels,
-	description = [[Your job is to handle dangerous materials during your team missions to an unknown border world.]],
+	description = [[Your job is to handle dangerous materials during your team missions to an unknown border world. Higher level survey can capture aliens.]],
 	weapons = {},
 	command = "surveyminer",
 	max = 6,
@@ -208,7 +208,7 @@ TEAM_SURVEY_SUPPORT = DarkRP.createJob("Survey Munitions Expert",{
 	category = "Survey Personnel"
 })
 
-
+/*
 TEAM_SURVEY_CATCHER = DarkRP.createJob("Survey Specimen Extractor",{
 	color = Color(255, 153, 0, 255),
 	model = Scientistmodels,
@@ -229,10 +229,10 @@ TEAM_SURVEY_CATCHER = DarkRP.createJob("Survey Specimen Extractor",{
 	----------------
 	category = "Survey Personnel"
 })
-
+*/
 
 TEAM_SURVEYTEAM_COMMANDER = DarkRP.createJob("Survey Team Commander", {
-    color = Color(8, 222, 171, 255),
+   color = Color(8, 222, 171, 255),
     model = Scientistmodels,
     description = [[The commander of the Survey Team, lead your team on an expedition into the unknown.]],
     weapons = {},
@@ -440,7 +440,7 @@ TEAM_SECURITY = DarkRP.createJob("Security Guard", {
 })
 
 
-TEAM_SECURITYRECRUIT = DarkRP.createJob("Security Recruit", {
+/*TEAM_SECURITYRECRUIT = DarkRP.createJob("Security Recruit", {
     color = Color(41, 17, 136, 255),
     model = Securitymodels,
     description = [[You're a recruit. Working your way up the ranks in the BMRF Security Force.]],
@@ -458,7 +458,7 @@ TEAM_SECURITYRECRUIT = DarkRP.createJob("Security Recruit", {
     issecurity = true,
     ------------------
     category = "Security Personnel"
-})
+})*/
 
 
 TEAM_ADMINISTRATOR = DarkRP.createJob("Facility Administrator", {
@@ -646,6 +646,9 @@ TEAM_HOUNDEYE = DarkRP.createJob("Houndeye", {
     salary = 30,
     PlayerSpawn = function(ply) ply:JobPill("hl1_houndeye") end,
     category = "Xenians",
+    rdmgroup = "Xenian",
+    noradio = true,
+    isalien = true,
     viewPos = {Vector(45, 55, 32), Vector(0, 0, 32)}
 })
 
@@ -660,6 +663,9 @@ TEAM_BULLSQUID = DarkRP.createJob("Bullsquid", {
     salary = 30,
     PlayerSpawn = function(ply) ply:JobPill("hl1_bullsquid") end,
     category = "Xenians",
+    rdmgroup = "Xenian",
+    noradio = true,
+    isalien = true,
     viewPos = {Vector(45, 55, 32), Vector(0, 0, 32)}
 })
 
@@ -736,7 +742,7 @@ TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
     category = "Government"
 })
 
-TEAM_HECU = DarkRP.createJob("HECU Grunt", {
+TEAM_HECU = DarkRP.createJob("HECU Military", {
     color = Color(0, 100, 0, 255),
     model = {
         "models/player/bms_marine.mdl",
@@ -749,7 +755,7 @@ TEAM_HECU = DarkRP.createJob("HECU Grunt", {
 
     },
     description = [[You are the firepower for the onsight military. Listen to your sergeant]],
-    weapons = {"weapon_bms_mp5", "weapon_knife","itemstore_pickup"},
+    weapons = {"weapon_knife","itemstore_pickup"},
     command = "hecu",
     max = 6,
     admin = 0,
@@ -877,7 +883,7 @@ Define which teams belong to civil protection
 Civil protection can set warrants, make people wanted and do some other police related things
 ---------------------------------------------------------------------------]]
 GAMEMODE.CivilProtection = {
-    [TEAM_SECURITYRECRUIT] = true,
+    --[TEAM_SECURITYRECRUIT] = true,
     [TEAM_SECURITY] = true,
     [TEAM_SECURITYCHEIF] = true,
     [TEAM_ADMINISTRATOR] = true,

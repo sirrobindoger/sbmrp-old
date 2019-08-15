@@ -47,7 +47,9 @@ DarkRP.createShipment("P228", {
     separate = true,
     pricesep = 400,
     noship = true,
-    allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT},
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_p228"] and JobRanks[ply:Team()].Entities["tfcss_p228"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl" ..  JobRanks[ply:Team()].Entities["tfcss_p228"] .. " to purchase this." end,
+    allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF, TEAM_SECURITY, TEAM_SECURITYRECRUIT},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
 DarkRP.createShipment("Glock18", {
@@ -58,7 +60,9 @@ DarkRP.createShipment("Glock18", {
     separate = true,
     pricesep = 550,
     noship = true,
-    allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT},
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_glock"] and JobRanks[ply:Team()].Entities["tfcss_glock"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl" .. JobRanks[ply:Team()].Entities["tfcss_glock"] .. " to purchase this." end,
+    allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY, TEAM_SECURITYRECRUIT},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
 
@@ -70,6 +74,8 @@ DarkRP.createShipment("FiveseveN", {
 	separate = true,
 	pricesep = 550,
 	noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_fiveseven"] and JobRanks[ply:Team()].Entities["tfcss_fiveseven"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " .. JobRanks[ply:Team()].Entities["tfcss_fiveseven"] .. " to purchase this." end,
 	allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
@@ -84,6 +90,8 @@ DarkRP.createShipment(".357 Magnum", {
     separate = true,
     pricesep = 550,
     noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["weapon_bms_357"] and JobRanks[ply:Team()].Entities["weapon_bms_357"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["weapon_bms_357"] .. " to purchase this." end,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
@@ -96,6 +104,8 @@ DarkRP.createShipment("Desert Eagle", {
     separate = true,
     pricesep = 550,
     noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_deagle"] and JobRanks[ply:Team()].Entities["tfcss_deagle"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " .. JobRanks[ply:Team()].Entities["tfcss_deagle"] .. " to purchase this." end,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
@@ -108,6 +118,8 @@ DarkRP.createShipment("HK USP", {
     separate = true,
     pricesep = 750,
     noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_usp"] and JobRanks[ply:Team()].Entities["tfcss_usp"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " .. JobRanks[ply:Team()].Entities["tfcss_usp"] .. " to purchase this." end,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
@@ -120,6 +132,8 @@ DarkRP.createShipment("MAC 10", {
     separate = true,
     pricesep = 1000,
     noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_mac10"] and JobRanks[ply:Team()].Entities["tfcss_mac10"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["tfcss_mac10"] .. " to purchase this." end,
     allowed = {TEAM_SURVEY_SUPPORT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
@@ -135,8 +149,10 @@ DarkRP.createShipment("SPAS-12", {
     amount = 1,
     separate = true,
     pricesep = 600,
-    noship = true, 
-    allowed = {TEAM_SECURITYCHEIF,TEAM_SECURITY,TEAM_SECURITYRECRUIT, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
+    noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["weapon_bms_shotgun"] and JobRanks[ply:Team()].Entities["weapon_bms_shotgun"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["weapon_bms_shotgun"] .. " to purchase this." end,
+    allowed = {TEAM_SECURITYCHEIF,TEAM_SECURITY, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
 
@@ -148,7 +164,9 @@ DarkRP.createShipment("MP5", {
     separate = true,
     pricesep = 600,
     noship = true,
-    allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["weapon_bms_mp5"] and JobRanks[ply:Team()].Entities["weapon_bms_mp5"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["weapon_bms_mp5"] .. " to purchase this." end,
+    allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS, TEAM_SECURITY},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
 
@@ -160,7 +178,9 @@ DarkRP.createShipment("M4", {
     separate = true,
     pricesep = 850,
     noship = true,
-    allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_m4a1"] and JobRanks[ply:Team()].Entities["tfcss_m4a1"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["tfcss_m4a1"] .. " to purchase this." end,
+    allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS, TEAM_SECURITY},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
 
@@ -172,13 +192,51 @@ DarkRP.createShipment("Xm1014", {
     separate = true,
     pricesep = 850,
     noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_xm1014"] and JobRanks[ply:Team()].Entities["tfcss_xm1014"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["tfcss_xm1014"] .. " to purchase this." end,
     allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
 
+DarkRP.createShipment("AWP", {
+    model = "models/weapons/3_snip_awp.mdl",
+    entity = "tfcss_awp",
+    price = 1000,
+    amount = 1,
+    separate = true,
+    pricesep = 850,
+    noship = true,
+    customCheck = function(ply) if JobRank[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_awp"] and JobRanks[ply:Team()].Entities["tfcss_awp"] > ply:GetJobRank() then return false end end,
+    CustomCheckFailMsg = function(ply) "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["tfcss_awp"] .. " to purchase this." end,
+    allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
+    onBought = function(ply, shipment) ply:Give(shipment.entity) end,
+})
 --[[-------------------------------------------------------------------------
 MISC
 ---------------------------------------------------------------------------]]
+DarkRP.createShipment( "Alien Capture Cuffs", { 
+    model = "models/items/boxmrounds.mdl",
+    entity = "weapon_leash_survey",
+    price = 0,
+    amount = 1,
+    separate = true,
+    pricesep = 850,
+    noship = true,
+   allowed = {TEAM_SURVEY_MINER},
+   onBought = function(ply, shipment) ply:Give(shipment.entity) end,
+})
+
+DarkRP.createShipment( "Door Ram", { 
+    model = "models/items/boxmrounds.mdl",
+    entity = "door_ram",
+    price = 0,
+    amount = 1,
+    separate = true,
+    pricesep = 600,
+    noship = true,
+   allowed = {TEAM_SECURITYCHEIF,TEAM_SECURITY},
+   onBought = function(ply, shipment) ply:Give(shipment.entity) end,
+})
 
 DarkRP.createEntity( "Universal Ammo", { 
    ent = "universal_ammo",

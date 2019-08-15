@@ -20,6 +20,7 @@ DarkRP.removeChatCommand("buyradio")
 DarkRP.removeChatCommand("advert")
 DarkRP.removeChatCommand("a")
 DarkRP.removeChatCommand("/")
+DarkRP.removeChatCommand("g")
 DarkRP.removeChatCommand("ooc")
 
 

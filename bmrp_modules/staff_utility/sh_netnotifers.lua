@@ -24,7 +24,7 @@ sBMRP_Notify["VOX"] = {
 	[2] = {4, 217, 61}	
 }
 
-sBMRP_Notify["VOX"] = {
+sBMRP_Notify["Tip"] = {
 	[1] = {201, 168, 0},
 	[2] = {255, 213, 0}	
 }

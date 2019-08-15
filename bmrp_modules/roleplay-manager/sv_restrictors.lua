@@ -177,9 +177,10 @@ local function OnLabBuy(ply, door)
 		return false, "Only Bio Researchers can own these labs!"
 	elseif ply:IsBio() and !sBMRP.LocList.Biosector[GetLocation(door:GetPos())] then
 		return false, "You can only own a lab within the biosector!"
-	elseif ply:Team() == TEAM_ASSOCIATE then
+	elseif ply:Team() == TEAM_RESEARCH and ply:GetJobRank() < 3 then
 		if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
-			return false, "Interns cannot own a lab. You can co-own one with a scientist!"
+			sBMRP.ChatNotify({ply}, "Error", "You must be at least science Lvl. 4 to own a lab on your own.")
+			return false, "You cannot own a lab. You can co-own one with a scientist!"
 		end
 	else
 		for k,v in pairs(sBMRP.Labs[door.LabName][1]) do
@@ -320,9 +321,9 @@ local function AntiPropSpawn(ply, model, entity)
 	elseif sBMRP.DisablePropsSpawn and !ply:IsAdmin() then
 		ply:ChatPrint("Prop Spawning has been disabled by staff.")
 		entity:Remove()
-	elseif !ply:IsAdmin() or !ply:GetUserGroup() == "supporter" or (!ply.AdvDupe2 or !ply.AdvDupe2.Pasting) then
+	elseif !ply:IsAdmin() or (!ply.AdvDupe2 or !ply.AdvDupe2.Pasting) then
 		if tonumber(ply:getDarkRPVar("money")) <= 0 then return end
-		ply:addMoney(-1)
+		ply:addMoney(sBMRP.PropTax or -1)
 	end
 end
 hook.Add( "PlayerSpawnVehicle", "bmrp_AntiPropSpawn_vehicle",AntiVehicleSpawn)
