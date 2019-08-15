@@ -5,7 +5,7 @@ sBMRP -- Coded by Sirro, Fay and Creed et al.
 sBMRP = sBMRP || {}
 sBMRP.LoadedModules = sBMRP.LoadedModules || {}
 sBMRP.version = "2.3 - Events"
-
+sBMRP.AMS = sBMRP.AMS || {}
 --[[-------------------------------------------------------------------------
 Localazing varibles
 -- localizing global functions/tables is an encouraged practice that improves code efficiency,

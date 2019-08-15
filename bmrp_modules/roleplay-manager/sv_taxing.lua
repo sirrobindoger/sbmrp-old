@@ -9,7 +9,7 @@ Mayor tax Config (by Sirro)
 
 sBMRP.Tax.NonTaxedJobs = { -- any job in here will not be affected by the tax
 	[TEAM_ADMINISTRATOR] = true,
-	[TEAM_SECURITY_CHIEF] = true,
+	[TEAM_SECURITY] = true,
 	[TEAM_SECURITYCHEIF] = true,
 	--[TEAM_ETC] = true,
 }

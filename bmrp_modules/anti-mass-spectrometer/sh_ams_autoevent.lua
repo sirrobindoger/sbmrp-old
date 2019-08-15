@@ -78,9 +78,7 @@ sBMRP.AMS.StateChange = {
 	    end
 	end,
 	[3] = function(state)
-		if state then
-			ents.GetMapCreatedEntity(v):EmitSound("weapons/stunstick/alyx_stunner2.wav")
-		end
+
 	end,
 	[4] = function(state)
 
