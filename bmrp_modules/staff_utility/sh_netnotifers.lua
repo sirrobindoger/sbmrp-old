@@ -9,15 +9,21 @@ sBMRP_Notify["Info"] = {
 	[2] = {52, 158, 235} 
 }
 
+sBMRP_Notify["Server"] = {
+	[1] = {0, 118, 204},
+	[2] = {52, 158, 235} 
+}
+
 sBMRP_Notify["Error"] = {
 	[1] = {201, 0, 10},
 	[2] = {255, 0, 13}
 }
 
-sBMRP_Notify["Security"] = {
-	[1] = {0, 213, 255},
-	[2] = {40, 160, 184}
+sBMRP_Notify["Warning"] = {
+	[1] = {201, 168, 0},
+	[2] = {255, 213, 0}
 }
+
 
 sBMRP_Notify["VOX"] = {
 	[1] = {27, 158, 62},

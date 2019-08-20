@@ -965,6 +965,52 @@ local removepac = ulx.command(CATEGORY_NAME .. " - PAC3", "ulx removepac", ulx.r
 removepac:addParam{ type=ULib.cmds.StringArg, completes=playernames(), hint="Name or Steamid",}
 removepac:defaultAccess( ULib.ACCESS_ADMIN)
 removepac:help( "Grants the target player or steamid PAC3 permissions." )
+
+--[[-------------------------------------------------------------------------
+Prop Protection shit
+---------------------------------------------------------------------------]]
+local ToJSON = util.TableToJSON
+local propoverrides = {
+	["worldspawn"] = true,
+	["player"] = true,
+}
+function ulx.addBlockedCollisionEnt(ply, entityclass, remove)
+	local entity = entityclass && not entityclass == "" || ply:GetEyeTrace().Entity:GetClass()
+	if not entity || propoverrides[ entity ] then
+		ULib.tsayError( calling_ply, "You must be looking at a prop || type its class!", true )
+		return
+	end
+	if not remove then 
+		sPropProtection.NoCollidedEnts[entity] = true -- update list
+		file.Write("blockedents.txt", ToJSON(sPropProtection.NoCollidedEnts))
+		ulx.fancyLog( player.GetAll(), "#P added #s to the collision blacklist.",ply, entity)
+		if sPropProtection.CollisionOverride then
+			for k,v in pairs(ents.FindByClass(entity)) do
+				if not v:CPPIGetOwner() then continue end
+				v:SetCustomCollisionCheck(true)
+				v:CollisionRulesChanged()
+			end
+		end
+	else
+		sPropProtection.NoCollidedEnts[entity] = false
+		file.Write("blockedents.txt", ToJSON(sPropProtection.NoCollidedEnts))
+		ulx.fancyLog( player.GetAll(), "#P removed #s from the collision blacklist.",ply, entity)
+		if sPropProtection.CollisionOverride then
+			for k,v in pairs(ents.FindByClass(entity)) do
+				if not v:CPPIGetOwner() then continue end
+				v:SetCustomCollisionCheck(false)
+				v:CollisionRulesChanged()
+			end
+		end
+	end
+end
+
+local addBlockedCollisionEnt = ulx.command(CATEGORY_NAME .. "- Players", "ulx addblacklist", ulx.addBlockedCollisionEnt, "!addblacklist", true, false)
+addBlockedCollisionEnt:addParam{ type=ULib.cmds.StringArg, hint="Entity class (you can also look at the ent).",ULib.cmds.optional}
+addBlockedCollisionEnt:addParam{ type=ULib.cmds.BoolArg, invisible=true}
+addBlockedCollisionEnt:defaultAccess( ULib.ACCESS_ADMIN)
+addBlockedCollisionEnt:help( "Blacklist/Unblacklist the entered entity/entity you are looking at from colliding with other entitys." )
+addBlockedCollisionEnt:setOpposite( "ulx removeblacklist", {_, _, true}, "!removeblacklist" )
 --[[-------------------------------------------------------------------------
 ADMIN HELP NOTIFER
 ---------------------------------------------------------------------------]]

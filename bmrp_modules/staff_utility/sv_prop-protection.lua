@@ -1,88 +1,89 @@
-require("fps")
-sPP = sPP or {}
+--[[-------------------------------------------------------------------------
+Sirro"s Prop Protection (recoded)
+---------------------------------------------------------------------------]]
+sPropProtection = sPropProtection || {}
+
+local eMeta = FindMetaTable("Entity")
+local pMeta = FindMetaTable("Player")
+
+local IsValid = IsValid
+local pairs = pairs
+local string = string
+local ToJSON = util.TableToJSON
+local FromJSON = util.JSONToTable
+local file = file
+
+sPropProtection.CollisionOverride = sPropProtection.CollisionOverride || false
+sPropProtection.NoCollidedEnts = file.Read("blockedents.txt", "DATA") && FromJSON(file.Read("blockedents.txt", "DATA")) || {}
+
 --[[-------------------------------------------------------------------------
 CONFIG
 ---------------------------------------------------------------------------]]
 
-
-local nodamageclass = { -- list of damage types player's can't be damaged by
-	["entityflame"] = true,
-	["prop_physics"] = true,
-	["worldspawn"] = true,
-	["func_movelinear"] = true,
-	["prop_ragdoll"] = true,
-	["gmod_wheel"] = true,
-	["gmod_wire_turret"] = true,
-	["gmod_wire_explosive"] = true,
-	["gmod_wire_simple_explosive"] = true,
+local NoDamageEnts = { -- list of damage types player"s can"t be damaged by
+	["entityflame"] = true, -- flames
+	["prop_physics"] = true, -- props
+	["worldspawn"] = false, -- fall damage
+	["func_movelinear"] = true, -- moving map entites
+	["prop_ragdoll"] = true, -- ragdolls
+	["gmod_wheel"] = true, -- wheels (from the toolgun)
+	["gmod_wire_turret"] = true, -- wire turrents
+	["gmod_wire_explosive"] = true, -- wire explosives
+	["gmod_wire_simple_explosive"] = true, -- wire explosives pt. 2
 }
-
-local BuildingEnts = { -- when the server lags a little, only these ents will be frozen
-	["prop_physics"] = true,
-	["gmod_button"] = true,
-	["gmod_cameraprop"] = true,
-	["keypad"] = true,
-}
-
-local LagCheck = 3 -- the delay at which the server checks if it is lagging
-
 
 -- The precentage at which if a prop exceeds at on being outside the world, is blocked from being spawned
 -- Ex. Spawning a massive prop in a small room will result in most of the prop being outside the world
-	sPP.PropPrecentage = 50
+sPropProtection.PropPrecentage = 50 --%
 
--- This is the same as the last setting, expect that it is for props being duped in, recommend that this is higher
--- as props being duped in are most likely not going to crash the server
---	sPP.PropPrecentageDupe = 60 (This setting is now deprecated.)
+--[[-------------------------------------------------------------------------
+END OF CONFIG
+(see ULX commands about collision blacklisting)
+---------------------------------------------------------------------------]]
+
+-- collision nerf
+sPropProtection.OldConstant = sPropProtection.OldConstant || constraint.NoCollide -- double declaring for redundency 
+function constraint.NoCollide() end
+
+concommand.Add("sPropProtection_RestoreConstraintFunc", function(ply) -- incase players freak the fuck out
+	if IsValid(ply) then return end
+	constraint.NoCollide = sPropProtection.OldConstant
+end)
 
 
-
-
+-- anti prop kill
 local function PlayerHit( ent, dmginfo )
 	local inf = dmginfo:GetInflictor()
 	local att = dmginfo:GetAttacker()
 	if ent:IsPlayer() then
-		if inf == NULL or inf == nil or att == NULL or inf == nil or (inf:GetClass() == nil and not(att:IsPlayer())) then return end
-	    if nodamageclass[inf:GetClass()] or dmginfo:GetDamageType() == 1 then
-			return true
-		elseif inf:GetClass() == "trigger_hurt" and (ent:IsOnFire() and ent:Team() == TEAM_GARGA) then
+		if inf == NULL || inf == nil || att == NULL || inf == nil || (inf:GetClass() == nil && !att:IsPlayer()) then return end
+	    if NoDamageEnts[inf:GetClass()] || dmginfo:GetDamageType() == 1 then
 			return true
 		end
 	end
-	
 end
 hook.Add( "EntityTakeDamage", "PlayerHit", PlayerHit )
 
+-- Ghosting
 
---[[-------------------------------------------------------------------------
-Anti crash
----------------------------------------------------------------------------]]
-
-local entity = FindMetaTable("Entity")
-local PhysObj = FindMetaTable("PhysObj")
-local ply = FindMetaTable("Player")
-
-
-
-function sPP.Ghost(self) -- Ghosting the entities
-	if self.ghosted or self:IsPlayer() then return end
-
+function eMeta:Ghost() -- Ghosting the entities
+	if !IsValid(self) || self.ghosted || self:IsPlayer() then return end
 	self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
-
 	self.ghosted = true
 end
-function sPP.Unghost(self) -- Unghosting the entities
-	if not self.ghosted or self:IsPlayer()  then return end
+
+function eMeta:UnGhost() -- Unghosting the entities
+	if !IsValid(self) || !self.ghosted || self:IsPlayer()  then return end
 	self:SetCollisionGroup(COLLISION_GROUP_NONE)
 	self.ghosted = false
 end
 
-function sPP.CanUnghost(self)
-	if not IsValid(self) then return end
+function eMeta:CanUnghost()
+	if !IsValid(self) then return end
 	local PObj = self:GetPhysicsObject()
-	if IsValid(PObj) and !self:IsVehicle() then
-		if not PObj:GetVolume() then return true end
-		for k, v in pairs(ents.FindInSphere(self:GetPos(), PObj:GetVolume() / 10000 + 20 ) ) do
+	if IsValid(PObj) && !self:IsVehicle() then
+		if !PObj:GetVolume() then return true end
+		for k, v in pairs(ents.FindInSphere(self:GetPos(), PObj:GetVolume() / 10000 + 20 ) ) do -- if the player unghosts a prop inside a player, keep ghosted
 			if v:IsPlayer() then
 				return false
 			end
@@ -91,105 +92,52 @@ function sPP.CanUnghost(self)
 	return true
 end
 
-
-function entity:Ghost()
-	return sPP.Ghost(self)
-end
-function entity:Unghost()
-	return sPP.Ghost(self)
-end
-function entity:GetPlayerOwner()
-	return sPP.GetPlayerOwner(self)
-end
-
-
--- Server is dying, try to save it!
-local AntiSpamWarning = CurTime()
-function sPP.StopLag()
-	if CurTime() < AntiSpamWarning then return end
-    	
-	RunConsoleCommand( "phys_timescale", "0" )
-	for k,v in pairs(player.GetAll()) do
-		v:ChatPrint("Server physics have been frozen.")
-		if v:IsAdmin() then
-			v:ChatPrint("Server physics frozen! Resuming in 30 seconds.")
+function sPropProtection.DoGrab(ply, ent)
+	ent:Ghost()
+	if ent:IsConstrained() then
+		for k, v in pairs(constraint.GetAllConstrainedEntities(ent)) do
+			if ent == k then continue end
+			k:Ghost()
 		end
 	end
-	game.ConsoleCommand("darkrp admintellall Server physics have been frozen temporaraly.\n")
-	timer.Simple(30, function()
-		RunConsoleCommand( "phys_timescale", "1" )
-
-		for k,v in pairs(player.GetAll()) do
-			v:ChatPrint("Server physics have been unfrozen.")
-		end
-		game.ConsoleCommand("darkrp admintellall Server physics have been unfrozen.\n")		
-	end)
-	local admins = false
-	for k,v in pairs(player.GetAll()) do
-		if v:IsAdmin() then
-			admins = true
-		end
-	end
-	if not admins then 
-		for k,v in pairs(ents.GetAll()) do if v:IsNPC() and v.PrintName then v:Remove() end end
-		game.ConsoleCommand("say Cleared all NPC's due to extreme lag.\n")
-	end
-	for k, v in pairs(ents.GetAll()) do
-		if v:MapCreationID() != -1 then continue end
-		local pobj = v:GetPhysicsObject()
-		if IsValid(pobj) then
-			pobj:EnableMotion(false)
-		end
-	end
-	AntiSpamWarning = CurTime() + 60
 end
 
 
-
-function sPP.DeLag()
-	for k, v in pairs(ents.GetAll()) do
-		if BuildingEnts[v:GetClass()] then
-			if v:MapCreationID() != -1 then continue end
-			local pobj = v:GetPhysicsObject()
-			if IsValid(pobj) then
-				pobj:EnableMotion(false)
+function sPropProtection.DoUngrab(ply, ent)
+	ent:UnGhost()
+	if ent:IsConstrained() then
+		for k, v in pairs(constraint.GetAllConstrainedEntities(ent)) do
+			if ent == k then continue end
+			if k:CanUnghost() then
+				k:UnGhost()
 			end
 		end
 	end
 end
 
+for k,v in pairs({"OnPhysgunPickup", "GravGunOnPickedUp"}) do
+	hook.Add(v, "sPropProtection_ghost", sPropProtection.DoGrab)
+end
 
--- Work out when the server is lagging
-hook.Add("Tick", "sPP.Tick", function()
-	local systime = SysTime()
-	if sPP.Delay and sPP.Delay > systime then return end
+for k,v in pairs({"GravGunOnDropped", "PhysgunDrop"}) do
+	hook.Add(v, "sPropProtection_unghost", sPropProtection.DoUngrab)
+end
 
-	local realframetime = engine.RealFrameTime()
-	if realframetime >= 0.5 then -- We're seriously lagging
-		if !sPP.ClearCheck then
-			sPP.StopLag()
-		else
-			sPP.DeLag()
-		end
-		sPP.ClearCheck = false
-	elseif realframetime >= 0.3 then -- We're just lagging a bit
-		if !sPP.ClearCheck then
-			sPP.DeLag()
-		end
-		sPP.ClearCheck = false
-	else
-		sPP.ClearCheck = true
+hook.Add("CanProperty", "bmrp_fireblock", function(ply, ent) -- smoking isn"t cool
+	if (!ply:IsAdmin() && ent == "ignite") then
+		return false
 	end
-
-	sPP.Delay = systime + LagCheck
 end)
 
-hook.Add( "CanTool", "sPP.CanTool", function( ply, tr, tool ) -- Stop people fucking with tools
-    -- Advanced Dupe model scale exploit
+--[[-------------------------------------------------------------------------
+Blocking some known exploits (credits to Crident"s anticrash for this one)
+---------------------------------------------------------------------------]]
+hook.Add( "CanTool", "sPropProtection.CanTool", function( ply, tr, tool ) -- Stop people fucking with tools
+	-- Advanced Dupe model scale exploit
 	local dupetab =
-		(tool == 'adv_duplicator' and ply:GetActiveWeapon():GetToolObject().Entities) or
-		(tool == 'advdupe2' and ply.AdvDupe2 and ply.AdvDupe2.Entities) or
-		(tool == 'duplicator' and ply.CurrentDupe and ply.CurrentDupe.Entities)
+		(tool == "adv_duplicator" && ply:GetActiveWeapon():GetToolObject().Entities) ||
+		(tool == "advdupe2" && ply.AdvDupe2 && ply.AdvDupe2.Entities) ||
+		(tool == "duplicator" && ply.CurrentDupe && ply.CurrentDupe.Entities)
 
 	if dupetab then
 		for k, v in pairs(dupetab) do
@@ -202,110 +150,21 @@ hook.Add( "CanTool", "sPP.CanTool", function( ply, tr, tool ) -- Stop people fuc
 	end
 
 	if tool:lower() == "material" then -- blackscreen exploit
-        local tool = ply:GetActiveWeapon():GetToolObject()
-	local mat = string.lower(tool:GetClientInfo("override"))	
-        if string.StartWith(mat, "pp/") and string.EndsWith(mat, "/copy") then -- blackscreen exploit
-            return false
-        end
-    end
-end)
-
--- Code below this stops collisions
-
-hook.Add("PlayerSpawnedProp", "sPP.PlayerSpawnedProp", function(ply, _, ent)
-	local mat = ent:GetMaterial()
-	if string.StartWith(mat, "pp/") and string.EndsWith(mat, "/copy") then -- blackscreen exploit
-        ent:Remove()
-    end
-    if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
-    ent:GetPhysicsObject():EnableMotion(false)
-
-end)
-
-
-hook.Add( "PhysgunPickup", "sPP.PhysgunPickup", function( ply, ent )
-	if ent:IsPlayer() then return end
-	local cantouch = ent:CPPICanPhysgun(ply)
-	if cantouch then
-		sPP.Ghost(ent)
-		if ent:IsConstrained() then
-			local tbl = constraint.GetAllConstrainedEntities(ent)
-			for k, v in pairs(tbl) do
-				if ent == k then continue end
-				sPP.Ghost(k)
-			end
-		end
-	else
-		return false
-	end
-	if ply:IsSirro() then ply:ChatPrint(#constraint.FindConstraints(ent, "Weld")) end
-end)
-
-hook.Add("OnPhysgunReload", "bmrp_unfreeze", function(phys,ply)
-	local ent = ply:GetEyeTrace().Entity
-	if IsValid(ent) then
-		if #constraint.FindConstraints(ent, "Weld") > 0 then
-			ply:ChatPrint("Unfroze " .. ent:GetModel() .. " with " .. #constraint.FindConstraints(ent, "Weld") .. " welded props.")
+		local tool = ply:GetActiveWeapon():GetToolObject()
+		local mat = string.lower(tool:GetClientInfo("override"))
+		if string.StartWith(mat, "pp/") && string.EndsWith(mat, "/copy") then -- blackscreen exploit
+			return false
 		end
 	end
 end)
 
+--[[-------------------------------------------------------------------------
+Prop canFit function
+---------------------------------------------------------------------------]]
 
-hook.Add("PhysgunDrop", "sPP.PhysgunDrop", function(ply, ent)
-    if sPP.CanUnghost(ent, ply) then
-        sPP.Unghost(ent)
-        if ent:IsConstrained() then
-			local tbl = constraint.GetAllConstrainedEntities(ent)
-			for k, v in pairs(tbl) do
-				if ent == k then continue end
-				if sPP.CanUnghost(k, ply) then
-					sPP.Unghost(k)
-				end
-			end
-		end
-    end
-end)
+hook.Add("PlayerSpawnProp", "sPropProtection_primary", function(ply, model)
 
-hook.Add("GravGunOnPickedUp", "bmrp_grav", function(ply, ent)
-		sPP.Ghost(ent)
-end)
-
-hook.Add("GravGunOnDropped", "bmrp_ghost_drop_grav", function(ply, ent)
-		sPP.Unghost(ent)
-end)
-
-hook.Add("CanProperty", "bmrp_fireblock", function(ply, ent) 
-	if (!ply:IsAdmin() and ent == "ignite") then return false end end)
-
---[[
-	<-- Overwriting the default setposition functions and clamping them.
---	This shouldn't be needed however it could stop strange stuff happening. -->
-]]--
-if (entity.SetRealPos == nil) and (PhysObj.SetRealPos == nil) then
-	entity.SetRealPos = entity.SetPos
-	PhysObj.SetRealPos = PhysObj.SetPos
-end
-
-local Clamp = math.Clamp
-function entity.SetPos(ent, pos)
-	if not IsValid(ent) then return end
-    pos.x = Clamp(pos.x, -20000, 20000)
-    pos.y = Clamp(pos.y, -20000, 20000)
-    pos.z = Clamp(pos.z, -20000, 20000)
-    entity.SetRealPos(ent, pos) -- called with pos being nil? wtf
-end
-function PhysObj.SetPos(phys, pos)
-    pos.x = Clamp(pos.x, -20000, 20000)
-    pos.y = Clamp(pos.y, -20000, 20000)
-    pos.z = Clamp(pos.z, -20000, 20000)
-    PhysObj.SetRealPos(phys, pos)
-end
-
-
-
-hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
-
-	if ply.AdvDupe2 and ply.AdvDupe2.Pasting then return end
+	if ply.AdvDupe2 && ply.AdvDupe2.Pasting then return end
 	local prop = ents.Create("prop_dynamic")
 	prop:SetPos(ply:GetEyeTrace().HitPos)
 	prop:SetModel(model)
@@ -324,21 +183,10 @@ hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
 			numoutside = numoutside + 1
 		end
 	end
-	local precentageoutside = math.Round(numoutside/totalmesh*100)
+	local precentageoutside = math.Round( numoutside / totalmesh * 100)
 
-	--[[if ply.AdvDupe2 and ply.AdvDupe2.Pasting then
-		if precentageoutside >= sPP.PropPrecentageDupe then
-			ply:ChatPrint("[sPP - AdvDupe2]: " .. prop:GetModel() .. " was removed for being " .. precentageoutside .. "% outside the world.")
-			Log(ply:GetName() .. " tried to spawn in " .. model .. " while duping. [" .. precentageoutside .. "% outside map.]")
-			prop:Remove()
-			return false
-		else
-			prop:Remove()
-			return
-		end
-	else]]--
-	if precentageoutside >= sPP.PropPrecentage then
-		ply:Notify("[sPP]: This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
+	if precentageoutside >= sPropProtection.PropPrecentage then
+		ply:Notify("[sPropProtection]: This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
 		Log(ply:GetName() .. " tried to spawn in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 		prop:Remove()
 		return false
@@ -349,39 +197,56 @@ hook.Add("PlayerSpawnProp", "sPP_primary", function(ply, model)
 end)
 
 --[[-------------------------------------------------------------------------
-Collision timeouts
+Collision Overrides Section
 ---------------------------------------------------------------------------]]
---[[
-hook.Add("PlayerSpawnedProp", "collision_timeout-init", function(ply,model, ent)
-	--ent:SetCustomCollisionCheck(false)
-	--ent:CollisionRulesChanged()
-end)
 
-hook.Add("ShouldCollide", "collision_timeout", function(ent1,ent2)
-	/*
-	if (ent1:CPPIGetOwner() != ent2:CPPIGetOwner()) or not IsValid(ent1:CPPIGetOwner()) or not ent1:CPPIGetOwner():IsPlayer() or (ent1:GetPos():DistToSqr(ent2:GetPos()) < 2000) then return true end
-	local ply = ent1:CPPIGetOwner() -- they both have the same owner so it doesn't matter
-	if not ply.propcollision then ply.propcollision = 0 end
-	ply.propcollision = ply.propcollision + 1
-	*/
-	return true
-end)
+local function onEntityCreated(ent)
+	timer.Simple(0, function()
+		local ply = ent:CPPIGetOwner()
+		if ply && sPropProtection.CollisionOverride && sPropProtection.NoCollidedEnts[ ent:GetClass() ] then
+			ent:SetCustomCollisionCheck(true)
+			ent:CollisionRulesChanged()
+			if !ply.warned then
+				ply.warned = true
+				sBMRP.ChatNotify({ply}, "Warning", "Due to the high traffic in players, prop collisions for player-props have been disabled for proformance reasons.")
+			end
+		end
+	end)
+end
+hook.Add("OnEntityCreated", "prop_collide", onEntityCreated)
 
-timer.Create("collision_rate-print", 5, 0, function()
-	if not sBMRP.Debug then return end
-	print("------------")
-	for k,v in pairs(player.GetAll()) do
-		if not v.propcollision then continue end
-		print(v.propcollision)
-		v.propcollision = 0
+hook.Add("ShouldCollide", "sPropProtectionShouldCollide" , function(e1 , e2)
+	if sPropProtection.NoCollidedEnts[e1:GetClass()] && sPropProtection.NoCollidedEnts[e2:GetClass()] then
+		return false
 	end
-	print("------- END -------")
 end)
 
-
-for k,v in pairs(ents.FindByClass("prop_physics")) do
-	if IsValid(v:CPPIGetOwner()) and v:CPPIGetOwner():IsPlayer() then
-		ent:SetCustomCollisionCheck(true)
-		ent:CollisionRulesChanged()	
+function sPropProtection.EnableCollisionCheck(bool)
+	for k,v in pairs(ents.GetAll()) do
+		if sPropProtection.NoCollidedEnts[ v:GetClass() ] && v:CPPIGetOwner() then
+			ent:SetCustomCollisionCheck(bool)
+			ent:CollisionRulesChanged()
+		end
 	end
-end]]--
+	sPropProtection.CollisionOverride = bool
+end
+
+
+local function doCollisionCheck(plycount)
+	if plycount >= 1 && !sPropProtection.CollisionOverride && !sPropProtection.AdminOverride then
+		sPropProtection.EnableCollisionCheck(true)
+		Log("Enabling collision checks.")
+		sBMRP.ChatNotify(player.GetAll(), "Server", "High player traffic detected, disabling collisions for player-props to ensure proformance.")
+	elseif plycount < 0 && sPropProtection.CollisionOverride then
+		sPropProtection.EnableCollisionCheck(false)
+		Log("Disabling collision checks.")
+		sBMRP.ChatNotify(player.GetAll(), "Server", "High player traffic subsided, re-enabling collisions for player-props.")
+	end
+end
+
+for k,v in pairs({"PlayerInitalSpawn", "PlayerDisconnected"}) do
+	hook.Add(v, "sPP_CollisionCheck", function()
+		print("yes")
+		doCollisionCheck(#player.GetHumans())
+	end)
+end
