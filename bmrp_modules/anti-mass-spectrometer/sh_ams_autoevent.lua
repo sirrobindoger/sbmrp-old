@@ -69,7 +69,7 @@ sBMRP.AMS.StateChange = {
 	    end
 	end,
 	[2] = function(state)
-		print(tostring(state) .. "<---")
+
 
 		if state then
 	       amsCore:EmitSound("ambient/machines/thumper_startup1.wav", 75, 100 )
@@ -102,7 +102,6 @@ hook.Add("AMSStateChange", "bmrp-ams", function(state, prevstate)
 		if state > prevstate then -- moving up a state
 			sBMRP.AMS.StateChange[state](true)
 		else
-			print(state .. "<----")
 			sBMRP.AMS.StateChange[state]() -- its moving down a state
 		end	
 	end

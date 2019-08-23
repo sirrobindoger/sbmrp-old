@@ -9,8 +9,9 @@ if SERVER then
 	function Log(str)
 		ServerLog(str .. "\n")
 	end
-
-	-- Chat command that fills in darkrp shit for me
+	--[[-------------------------------------------------------------------------
+	sBMRP Chat Command
+	---------------------------------------------------------------------------]]
 	function sBMRP.CreateChatCommand(command, func, desc, delay) -- declars and defines
 		if not command or not func or not isfunction(func) then
 			error("Invalid parameters!")
@@ -25,9 +26,7 @@ if SERVER then
 		DarkRP.defineChatCommand(command, func)
 	end
 
-	function ARitzDDMsg(...)
-		return -- ARitz can go fuck himself
-	end
+
 	function sBMRP.RemoveChatCommand(command)
 		if not command then error("Invalid parameters!") end
 		DarkRP.removeChatCommand(command)
@@ -47,6 +46,10 @@ if SERVER then
 		ply:ChatPrint(ply:GetActiveWeapon():GetWeaponWorldModel())
 		ply:ChatPrint(ply:GetActiveWeapon():GetClass())
 	end)
+
+	function ARitzDDMsg(...)
+		return -- ARitz can go fuck himself
+	end
 end
 
 if CLIENT then
@@ -96,22 +99,20 @@ function player.InLocation(loc)
 end
 
 
+function player.GetLocation(loc)
+	local loc = tostring(loc) or ""
+	local tab = {}
+	for k,v in pairs(player.GetAll()) do
+		if GetLocation(v) == loc then
+			table.insert(tab, v)
+		end
+	end
+	return tab
+end
+
 
 
 if SERVER then
-	function adminchatall(text)
-		for k,v in pairs(player.GetAll()) do
-			if v:IsAdmin() then
-				v:ChatPrint(text)
-			end
-		end
-	end
-
-	function chatall(text)
-		for k,v in pairs(player.GetAll()) do
-			v:ChatPrint(text)
-		end
-	end
 	function EntID(ent)
 		if not IsValid(ents.GetMapCreatedEntity(ent)) then return end
 		return ents.GetMapCreatedEntity(ent)
@@ -156,14 +157,17 @@ if SERVER then
 	end
 
 
-	function ent:LerpToAngle(ang)
-		local targ = ang
-		print("Starting Motion")
+	function ent:LerpToAngle(ang, mult)
+		hook.Remove("Think", "lerp-ang_" .. self:EntIndex())  -- make sure there are no other lerp motions running
+
+		local targang = vec
+		local entindex = self:EntIndex()
+		local ent = self
 		hook.Add("Think", "lerp-ang_" .. self:EntIndex(), function()
-			local targlerp = LerpAngle(FrameTime(), self:GetAngles(), targ)
-			if RoundVector(targlerp) == RoundVector(targ) then print(util.TypeToString(RoundVector(targlerp)) .. "=" .. util.TypeToString(RoundVector(targ))) hook.Remove("Think","lerp-ang_" .. self:EntIndex()) end -- reached destination
+			if not IsValid(ent) then hook.Remove("Think", "lerp-ang__" .. entindex) end -- something went wrong
+			local targlerp = LerpAngle(FrameTime()*mult, self:GetAngles(), targang)
+			if RoundVector(targlerp) == RoundVector(targang) then hook.Remove("Think","lerp-ang_" .. entindex) end -- reached destination
 			self:SetAngles(targlerp)
-			print(targlerp)
 		end)
 	end
 
@@ -187,7 +191,8 @@ if SERVER then
 
 	function ply:AddHighlightEnt(ent, append)
 		if !istable( ent )  then return end
-		self.highlightedents = ( self.highligthedents and append and table.Add(self.highligthedents, ent) ) or ent
+		self.highlightents = self.highlightents || {}
+		self.highlightedents = ( #self.highligthedents >= 1 && append && table.Add(self.highligthedents, ent) ) or ent
 		net.Start("sBMRP.HighlightEnts")
 			net.WriteCompressedTable(self.highlightedents)
 		net.Send(self)
@@ -203,6 +208,7 @@ if SERVER then
 		net.Start("sBMRP.HighlightEnts")
 			net.WriteCompressedTable({-1})
 		net.Send(self)
+		self.highlightents = nil
 	end
 end
 
@@ -221,7 +227,9 @@ if CLIENT then
 
 	hook.Add( "PreDrawHalos", "bmrp_halodraw", function()
 		if not highlightents then return end
-		halo.Add( highlightents, Color( 255, 0, 0 ), 5, 5, 1 )
+		for k,v in pairs(highlightents) do
+			halo.Add({k}, v  and v.color and IsColor(v.color) or Color(255,255,255), 5, 5, 2, v and v.ignorez or false)
+		end
 	end )
 end
 

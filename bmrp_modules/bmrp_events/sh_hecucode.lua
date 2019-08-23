@@ -119,7 +119,7 @@ if SERVER then
 						sBMRP.ChatNotify({ply}, "Info", "Sent code request to the Administrator!")
 
 						sBMRP.ChatNotify({rec}, "Info", "The HECU Commander has requested a code change to code " .. args .. ".\nTo confirm, please type /confirmcode.")
-						timer.Create("confirmcode", 15, 1, function()
+						timer.Create("confirmcode_" .. rec:SteamID(), 15, 1, function()
 							sBMRP.ChatNotify({rec, ply}, "Info", "Code request expired. Cancelling code change.")
 						end)
 						return ""
@@ -131,7 +131,7 @@ if SERVER then
 						sBMRP.ChatNotify({ply}, "Info", "Sent code request to the HECU Commander!")
 						rec.codereq = args
 						sBMRP.ChatNotify({rec}, "Info", "The Facility Administartor has requested a code change to code " .. args .. ".\nTo confirm, please type /confirmcode.")
-						timer.Create("confirmcode", 15, 1, function()
+						timer.Create("confirmcode_" .. rec:SteamID(), 15, 1, function()
 							sBMRP.ChatNotify({rec, ply}, "Info", "Code request expired. Cancelling code change.")
 							rec.codereq = nil
 						end)
@@ -150,7 +150,7 @@ if SERVER then
 			sBMRP.ChatNotify({ply}, "Error", "You job is not qualified to use this command!")
 			return ""
 		end
-		if !timer.Exists("confirmcode") then
+		if !timer.Exists("confirmcode_" .. ply:SteamID()) then
 			sBMRP.ChatNotify({ply}, "Error", "No codes to confirm right now!")
 
 		else

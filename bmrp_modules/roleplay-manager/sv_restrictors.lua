@@ -307,6 +307,9 @@ end
 local function cantool(ply, tr,tool)
 	if tool == "witchergate" and (!ply:IsAdmin() and ply:GetUserGroup() != "supporter") then
 		return false
+	elseif tool:find("pcspawn") and ply:Team() != TEAM_ITTECH and !ply:IsAdmin() then
+		ply:Notify("Only the IT TECH job can use PCMod!", 1, 2)
+		return false
 	end
 end
 hook.Add("CanTool","BMRP_cantool", cantool)

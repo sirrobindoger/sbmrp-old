@@ -93,7 +93,7 @@ sCON:RegisterCommand("find", function(message)
 		local dID = string.Replace(targ,"<@",""):Replace(">",""):Replace("!", "")
 		if sCON:IsRegistered(_,dID) then
 			local member = sCON:GetFromDB(_,dID)
-			DarkRP.offlinePlayerData(member, function(body) rpname = body[1].rpname end)
+			DarkRP.offlinePlayerData(member, function(body) rpname = body[1] and body[1].rpname or "NULL" end)
 			if sCON:findPlayer(member) then
 				local player = sCON:findPlayer(member)
 				--[[-------------------------------------------------------------------------]]

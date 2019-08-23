@@ -7,15 +7,27 @@ if SERVER then
 		return self.QuestName
 	end
 
+	function ply:CanStartQuest(QUEST)
+		if not sBMRP.Quests[QUEST] then return end
+
+		if !sBMRP.Quests[QUEST].canstart or !sBMRP.Quests[QUEST].canstart() then
+			return false
+		else
+			return true
+		end
+	end
+
+
 	function ply:StartQuest(QUEST)
 		if not sBMRP.Quests[QUEST] then return end
-		--if self:InQuest() then error("[sQuests]:" .. self:Name() .. " is already in a quest.") end
+
+		if self:InQuest() then return error("[sQuests]:" .. self:Name() .. " is already in a quest.") end
 		-------------Setting up varibles----------
 		self.QuestName = QUEST
 		self.QuestLevel = 1
-		ply.Quest = ply.Quest || {}
-		ply.Quest.QuestHooks = ply.Quest.QuestHooks || {}
-		ply.Quest.QuestTimers = ply.Quest.QuestTimers || {}
+		self.Quest = self.Quest || {}
+		self.Quest.QuestHooks = self.Quest.QuestHooks || {}
+		self.Quest.QuestTimers = self.Quest.QuestTimers || {}
 		-------------------------------=----------
 		sBMRP.Quests.UpdatePlayer(sBMRP.Quests[QUEST][1], self)
 	end
