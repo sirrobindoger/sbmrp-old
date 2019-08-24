@@ -30,7 +30,12 @@ sound.Add( {
     sound = "ambient/levels/citadel/zapper_loop1.wav"
 } )
 
-amsCore = ents.GetMapCreatedEntity(5367)
+
+
+function sBMRP.AMS.SetRotorSpeed(speed)
+    ents.GetMapCreatedEntity(5369):SetKeyValue("speed",speed)
+end
+
 
 
 sBMRP.AMS.StateChange = {
@@ -88,16 +93,17 @@ sBMRP.AMS.StateChange = {
 
 
 
-hook.Add("EntityEmitSound", "silence_ams", function(data)
+--[[hook.Add("EntityEmitSound", "silence_ams", function(data)
     ent = data.Entity
     if data.SoundName == "ambience/zapmachine.wav" and not muteSound then
         return false
     end
-end)
+end)]]--
 
 
 
 hook.Add("AMSStateChange", "bmrp-ams", function(state, prevstate)
+	amsCore = ents.GetMapCreatedEntity(5367)
 	if sBMRP.AMS.StateChange[state] != nil then
 		if state > prevstate then -- moving up a state
 			sBMRP.AMS.StateChange[state](true)
@@ -106,3 +112,20 @@ hook.Add("AMSStateChange", "bmrp-ams", function(state, prevstate)
 		end	
 	end
 end)
+
+
+local function createNewCart() --5546
+	local amsCart = ents.GetMapCreatedEntity(5546)
+	amsCart:SetRenderMode(RENDERMODE_NONE)
+	amsCart:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	local amsCartPos = amsCart:GetPos()
+	local amsCartAngs = amsCart:GetAngles()
+	--amsCart:SetPos(Vector(0,0,0))
+
+	local newCart = ents.Create("ams_cart")
+	newCart:SetPos(amsCartPos)
+	newCart:SetAngles(amsCartAngs)
+	newCart:Spawn()
+	amsCart:SetParent(newCart)
+end
+sBMRP.MapHook("Create_cart",createNewCart)

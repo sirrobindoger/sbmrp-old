@@ -21,10 +21,6 @@ local amsbuttons = {
     1818, -- AMS Prop Arm
 }
 
---[[-------------------------------------------------------------------------
-Delcaring a fuckton of varibles
----------------------------------------------------------------------------]]
-
 
 local MetaStates = {
     ["func_door"] = function( self )
