@@ -26,7 +26,7 @@ if SERVER then
 
 		self:SetInUse( false )
 
-		self:SetModel( 'models/humans/guard.mdl' )
+		self:SetModel( 'models/decay/scientist_rosenberg.mdl' )
 		self:SetHullType( HULL_HUMAN )
 		self:SetHullSizeNormal(  )
 		self:SetNPCState( NPC_STATE_SCRIPT )

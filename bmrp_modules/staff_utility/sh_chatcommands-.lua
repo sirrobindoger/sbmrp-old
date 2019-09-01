@@ -210,6 +210,23 @@ clearfire:defaultAccess(ULib.ACCESS_ADMIN)
 clearfire:help("Remove fire.")
 
 --[[-------------------------------------------------------------------------
+Utime
+---------------------------------------------------------------------------]]
+local function ulxGetTimeC(ply, target_ply)
+   local target = target_ply[1] or false
+   
+	if target then
+		local curTime, totalTime = Utime.timeToStr(target:GetUTimeSessionTime()), Utime.timeToStr(target:GetUTimeTotalTime())
+		print(curTime .. totalTime)
+		ply:ChatPrint(("Time Info for %s:\nSession Time: %s\nTotal Time: %s"):format(target:GetName(), curTime, totalTime))
+	end
+end
+local ulxGetTime = ulx.command("Essentials", "ulx showtime", ulxGetTimeC, "!showtime", true, false)
+ulxGetTime:addParam{ type=ULib.cmds.PlayersArg }
+ulxGetTime:defaultAccess(ULib.ACCESS_ALL)
+ulxGetTime:help("Get info about a player's time.")
+
+--[[-------------------------------------------------------------------------
 Lockdown
 ---------------------------------------------------------------------------]]
 
