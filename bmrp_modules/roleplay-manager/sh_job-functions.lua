@@ -98,8 +98,8 @@ Pill functions
 ---------------------------------------------------------------------------]]
 
 function ply:JobPill(pill)
-	if not (pk_pills or self.PillActive) and (not ply:Alive()) then return end
-	ply.PillActive = true
+	if not (pk_pills or self.PillActive) and (not self:Alive()) then return end
+	self:SetNWBool("InPill", true)
 	pk_pills.apply(self, pill, "lock-life")
 end
 

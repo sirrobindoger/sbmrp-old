@@ -101,7 +101,7 @@ if SERVER then
 	--[[-------------------------------------------------------------------------
 	Chat Commands
 	---------------------------------------------------------------------------]]
-
+	local codeRequest
 	local function RequestCodeChange(ply, args)
 		if ply:Team() != TEAM_HECUCOMMAND and ply:Team() != TEAM_ADMINISTRATOR and not ply:IsAdmin() then
 			sBMRP.ChatNotify({ply}, "Error", "You job is not qualified to use this command!")
@@ -117,7 +117,7 @@ if SERVER then
 				for k,rec in pairs(player.GetAll()) do
 					if rec:Team() == TEAM_ADMINISTRATOR then
 						sBMRP.ChatNotify({ply}, "Info", "Sent code request to the Administrator!")
-
+						codeRequest = args
 						sBMRP.ChatNotify({rec}, "Info", "The HECU Commander has requested a code change to code " .. args .. ".\nTo confirm, please type /confirmcode.")
 						timer.Create("confirmcode_" .. rec:SteamID(), 15, 1, function()
 							sBMRP.ChatNotify({rec, ply}, "Info", "Code request expired. Cancelling code change.")
@@ -129,7 +129,7 @@ if SERVER then
 				for k,rec in pairs(player.GetAll()) do
 					if rec:Team() == TEAM_HECUCOMMAND then
 						sBMRP.ChatNotify({ply}, "Info", "Sent code request to the HECU Commander!")
-						rec.codereq = args
+						codeRequest = args
 						sBMRP.ChatNotify({rec}, "Info", "The Facility Administartor has requested a code change to code " .. args .. ".\nTo confirm, please type /confirmcode.")
 						timer.Create("confirmcode_" .. rec:SteamID(), 15, 1, function()
 							sBMRP.ChatNotify({rec, ply}, "Info", "Code request expired. Cancelling code change.")
@@ -154,9 +154,9 @@ if SERVER then
 			sBMRP.ChatNotify({ply}, "Error", "No codes to confirm right now!")
 
 		else
-			sBMRP.SetHECUCode(ply.codereq or "Green")
-			ply.codereq = nil
-			timer.Remove("confirmcode")
+			sBMRP.SetHECUCode(codeRequest or "Green")
+			codeRequest = args
+			timer.Remove("confirmcode_" .. ply:SteamID())
 		end
 	end
 	sBMRP.CreateChatCommand("confirmcode", ConfirmCodeChange, "Confirm a code change", 10)

@@ -191,10 +191,13 @@ if SERVER then
 
 	function ply:AddHighlightEnt(ent, append)
 		if !istable( ent )  then return end
-		self.highlightents = self.highlightents || {}
-		self.highlightedents = ( #self.highligthedents >= 1 && append && table.Add(self.highligthedents, ent) ) or ent
+		self.highlightedents = self.highlightedents || {}
+		if #self.highlightedents > 1 then
+			self.highlightedents = append and self.highlightedents || table.Empty(self.highlightedents)
+		end
+		self.highlightedents[ent] = true
 		net.Start("sBMRP.HighlightEnts")
-			net.WriteCompressedTable(self.highlightedents)
+			net.WriteCompressedTable(table.GetKeys(self.highlightedents))
 		net.Send(self)
 	end
 
@@ -228,7 +231,8 @@ if CLIENT then
 	hook.Add( "PreDrawHalos", "bmrp_halodraw", function()
 		if not highlightents then return end
 		for k,v in pairs(highlightents) do
-			halo.Add({k}, v  and v.color and IsColor(v.color) or Color(255,255,255), 5, 5, 2, v and v.ignorez or false)
+			print(k, v)
+			halo.Add({k}, v  and v.color and IsColor(v.color) and v.color or Color(255,255,255), 5, 5, 2, v and v.ignorez or false)
 		end
 	end )
 end

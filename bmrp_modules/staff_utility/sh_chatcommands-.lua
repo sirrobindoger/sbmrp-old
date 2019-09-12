@@ -234,6 +234,7 @@ local goodgroups = table.ValuesToKeys({
 	"superadmin",
 	"staff",
 	"trialstaff",
+	"supporter"
 })
 function ulx.lockdown(calling_ply, shouldkick, unlockdown)
 	if shouldkick then

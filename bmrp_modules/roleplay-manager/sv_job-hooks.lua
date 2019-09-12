@@ -21,6 +21,10 @@ hook.Add("PlayerSpawn", "bmrp_playerspawned", playerspawn)
 --[[-------------------------------------------------------------------------
 Change teams
 ---------------------------------------------------------------------------]]
+local PILL_JOBS = {
+	[TEAM_BULLSQUID] = true,
+	[TEAM_HOUNDEYE] = true,
+}
 local function TeamChange(ply, before, after)
 	----- smart spawn
 	timer.Simple(2, function()
@@ -41,9 +45,8 @@ local function TeamChange(ply, before, after)
 		ply:Say("/unownalldoors")
 	end
 
-	if ply.PillActive then
+	if PILL_JOBS[before] || PILL_JOBS[after] then
 		ply:Kill()
-		ply.PillActive = nil
 	end
 end
 hook.Add("OnPlayerChangedTeam", "bmrp_jobchange", TeamChange)

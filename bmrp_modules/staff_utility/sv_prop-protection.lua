@@ -186,7 +186,7 @@ hook.Add("PlayerSpawnProp", "sPropProtection_primary", function(ply, model)
 	local precentageoutside = math.Round( numoutside / totalmesh * 100)
 
 	if precentageoutside >= sPropProtection.PropPrecentage then
-		ply:Notify("[sPropProtection]: This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
+		ply:Notify("This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
 		Log(ply:GetName() .. " tried to spawn in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 		prop:Remove()
 		return false

@@ -104,9 +104,9 @@ sBMRP.Labs = {
 	["Sector A Lab 3"] = {
 		{3200}, Vector(-11719.198242, -228.716599, -188.968750), "Medium"
 	},
-	["Sector A Large Lab"] = {
-		{5383,5384}, Vector(-7525.5258789063,233.23014831543,-188.96875), "Large"
-	},
+	--["Sector A Large Lab"] = {
+	--	{5383,5384}, Vector(-7525.5258789063,233.23014831543,-188.96875), "Large"
+	--},
 	["Sector A Lab 4"] = {
 		{3199}, Vector(-11556.583984, -765.396118, -188.968750), ""
 	},
@@ -177,9 +177,9 @@ local function OnLabBuy(ply, door)
 		return false, "Only Bio Researchers can own these labs!"
 	elseif ply:IsBio() and !sBMRP.LocList.Biosector[GetLocation(door:GetPos())] then
 		return false, "You can only own a lab within the biosector!"
-	elseif ply:Team() == TEAM_RESEARCH and ply:GetJobRank() < 3 then
+	elseif ply:Team() == TEAM_RESEARCH and ply:GetJobRank() < 2 then
 		if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
-			sBMRP.ChatNotify({ply}, "Error", "You must be at least science Lvl. 4 to own a lab on your own.")
+			sBMRP.ChatNotify({ply}, "Error", "You must be at least science Lvl. 2 to own a lab on your own.")
 			return false, "You cannot own a lab. You can co-own one with a scientist!"
 		end
 	else

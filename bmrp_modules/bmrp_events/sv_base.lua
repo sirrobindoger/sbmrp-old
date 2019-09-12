@@ -103,7 +103,7 @@ function sBMRP.Event.UpdateEvent(rEvent, aEvent, stage)
 				local timername = aEvent.Name .. "_eventtimer-" .. _
 				table.insert(aEvent.Timers, timername)
 
-				timer.Create(timername, timers[stage], timers[2], function() timers[3]() end)
+				timer.Create(timername, timers[1], timers[2], function() timers[3]() end)
 			end
 		elseif flag == "Hooks" then
 			for _, hooks in pairs(rEvent[stage]["Hooks"]) do
@@ -123,8 +123,8 @@ function sBMRP.Event.UpdateEvent(rEvent, aEvent, stage)
 				eEnt.EventEntity = aEvent.Name
 				eEnt.EventStage = stage
 				eEnt.EventPersistant = enttab[2]
-				local entsetup = pcall(function() enttab[3](eEnt) end)
-				if !entsetup then ErrorNoHalt("Entity " .. enttab[1] .. " errored while being passed into your function!") end
+				local entsetup,err = pcall(function() enttab[3](eEnt) end)
+				if !entsetup then ErrorNoHalt("Entity " .. enttab[1] .. " errored while being passed into your function!\n" .. err) end
 				table.insert(aEvent.Entities, eEnt)
 				
 			end
