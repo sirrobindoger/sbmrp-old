@@ -1,3 +1,4 @@
+CATEGORY_NAME = "BMRP"
 --[[-------------------------------------------------------------------------
 Pac Commands
 ---------------------------------------------------------------------------]]
@@ -209,6 +210,51 @@ clearfire = ulx.command(CATEGORY_NAME .. " - Map", "ulx clearfire", ulx.clearfir
 clearfire:defaultAccess(ULib.ACCESS_ADMIN)
 clearfire:help("Remove fire.")
 
+--[[-------------------------------------------------------------------------
+HECU Code
+---------------------------------------------------------------------------]]
+
+local GoodCodes = {
+	["Yellow"] = true,
+	["Green"] = true,
+	["Black"] = true,
+	["Red"] = true,
+}
+
+
+function ulx.hecucode(ply, code)
+	if !GoodCodes[ code ] then
+		ULib.tsayError( ply, "Invalid code entered, valid codes (case sensitive):\n " .. table.concat(table.GetKeys(GoodCodes), ", "))
+	else
+		sBMRP.SetHECUCode(code)
+		ulx.fancyLog( player.GetAdmins(), "#P forced the HECU code to #s.",ply, code)
+	end
+end
+local hecucode = ulx.command(CATEGORY_NAME .. " - Map", "ulx hecucode", ulx.hecucode, "!hecucode", true, false)
+hecucode:addParam{ type=ULib.cmds.StringArg, completes=GoodCodes, hint="Code to change too.",}
+hecucode:defaultAccess( ULib.ACCESS_ADMIN)
+hecucode:help( "Forces the HECU code." )
+--[[-------------------------------------------------------------------------
+Timed cleanup
+---------------------------------------------------------------------------]]
+
+
+function ulx.cleanup(ply, time)
+	local timeLeft = time
+	ulx.fancyLog( player.GetAll(), "#P triggered a timed mapclean.",ply)
+	timer.Create("bmrp_cleanup", 1, timeLeft, function()
+		if timeLeft >= 1 then
+			RunConsoleCommand("darkrp", "admintellall", "Cleanup in " .. timeLeft .. " seconds.")
+			timeLeft = timeLeft - 1
+		else
+			RunConsoleCommand("fadmin", "cleanup")
+		end
+	end)
+end
+local cleanup = ulx.command("Essentials", "ulx cleanup", ulx.cleanup, "!cleanup", true, false)
+cleanup:addParam{type=ULib.cmds.NumArg, min=10, max=420,default=60,hint="time(seconds)",ULib.cmds.round}
+cleanup:defaultAccess(ULib.ACCESS_ADMIN)
+cleanup:help("Timed cleanup")
 --[[-------------------------------------------------------------------------
 Utime
 ---------------------------------------------------------------------------]]

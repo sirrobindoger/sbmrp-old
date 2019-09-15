@@ -108,4 +108,4 @@ local function resetOnMayorDeath(ply, before)
 	end
 end
 hook.Add("PlayerDeath", "sBMRP.Tax_resetOnMayorDeath", resetOnMayorDeath)
-hook.Add("OnPlayerChangedTeam", "sBMRP.Tax_resetOnMayorDeath", resetOnMayorDeath)
+--hook.Add("OnPlayerChangedTeam", "sBMRP.Tax_resetOnMayorDeath", resetOnMayorDeath)

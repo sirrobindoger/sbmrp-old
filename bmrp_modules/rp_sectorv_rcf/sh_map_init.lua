@@ -21,7 +21,7 @@ local function mapinit()
 	Sounds
 	---------------------------------------------------------------------------]]
 
-	for k,v in pairs({4647,3003, 5606}) do
+	for k,v in pairs({4647,3003, 5606, 4542, 2936}) do
 		SafeRemoveEntity(ents.GetMapCreatedEntity(v))
 	end
 	timer.Create("ambience-sound_fix", 1, 0, function()
@@ -251,6 +251,30 @@ local function mapinit()
 	timer.Simple(5, function()
 		BODYMAN:LoadClosets()
 	end)
+
+
+	--[[-------------------------------------------------------------------------
+	fast travel doors (topside canyon)
+	---------------------------------------------------------------------------]]
+	local toucherents = {
+		{"models/hunter/plates/plate8x16.mdl", Vector(-4378.50, 10425.73, 225.74),Angle(-90, 180, 180.000), "canyon_2"},
+		{"models/hunter/plates/plate3x5.mdl", Vector(-2467.15, -1002.22, 640.75), Angle(90.000, 90.000, 180.000), "canyon_1"}
+	}
+	for k,v in pairs(ents.FindByClass("npc_quest-dealer")) do v:Remove() end
+	for k,v in pairs(toucherents) do
+		local ent = ents.Create("npc_quest-dealer")
+
+		ent:SetModel(v[1])
+		ent:PhysicsInit(SOLID_VPHYSICS)
+		ent:SetPos(v[2])
+		ent:SetAngles(v[3])
+		ent:SetName(v[4])
+		ent:Spawn()
+		ent:SetRenderMode(RENDERMODE_NONE)
+		ent:GetPhysicsObject():EnableMotion(false)
+	end
+
+
 end
 /*
 for k,v in pairs(ents.GetAll()) do
@@ -285,3 +309,19 @@ hook.Add("PlayerUse", "ladder_ply", function(ply, ent)
 end)
 
 
+if SERVER then
+
+	hook.Add("TriggerEntTouch", "test", function(ent, triggerEnt)
+		if ent:GetName() == "canyon_1" and triggerEnt:IsPlayer() then
+			triggerEnt:SetPos(DarkRP.findEmptyPos(Vector(-4225.3720703125,10443.5,136.03125), {}, 300, 30, Vector(16,16,64)))
+			triggerEnt:DropToFloor()
+			triggerEnt:SetEyeAngles(Angle(0,0,0))
+			sound.Play("doors/handle_pushbar_locked1.wav",triggerEnt:GetPos(),75,100,0.5)
+		elseif ent:GetName() == "canyon_2" and triggerEnt:IsPlayer() then
+			triggerEnt:SetPos(DarkRP.findEmptyPos(Vector(-2472.7902832031,-1078.8332519531,633.14520263672), {}, 300, 30, Vector(16,16,64)))
+			triggerEnt:DropToFloor()
+			triggerEnt:SetEyeAngles(Angle(0,-90,0))
+			sound.Play("doors/metal_stop1.wav",triggerEnt:GetPos(),75,100,0.25)
+		end
+	end)
+end

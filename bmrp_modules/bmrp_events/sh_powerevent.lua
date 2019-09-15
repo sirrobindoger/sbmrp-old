@@ -7,6 +7,17 @@ if SERVER then
 
 	POWER_EVENT.name = "PowerEvent"
 	SetGlobalString("generatorIDs", "")
+	local genMeta = FindMetaTable("Entity")
+	--[[-------------------------------------------------------------------------
+	Meta funcs
+	---------------------------------------------------------------------------]]
+	function genMeta:GetGenHealth()
+		return self:GetNWInt("GMHealth", -1)
+	end
+
+	function genMeta:SetGenHealth(int)
+		return self:GetName() == "gm_power" && self:SetNWInt("GMHealth", int) || nil
+	end
 	--[[-------------------------------------------------------------------------
 	CanStart
 	---------------------------------------------------------------------------]]
@@ -18,7 +29,20 @@ if SERVER then
 	end
 
 
+	--[[-------------------------------------------------------------------------
+	Generator Logic
+	---------------------------------------------------------------------------]]
 
+	POWER_EVENT["GeneratorDecay"] = function()
+		local generators = ents.FindByName("gm_power")
+		if #generators < 1 then return end
+
+		for k,ent in pairs(generators) do
+			local genHP = ent:GetGenHeath()
+
+
+		end
+	end
 
 	--[[-------------------------------------------------------------------------
 	Stage(s)
@@ -38,17 +62,15 @@ if SERVER then
 
 	PowerSetup["Entities"] = {}
 	local generatorEnts = {
-		{"models/props_am/powersource.mdl", Vector(-13589.46, -538.12, -412.52), Angle(0,0,0)},
-		{"models/props/hl10props/amsmachine00.mdl",  Vector(-5060.69, -3012.82, -1124.32), Angle(0,90,0)},
-		{"models/props/hl16props/generator03.mdl",  Vector(-5957.46 ,-3499.58, -184.54), Angle(0,90,0)}
+		{"models/props_am/powersource.mdl", Vector(-13589.46, -538.12, -412.52), Angle(0,0,0), "TeleLab"},
+		{"models/props/hl10props/amsmachine00.mdl",  Vector(-5060.69, -3012.82, -1124.32), Angle(0,90,0), "Ams"},
+		{"models/props/hl16props/generator03.mdl",  Vector(-5957.46 ,-3499.58, -184.54), Angle(0,90,0), ""}
 	}
 	for k,v in pairs(generatorEnts) do
 		print("Debug 0")
 		PrintTable(v)
 		table.insert(PowerSetup["Entities"],{
 			"prop_physics", true, function(ent)
-				print("Debug 1")
-				print(v[1])
 				ent:SetModel(v[1])
 				ent:SetPos(Vector(v[2]))
 				ent:SetAngles(Angle(v[3]))

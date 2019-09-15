@@ -110,7 +110,34 @@ function player.GetLocation(loc)
 	return tab
 end
 
+if SERVER then
+	function sBMRP.PermaProp(ent)
+		--local ply = self:GetOwner()
 
+		if not PermaProps then Log( "ERROR: Lib not found" ) return end
+		
+
+		if not ent:IsValid() then Log( "That is not a valid entity !" ) return end
+		if ent:IsPlayer() then Log( "That is a player !" ) return end
+		if ent.PermaProps then Log( "That entity is already permanent !" ) return end
+
+		local content = PermaProps.PPGetEntTable(ent)
+		if not content then return end
+
+		local max = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;"))
+		if not max then max = 1 else max = max + 1 end
+
+		local new_ent = PermaProps.PPEntityFromTable(content, max)
+		if !new_ent or !new_ent:IsValid() then return end
+
+		PermaProps.SparksEffect( ent )
+
+		PermaProps.SQL.Query("INSERT INTO permaprops (id, map, content) VALUES(NULL, ".. sql.SQLStr(game.GetMap()) ..", ".. sql.SQLStr(util.TableToJSON(content)) ..");")
+		Log("You saved " .. ent:GetClass() .. " with model ".. ent:GetModel() .. " to the database.")
+
+		ent:Remove()
+	end
+end
 
 if SERVER then
 	function EntID(ent)

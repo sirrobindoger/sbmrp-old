@@ -177,11 +177,11 @@ local function OnLabBuy(ply, door)
 		return false, "Only Bio Researchers can own these labs!"
 	elseif ply:IsBio() and !sBMRP.LocList.Biosector[GetLocation(door:GetPos())] then
 		return false, "You can only own a lab within the biosector!"
-	elseif ply:Team() == TEAM_RESEARCH and ply:GetJobRank() < 2 then
-		if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
-			sBMRP.ChatNotify({ply}, "Error", "You must be at least science Lvl. 2 to own a lab on your own.")
-			return false, "You cannot own a lab. You can co-own one with a scientist!"
-		end
+	--elseif ply:Team() == TEAM_RESEARCH and ply:GetJobRank() < 2 then
+	--	if door:getDoorOwner() == nil then -- he is not trying to buy a co-owned lab.
+	--		sBMRP.ChatNotify({ply}, "Error", "You must be at least science Lvl. 2 to own a lab on your own.")
+	--		return false, "You cannot own a lab. You can co-own one with a scientist!"
+	--	end
 	else
 		for k,v in pairs(sBMRP.Labs[door.LabName][1]) do
 			if IsValid(ents.GetMapCreatedEntity(v)) then

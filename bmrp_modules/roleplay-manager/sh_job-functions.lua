@@ -48,7 +48,7 @@ function ply:IsBio()
 end
 
 function ply:IsService()
-	if (self:getJobTable()["isservice"]) then
+	if (self:getJobTable() and self:getJobTable()["isservice"]) then
 		return true
 	else return false end
 end

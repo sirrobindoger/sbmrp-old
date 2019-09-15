@@ -51,7 +51,7 @@ sBMRP Locations
 	table.insert(sBMRP.locationnames,{"Topside Parking Lot",Vector(-6674.695313, -1600.678711, 486.844330),Vector(-3730.725098, -4524.578125, 997.631897)})
 	table.insert(sBMRP.locationnames,{"Sector H",Vector(-6044.6728515625,994.28479003906,1282.7595214844),Vector(-9646.9599609375,-426.29504394531,545.421875)})
 	table.insert(sBMRP.locationnames,{"Topside Tram Station",Vector(-413.104828, -2111.416748, 1381.952515),Vector(-2676.043213, -3573.435547, 50.428474)})
-
+	table.insert(sBMRP.locationnames,{"Topside Canyon",Vector(-5797.0234375,12559.677734375,2619.615234375),Vector(8277.7763671875,2936.0422363281,-722.83880615234)})
 	table.insert(sBMRP.locationnames,{"Topside Lobby",Vector(-10927.525391, -443.453094, 1080.224121),Vector(-9334.310547, -1456.305054, 283.680664)})
 	table.insert(sBMRP.locationnames,{"Parking Lot Elevator",Vector(-4774.485840, -3776.471680, 850.410217),Vector(-4964.471191, -3574.090576, -82.026550)})
 	table.insert(sBMRP.locationnames,{"Topside Underground",Vector(-4365.741699, -4053.309814, 50.468201),Vector(-5437.611816, -383.447540, 336.467896)})

@@ -180,6 +180,7 @@ local DevBoxs = {
 	["Closed"] = Vector(-11556.98828125,7204.3393554688,-1967.96875),
 	["Canyon"] = Vector(-9100.609375,5628.7661132813,-2092.8466796875),
 	["Helipad"] = Vector(-8807.2734375,8082.2431640625,-1967.96875),
+	["BigFuckingCanyon"] = Vector(-3745.5524902344,10321.29296875,136.03125),
 }
 local devtitle = table.GetKeys(DevBoxs)
 

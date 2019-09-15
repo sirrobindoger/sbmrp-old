@@ -502,7 +502,7 @@ Props
 ---------------------------------------------------------------------------]]
 sCON:RegisterCommand("props", function(message)
 	message:ReturnResponse({
-		description = "**Prop Count: " .. getproptable() .. "```",
+		description = "**Prop Count:** ```" .. getproptable() .. "```",
 		color = 3046486,
 		timestamp = message.timestamp,
 		footer = {

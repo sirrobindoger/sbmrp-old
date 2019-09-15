@@ -19,7 +19,7 @@ local HECU_Codes = {
 		color = {255,0,0, 156},
 		text = "Active Threat(s)",
 		canenterbmrf = true,
-		candamage = 2,
+		candamage = 1,
 		order = 3,
 	},
 	["Green"] = {
@@ -39,7 +39,7 @@ local HECU_Codes = {
 	["Yellow"] = {
 		color = {212, 184, 28, 156},
 		text = "Potential Active Threat(s)",
-		cantenterbmrf = false,
+		cantenterbmrf = true,
 		candamage = 1,
 		order = 2,
 	},
