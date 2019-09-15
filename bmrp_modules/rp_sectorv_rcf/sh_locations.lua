@@ -22,7 +22,8 @@ sBMRP.LocList.Topside = {
 	["Cliff face"] = true,
 	["Sector H"] = true,
 	["Topside Lift"] = true,
-	["Topside Lift Enterance"] = true
+	["Topside Lift Enterance"] = true,
+	["Topside Canyon"] = true,
 }
 
 sBMRP.LocList.Biosector = {
