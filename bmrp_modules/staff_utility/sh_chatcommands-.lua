@@ -243,12 +243,11 @@ function ulx.cleanup(ply, time)
 	local timeLeft = time
 	ulx.fancyLog( player.GetAll(), "#P triggered a timed mapclean.",ply)
 	timer.Create("bmrp_cleanup", 1, timeLeft, function()
-		if timeLeft >= 1 then
-			RunConsoleCommand("darkrp", "admintellall", "Cleanup in " .. timeLeft .. " seconds.")
-			timeLeft = timeLeft - 1
-		else
-			RunConsoleCommand("fadmin", "cleanup")
-		end
+		RunConsoleCommand("darkrp", "admintellall", "Cleanup in " .. timeLeft .. " seconds.")
+		timeLeft = timeLeft - 1
+	end)
+	timer.Create("bmrp-cleanup-clean", time + 1, 0, function()
+		RunConsoleCommand("fadmin", "cleanup")
 	end)
 end
 local cleanup = ulx.command("Essentials", "ulx cleanup", ulx.cleanup, "!cleanup", true, false)
