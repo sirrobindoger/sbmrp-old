@@ -233,11 +233,11 @@ end
 
 
 local function doCollisionCheck(plycount)
-	if plycount >= 32 && !sPropProtection.CollisionOverride && !sPropProtection.AdminOverride then
+	if plycount >= 30 && !sPropProtection.CollisionOverride && !sPropProtection.AdminOverride then
 		sPropProtection.EnableCollisionCheck(true)
 		Log("Enabling collision checks.")
 		sBMRP.ChatNotify(player.GetAll(), "Server", "High player traffic detected, disabling collisions for player-props to ensure proformance.")
-	elseif plycount < 31 && sPropProtection.CollisionOverride then
+	elseif plycount < 29 && sPropProtection.CollisionOverride then
 		sPropProtection.EnableCollisionCheck(false)
 		Log("Disabling collision checks.")
 		sBMRP.ChatNotify(player.GetAll(), "Server", "High player traffic subsided, re-enabling collisions for player-props.")
