@@ -104,7 +104,7 @@ TEAM_RESEARCH = DarkRP.createJob("Research Personnel", {
 	description = [[An accomplished scientist at the BMRF, you get to own a Lab and conduct experiments with the help of your associates.]],
 	weapons = {},
 	command = "reserachpersonnel",
-	max = 10,
+	max = 16,
 	salary = 45,
 	admin = 0,
 	vote = false,
@@ -273,7 +273,7 @@ TEAM_CHEF = DarkRP.createJob("Facility Cook", {
     category = "Black Mesa Faculty"
 })
 
-TEAM_SERVICE = DarkRP.createJob("Engineering Specalist", {
+TEAM_SERVICE = DarkRP.createJob("Engineering Specialist", {
     color = Color(238, 99, 99, 255),
     model = {
 --      "models/humans/bms_cwork.mdl",
@@ -335,6 +335,28 @@ TEAM_ITTECH = DarkRP.createJob("IT Technician", {
     ------------------
 })*/
 
+TEAM_CITYWORKER = DarkRP.createJob("Facility Custodian", {
+    color = Color( 20, 150, 20, 255 ),
+    model = {
+       "models/humans/bms_cwork.mdl",
+--        "models/humans/bms_engineer.mdl",
+       "models/kake/models/kake/heartbit_female_maintenance_pm.mdl"
+    },
+    description = "The city worker's job is to go around and fix leaks, rubble, and electrical problems around the facility, and get paid doing it!",
+    weapons = { "cityworker_pliers", "cityworker_shovel", "cityworker_wrench","broom" },
+    command = "maintenanceworker",
+    max = 4,
+    salary = 75,
+    admin = 0,
+    vote = false,
+    hasLicense = false,
+    candemote = false,
+    rdmgroup = "BMRF",
+    isservice = true,
+    isblackmesa = true,
+    category = "Black Mesa Faculty",
+})
+
 
 TEAM_OFFICE = DarkRP.createJob("Office Employee", {
     color = Color(34, 85, 85, 255),
@@ -361,6 +383,27 @@ TEAM_OFFICE = DarkRP.createJob("Office Employee", {
 })
 
 
+TEAM_INSPECTOR = DarkRP.createJob("Facility Inspector", {
+    color = Color(87, 219, 219, 240),
+    model = {
+    "models/player/suits/male_07_closed_tie.mdl",
+    "models/player/suits/male_07_open.mdl",
+    "models/player/suits/male_07_open_tie.mdl",
+    "models/player/suits/male_07_open_waistcoat.mdl",
+    },
+    description = [[Check up on Black Mesa East to make sure everything is within safety regulation.]],
+    weapons = {},
+    command = "facilityinspector",
+    max = 1,
+    admin = 0,
+    salary = 80,
+    rdmgroup = "BMRF",
+    isblackmesa = true,
+    category = "Black Mesa Faculty"
+})
+
+
+/*
 TEAM_OFFICEMANAGER = DarkRP.createJob("Office Manager", {
     color = Color(34, 85, 85, 255),
     model = {
@@ -383,9 +426,8 @@ TEAM_OFFICEMANAGER = DarkRP.createJob("Office Manager", {
     rdmgroup = "BMRF",
     isblackmesa = true,
     ------------------
-    NeedToChangeFrom = TEAM_OFFICE,
 })
-
+*/
 --[[-------------------------------------------------------------------------
 Security Jobs
 ---------------------------------------------------------------------------]]
@@ -422,7 +464,7 @@ TEAM_SECURITY = DarkRP.createJob("Security Guard", {
     In rare cases, security officers will be tasked with with capturing escaped research specimens]],
     weapons = {"itemstore_pickup"},
     command = "security",
-    max = 4,
+    max = 12,
     admin = 0,
     salary = 75, 
     PlayerSpawn = function(ply)
@@ -534,7 +576,7 @@ TEAM_BIO = DarkRP.createJob("Bio Researcher", {
     description = [[Run experiments on your subjects, handle hazerdous materials.]],
     weapons = {"taser","cage","weapon_leash_bio", "copsbracelet"},
     command = "bioresearcher",
-    max = 4,
+    max = 6,
     admin = 0,
     salary = 75,
     rdmgroup = "BMRF",
@@ -603,7 +645,7 @@ TEAM_VORT = DarkRP.createJob("Vortigaunt", {
     The only reason to leave XEN is with authorization or during a cascade]],
     weapons = {"swep_vortigaunt_beam","mininglaser"},
     command = "vortigaunt",
-    max = 6,
+    max = 10,
     admin = 0,
     salary = 45,
     canTalkToGlobal = false,
@@ -623,7 +665,7 @@ TEAM_GRUNT = DarkRP.createJob("Alien Grunt", {
     The only reason to leave XEN is with authorization or during a cascade]],
     weapons = {"weapon_bms_hivehand"},
     command = "aliengrunt",
-    max = 4,
+    max = 6,
     admin = 0,
     salary = 45,
     PlayerSpawn = function(ply) ply:SetArmor(100) ply:SetBodygroup(0, 1) ply:SetBodygroup(1, 1) ply:SetGravity(0.4) ply:SetNoTarget(true) end,
@@ -642,7 +684,7 @@ TEAM_HOUNDEYE = DarkRP.createJob("Houndeye", {
     weapons = {},
     command = "houndeye",
     admin = 0,
-    max = 2,
+    max = 4,
     salary = 30,
     PlayerSpawn = function(ply) ply:JobPill("hl1_houndeye") end,
     category = "Xenians",
@@ -659,7 +701,7 @@ TEAM_BULLSQUID = DarkRP.createJob("Bullsquid", {
     weapons = {},
     admin = 0,
     command = "bullsquid",
-    max = 2,
+    max = 4,
     salary = 30,
     PlayerSpawn = function(ply) ply:JobPill("hl1_bullsquid") end,
     category = "Xenians",
@@ -706,25 +748,6 @@ TEAM_BULLSQUID = DarkRP.createJob("Bullsquid", {
 --[[-------------------------------------------------------------------------
 TOPSIDE HECU 
 ---------------------------------------------------------------------------]]
-
-TEAM_INSPECTOR = DarkRP.createJob("Facility Inspector", {
-    color = Color(87, 219, 219, 240),
-    model = {
-    "models/player/suits/male_07_closed_tie.mdl",
-    "models/player/suits/male_07_open.mdl",
-    "models/player/suits/male_07_open_tie.mdl",
-    "models/player/suits/male_07_open_waistcoat.mdl",
-    },
-    description = [[Check up on Black Mesa East to make sure everything is within safety regulation.]],
-    weapons = {},
-    command = "facilityinspector",
-    max = 1,
-    admin = 0,
-    salary = 80,
-    rdmgroup = "BMRF",
-    isblackmesa = true,
-    category = "Government"
-})
 
 
 TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
