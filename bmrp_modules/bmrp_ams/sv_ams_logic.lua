@@ -36,11 +36,11 @@ local MetaStates = {
         return (self:GetSaveTable().m_toggle_state == 0)
     end,
 }
-
-function IsActivated( door ) -- this is pretty useful
-    local func = MetaStates[door:GetClass()]
+local ent = FindMetaTable("Entity")
+function ent:IsActivated() -- this is pretty useful
+    local func = MetaStates[self:GetClass()]
     if func then
-        return func( door )
+        return func( self )
     end
 end
 
@@ -50,7 +50,7 @@ end
 
 ------------------------------
 
-hook.Add("Think", "ams_state", function()
+--[[hook.Add("Think", "ams_state", function()
     state = 0
     for _,v in pairs(amsbuttons) do
         if IsActivated(EntID(v)) then
@@ -65,4 +65,4 @@ hook.Add("Think", "ams_state", function()
         Log("AMS State changed from Stage: " .. sBMRP.AMS.prev .. " -> " .. sBMRP.AMS.state)
         sBMRP.AMS.prev = sBMRP.AMS.state
     end
-end)
+end)]]
