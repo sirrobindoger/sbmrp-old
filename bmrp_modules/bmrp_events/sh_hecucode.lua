@@ -39,7 +39,7 @@ local HECU_Codes = {
 	["Yellow"] = {
 		color = {212, 184, 28, 156},
 		text = "Potential Active Threat(s)",
-		cantenterbmrf = true,
+		canenterbmrf = true,
 		candamage = 1,
 		order = 2,
 	},
@@ -143,7 +143,7 @@ if SERVER then
 			return ""
 		--end
 	end
-	sBMRP.CreateChatCommand("coderequest", RequestCodeChange, "Request a code change.", 10)
+	sBMRP.CreateChatCommand("coderequest", RequestCodeChange, "Request a code change.", 120)
 
 	local function ConfirmCodeChange(ply, args)
 		if ply:Team() != TEAM_HECUCOMMAND and ply:Team() != TEAM_ADMINISTRATOR and not ply:IsAdmin() then
