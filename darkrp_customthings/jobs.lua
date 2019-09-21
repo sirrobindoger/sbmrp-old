@@ -750,7 +750,7 @@ TOPSIDE HECU
 ---------------------------------------------------------------------------]]
 
 
-TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
+/*TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
     color = Color(0, 100, 0, 255),
     model = "models/player/bms_blackops.mdl",
     description = [[HECU Special Division. Does not have to take orders from commander but cannot interfere with HECU activities.]],
@@ -763,7 +763,7 @@ TEAM_HECUSPECOPS = DarkRP.createJob("HECU Special Ops", {
     rdmgroup = "BMRF",
     ishecu = true,
     category = "Government"
-})
+})*/
 
 TEAM_HECU = DarkRP.createJob("HECU Military", {
     color = Color(0, 100, 0, 255),

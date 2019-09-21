@@ -130,6 +130,8 @@ hook.Add("CuffsCanHandcuff", "bmrp_xen_capture", function(ply, targ)
 		if targ:IsAlien() then
 			return true
 		end
+	elseif ply:IsSecurity() and targ:IsHECU() then
+		return false
 	end
 end)
 

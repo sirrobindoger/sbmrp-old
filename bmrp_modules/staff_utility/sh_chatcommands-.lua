@@ -74,6 +74,23 @@ removepac:defaultAccess( ULib.ACCESS_ADMIN)
 removepac:help( "Grants the target player or steamid PAC3 permissions." )
 
 --[[-------------------------------------------------------------------------
+Clear NPC's
+---------------------------------------------------------------------------]]
+function ulx.clearnpcs(calling_ply)
+	for k,v in pairs(ents.GetAll()) do
+		if v:IsNPC() and v:MapCreationID() == -1 then
+			v:Remove()
+		end
+	end
+	ulx.fancyLog( player.GetAll(), "#P cleared all NPCs.",calling_ply)
+
+end
+local clearnpcs = ulx.command(CATEGORY_NAME .. " - Map", "ulx clearnpcs", ulx.clearnpcs, "!clearnpcs", true, false)
+clearnpcs:defaultAccess(ULib.ACCESS_ADMIN)
+clearnpcs:help("Clearns NPCs.")
+
+
+--[[-------------------------------------------------------------------------
 Prop Protection shit
 ---------------------------------------------------------------------------]]
 local ToJSON = util.TableToJSON
@@ -246,7 +263,7 @@ function ulx.cleanup(ply, time)
 		RunConsoleCommand("darkrp", "admintellall", "Cleanup in " .. timeLeft .. " seconds.")
 		timeLeft = timeLeft - 1
 	end)
-	timer.Create("bmrp-cleanup-clean", time + 1, 0, function()
+	timer.Create("bmrp-cleanup-clean", time + 1, 1, function()
 		RunConsoleCommand("fadmin", "cleanup")
 	end)
 end
