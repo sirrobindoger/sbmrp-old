@@ -1,17 +1,21 @@
---[[-------------------------------------------------------------------------
-Core functions
----------------------------------------------------------------------------]]
 local ent = FindMetaTable("Entity")
 local ply = FindMetaTable("Player")
+--[[-------------------------------------------------------------------------
+SERVER FUNCTIONS
+---------------------------------------------------------------------------]]
 if SERVER then
-	util.AddNetworkString("sbmrpcommandhandler")
-	-- Log function i guess
+	--[[
+		Log function
+	]]
 	function Log(str)
 		ServerLog(str .. "\n")
 	end
-	--[[-------------------------------------------------------------------------
-	sBMRP Chat Command
-	---------------------------------------------------------------------------]]
+
+
+	--[[
+		DarkRP SERVER only chat command creator that networks to clients.
+	]]
+	util.AddNetworkString("sbmrpcommandhandler")
 	function sBMRP.CreateChatCommand(command, func, desc, delay) -- declars and defines
 		if not command or not func or not isfunction(func) then
 			error("Invalid parameters!")
@@ -25,8 +29,6 @@ if SERVER then
 		net.Broadcast()
 		DarkRP.defineChatCommand(command, func)
 	end
-
-
 	function sBMRP.RemoveChatCommand(command)
 		if not command then error("Invalid parameters!") end
 		DarkRP.removeChatCommand(command)
@@ -36,81 +38,28 @@ if SERVER then
 		net.Broadcast()
 	end
 
-	function dprint(...)
-		if sBMRP.debug then print(...) end
-	end
 
-	concommand.Add("weapondet", function(ply)
+	--[[
+		Simple console command that prints the model of the weapon you're holding.
+	]]
+	concommand.Add("getweaponinfo", function(ply)
 		if not ply:GetActiveWeapon() then return end
 		
 		ply:ChatPrint(ply:GetActiveWeapon():GetWeaponWorldModel())
 		ply:ChatPrint(ply:GetActiveWeapon():GetClass())
 	end)
 
+	--[[
+		This just mutes another addon's print function because of how annoying it is.
+	]]
 	function ARitzDDMsg(...)
 		return -- ARitz can go fuck himself
 	end
-end
 
-if CLIENT then
-	net.Receive("sbmrpcommandhandler",function(ret)
-		local define = net.ReadTable()
-		local remove = net.ReadBool()
-		if not remove then
-			DarkRP.declareChatCommand{command = define[1], description = define[2], delay = define[3]}
-			return
-		end
-		DarkRP.removeChatCommand(define[1])
-	end)
-end
-
-concommand.Add("animprop_selectname", function() return end)
-
-function ply:IsSirro()
-	return self:SteamID() == "STEAM_0:1:72140646"
-end
-
-function player.GetSirro()
-	for k,v in pairs(player.GetAll()) do
-		if v:IsSirro() then return v end
-	end
-	return nil
-end
-
-function player.GetAdmins()
-	local admins = {}
-	for k,v in pairs(player.GetAll()) do
-		if v:IsAdmin() then table.insert(admins, v) end
-	end
-	return admins
-end
-
-
-function player.InLocation(loc)
-	local entry = {}
-	local istrue = false
-	for k,v in pairs(player.GetAll()) do
-		if GetLocation(v) == loc then
-			table.insert(entry, v)
-			istrue = true
-		end
-	end
-	return istrue, entry
-end
-
-
-function player.GetLocation(loc)
-	local loc = tostring(loc) or ""
-	local tab = {}
-	for k,v in pairs(player.GetAll()) do
-		if GetLocation(v) == loc then
-			table.insert(tab, v)
-		end
-	end
-	return tab
-end
-
-if SERVER then
+	--[[
+		This just allows me to perma prop stuff without having to Toolgun it.
+		Basically mass perma prop shit.
+	]]
 	function sBMRP.PermaProp(ent)
 		--local ply = self:GetOwner()
 
@@ -137,33 +86,28 @@ if SERVER then
 
 		ent:Remove()
 	end
-end
 
-if SERVER then
+	--[[
+		Simple function that checks the validity of a map ID code.
+	]]
 	function EntID(ent)
 		if not IsValid(ents.GetMapCreatedEntity(ent)) then return end
 		return ents.GetMapCreatedEntity(ent)
 	end
-end
 
-
-if SERVER then
-	function sBMRP.MapHook(name, func)
-		hook.Add("InitPostEntity", name, func)
-		hook.Add("PostCleanupMap", name, func)
-	end
-end
-
-function ply:Notify(text, typeint, time)
-	DarkRP.notify(self, typeint or 5, time or 5, text)
-end
-
-if SERVER then
+	--[[
+		IDK why nobody thought of this, so I made it myself.
+		Returns the vector but with rounded values.
+	]]
 	local vec = FindMetaTable("Vector")
 	function vec:Round(dec)
 		if not dec then dec = 0 end vec = self
 		return math.Round(vec.x,dec),math.Round(vec.y,dec),math.Round(vec.z,dec)
 	end
+
+	--[[
+		These two func's just simulate movement via linear interpolation, kinda buggy, but works.
+	]]
 	function ent:LerpToVector(vec,mult)
 
 		if !mult then mult = 1 end
@@ -183,7 +127,6 @@ if SERVER then
 
 	end
 
-
 	function ent:LerpToAngle(ang, mult)
 		hook.Remove("Think", "lerp-ang_" .. self:EntIndex())  -- make sure there are no other lerp motions running
 
@@ -197,23 +140,361 @@ if SERVER then
 			self:SetAngles(targlerp)
 		end)
 	end
+	--[[
+		Function that copy pastes a function into two hooks at once.
+		(When the server finishes starting and right after a map clean)
+		This is used for setting up perma map ents right after a map clean.
+	]]
+	function sBMRP.MapHook(name, func)
+		hook.Add("InitPostEntity", name, func)
+		hook.Add("PostCleanupMap", name, func)
+	end
+	--[[
+		Shakey map effect for players... I should remake this its kind bad.
+	]]
+	function sBMRP.ShakeMap(optional)
+	    if optional == 1 then
+	        engine.LightStyle(0,"vvvcvvvpvpsvvvvcvd")
+	        timer.Simple(2, function()
+	            engine.LightStyle(0,"vvvpvvpvs")
+	        end)
+	    else
+	        engine.LightStyle(0,"vvvbvprvvbvpcvvvvdvf")
+	        timer.Simple(2, function()
+	            engine.LightStyle(0,"vvvpvvpvs")
+	        end)
+	    end        
+	    timer.Simple(7, function()
+	        if sBMRP.powerout then
+	            engine.LightStyle(0, "b")
+	        else
+	            engine.LightStyle(0, "v")
+	        end
+	        for k,v in pairs(player.GetAll()) do
+	            v:SendLua([[render.RedownloadAllLightmaps(true)]])
+	        end
+	    end)
+	    if optional == 1 then
+	        for k,v in pairs(player.GetAll()) do
+	            v:SendLua([[
+	                surface.PlaySound("env/rumble_shake.wav")]])
+	        end
+	    else
+	        for k,v in pairs(player.GetAll()) do
+	            v:SendLua([[
+	                surface.PlaySound("env/rumble_shake.wav")
+	                surface.PlaySound("ambient/explosions/explode_9.wav")
+	                util.ScreenShake( Vector( 0, 0, 0 ), 5, 5, 7, 5000 )]])
+	        end
+	    end
+	end
+
+	--[[
+		Safter version of using an ent to avoid nil errors.
+	]]
+	function sBMRP.MapFire(entid, fire)
+		local ent = tonumber(entid) and IsValid(ents.GetMapCreatedEntity(entid)) and ents.GetMapCreatedEntity(entid) or IsValid(entid) and IsEntity(entid) or false
+		if ent then 
+			ent:Fire(fire)
+		end
+	end
 
 
-	function FindInVectors(vec1, vec2)
-		for k,v in pairs(ents.GetAll()) do
-			if v:GetPos():WithinAABox(vec1,vec2) then
-				print("-------------")
-				print("MAPID: " .. v:MapCreationID())
-				print("CLASS: " .. v:GetClass())
-				print("NAME: " .. v:GetName())
-				print("ENTID: " .. v:EntIndex())
-				print("-------------")
+	--[[
+		Resets all the doors in the map to unownable, this is used for resetting up doors when a map update happens.
+	]]
+	function sBMRP.WipeDoorData()
+		for k,ent in pairs(ents.GetAll()) do
+			if IsValid(ent) then
+			    ent:setKeysNonOwnable(not ent:getKeysNonOwnable())
+			    ent:removeAllKeysExtraOwners()
+			    ent:removeAllKeysAllowedToOwn()
+			    ent:removeAllKeysDoorTeams()
+			    ent:setDoorGroup(nil)
+			    ent:setKeysTitle(nil)
+
+			    -- Save it for future map loads
+			    DarkRP.storeDoorData(ent)
+			    DarkRP.storeDoorGroup(ent, nil)
+			    DarkRP.storeTeamDoorOwnability(ent)
 			end
 		end
 	end
+
+
+	--[[
+		This effectively ties engine.LightStyle and render.RedownloadAllLightMaps together.
+	]]
+	util.AddNetworkString("sBMRP.enginelight")
+
+	function sBMRP.UpdateEngineLight(lightstyle, doStaticProps)
+		engine.LightStyle(0, lightstyle)
+		timer.Simple(0.5, function()
+			net.Start("sBMRP.enginelight")
+				net.WriteBool(doStaticProps or false)
+			net.Broadcast()
+		end)
+	end
+
+	--[[
+		Vaporizes player
+	]]
+	function vaporize(ply)
+		local d = DamageInfo()
+		d:SetDamage( math.huge )
+		d:SetAttacker(game.GetWorld())
+		d:SetDamageType( DMG_DISSOLVE )
+		ply:TakeDamageInfo( d )
+	end
 end
 
-if SERVER then
+--[[-------------------------------------------------------------------------
+SHARED (CLIENT AND SERVER) FUNCTIONS
+---------------------------------------------------------------------------]]
+
+--[[
+	Skybox changer.
+]]
+if CLIENT then
+	sBMRP.Default = sBMRP.Default || GetConVar("sv_skyname"):GetString()
+    net.Receive( "BMRP_Skybox", function( len, ply )
+        local netstr = net.ReadString()
+        local skyboxname = netstr != "default" and netstr or sBMRP.Default
+        print(skyboxname)
+        local SourceSkyname = GetConVar("sv_skyname"):GetString()
+        print(SourceSkyname)
+        local SourceSkyPre  = {"lf","ft","rt","bk","dn","up",}
+        local SourceSkyMat  = {
+            Material("skybox/"..SourceSkyname.."lf"),
+            Material("skybox/"..SourceSkyname.."ft"),
+            Material("skybox/"..SourceSkyname.."rt"),
+            Material("skybox/"..SourceSkyname.."bk"),
+            Material("skybox/"..SourceSkyname.."dn"),
+            Material("skybox/"..SourceSkyname.."up"),
+        }
+        for i = 1,6 do
+            local D = Material("skybox/"..skyboxname..SourceSkyPre[i]):GetTexture("$basetexture")
+            print(D)
+            print(SourceSkyMat[i])
+            SourceSkyMat[i]:SetTexture("$basetexture",D)
+        end
+    end)
+else
+	util.AddNetworkString( "BMRP_Skybox" )
+    function sBMRP.ChangeSkybox(skyboxname)
+        Log("sending skybox change attempt...")
+        net.Start( "BMRP_Skybox" )
+        	net.WriteString(skyboxname || "default")
+        net.Broadcast()
+    end
+end
+
+concommand.Add("animprop_selectname", function() return end)
+
+--[[
+	Its you!	
+]]
+function ply:IsSirro()
+	return self:SteamID() == "STEAM_0:1:72140646"
+end
+
+--[[
+	Finds me.
+]]
+function player.GetSirro()
+	for k,v in pairs(player.GetAll()) do
+		if v:IsSirro() then return v end
+	end
+	return nil
+end
+
+--[[
+	Finds the admins.
+]]
+function player.GetAdmins()
+	local admins = {}
+	for k,v in pairs(player.GetAll()) do
+		if v:IsAdmin() then table.insert(admins, v) end
+	end
+	return admins
+end
+
+--[[
+	Finds all entities inside two vectors.
+]]
+function ents.GetInVec(vec1,vec2)
+	local l = {}
+	for k,v in pairs(ents.GetAll()) do
+		if v:WithinAABox(vec1, vec2) then
+			table.insert(l, v)
+		end
+	end
+	return l
+end
+
+--[[
+	Finds all players inside a location.
+]]
+function player.InLocation(loc)
+	local loc = tostring(loc) or ""
+	local e = {}
+	for k,v in pairs(player.GetAll()) do
+		if GetLocation(v) == loc then
+			table.insert(e, v)
+			istrue = true
+		end
+	end
+	return #e > 1 and e or false
+end
+
+--[[
+	Finds all ents inside a location.
+]]
+function ents.InLocation(loc)
+	local loc = tostring(loc) or ""
+	local e = {}
+	for k,v in pairs(ents.GetAll()) do
+		if GetLocation(v:GetPos()) == loc then
+			table.insert(e, v)
+			istrue = true
+		end
+	end
+	return #e > 1 and e or false
+end
+
+--[[
+	Less annoying notifiy function for my small brain.
+]]
+function ply:Notify(text, typeint, time)
+	DarkRP.notify(self, typeint or 5, time or 5, text)
+end
+
+--[[
+	Self explanitory.
+]]
+function string.starts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
+--[[
+	Converts all the values in a table into a list of keys that equal true.
+	This is normally for doing fast indexes, instead of table.HasValue().
+]]
+function table.ValuesToKeys(tab)
+	local newtab = {}
+	for k, v in pairs(tab) do
+		if !v then continue end
+		newtab[v] = true
+	end
+	return newtab
+end
+
+--[[
+	Iterates an entire table over one function, bascially a "for loop" but shorter.
+]]
+function table.Iterate(tab, func)
+	if !istable( tab ) or !isfunction( func ) then return end
+	for k,v in pairs(tab) do
+		local r, e = pcall(function() func(v) end)
+		if !r then
+			error("\n"..e)
+			break
+		end
+	end
+end
+--[[
+	Check if an entitiy is within two vector constraints.
+]]
+function CheckInRange(vec1,vec2,vecx)
+	if IsEntity(vecx) then
+		local vecx = vecx:GetPos()
+	end
+	if vecx:WithinAABox(vec1,vec2) then
+		return true
+	else
+		return false
+	end
+end
+
+--[[
+	Backend function for doing player location processing.
+]]
+function GetLocationRaw(recpos)
+	if type(recpos) == "Player" then
+		recpos = recpos:GetPos()
+	end
+	local location = DarkRP.getPhrase("gm_unknown")
+	for k,v in pairs(sBMRP.locationnames) do
+		if CheckInRange(v[2],v[3],recpos) then
+			location = v[1]
+			break
+		else location = "Unknown"
+		end
+	end
+	return location
+end
+
+
+--[[-------------------------------------------------------------------------
+Client only!
+---------------------------------------------------------------------------]]
+if CLIENT then
+	--[[
+		Client side of functions previously defined above.
+	]]
+	net.Receive("sbmrpcommandhandler",function(ret)
+		local define = net.ReadTable()
+		local remove = net.ReadBool()
+		if not remove then
+			DarkRP.declareChatCommand{command = define[1], description = define[2], delay = define[3]}
+			return
+		end
+		DarkRP.removeChatCommand(define[1])
+	end)
+
+	net.Receive("sBMRP.enginelight", function(len)
+		local staticProps = net.ReadBool()
+		sBMRP.ClearToRedownload = true
+		render.RedownloadAllLightmaps(staticProps)
+	end)
+
+
+
+	--[[
+		Displays your location as a Vector object.
+	]]
+	concommand.Add("getposvec", function(ply)
+		location = LocalPlayer():EyePos()
+		print("Vector(" .. location[1] .. "," .. location[2] .. "," .. location[3] .. ")")
+	end)
+
+	--[[
+		Font creator wrapper.
+	]]
+	function sBMRP.AppendFont(name, size, weight, antialias, outline, additive, shadow, underline)
+		surface.CreateFont("sBMRP." .. name, {
+			font = "ZektonRG-Regular",
+			size = size or 17,
+			weight = weight or 100,
+			antialias = antialias or true,
+			outline = outline or false,
+			additive = additive or true,
+			shadow = shadow or true,
+			underline = underline or false,
+		})
+		sBMRP.Fonts = sBMRP.Fonts || {}
+		sBMRP.Fonts[name] = true
+		return "sBMRP." .. name
+	end
+end
+
+
+
+
+--[[-------------------------------------------------------------------------
+Unused or deprecated functions.
+---------------------------------------------------------------------------]]
+--[[if SERVER then
 	util.AddNetworkString("sBMRP.HighlightEnts")
 
 	function ply:AddHighlightEnt(ent, append)
@@ -262,244 +543,4 @@ if CLIENT then
 			halo.Add({k}, v  and v.color and IsColor(v.color) and v.color or Color(255,255,255), 5, 5, 2, v and v.ignorez or false)
 		end
 	end )
-end
-
-if SERVER then
-	function sBMRP.ShakeMap(optional)
-	    if optional == 1 then
-	        engine.LightStyle(0,"vvvcvvvpvpsvvvvcvd")
-	        timer.Simple(2, function()
-	            engine.LightStyle(0,"vvvpvvpvs")
-	        end)
-	    else
-	        engine.LightStyle(0,"vvvbvprvvbvpcvvvvdvf")
-	        timer.Simple(2, function()
-	            engine.LightStyle(0,"vvvpvvpvs")
-	        end)
-	    end        
-	    timer.Simple(7, function()
-	        if sBMRP.powerout then
-	            engine.LightStyle(0, "b")
-	        else
-	            engine.LightStyle(0, "v")
-	        end
-	        for k,v in pairs(player.GetAll()) do
-	            v:SendLua([[render.RedownloadAllLightmaps(true)]])
-	        end
-	    end)
-	    if optional == 1 then
-	        for k,v in pairs(player.GetAll()) do
-	            v:SendLua([[
-	                surface.PlaySound("env/rumble_shake.wav")]])
-	        end
-	    else
-	        for k,v in pairs(player.GetAll()) do
-	            v:SendLua([[
-	                surface.PlaySound("env/rumble_shake.wav")
-	                surface.PlaySound("ambient/explosions/explode_9.wav")
-	                util.ScreenShake( Vector( 0, 0, 0 ), 5, 5, 7, 5000 )]])
-	        end
-	    end
-	end
-end
-
-function timeToStr( time )
-	local tmp = time
-	local s = tmp % 60
-	tmp = math.floor( tmp / 60 )
-	local m = tmp % 60
-	tmp = math.floor( tmp / 60 )
-	local h = tmp % 24
-	tmp = math.floor( tmp / 24 )
-	local d = tmp % 7
-	local w = math.floor( tmp / 7 )
-
-	return string.format( "%02iw %id %02ih %02im %02is", w, d, h, m, s )
-end
-
-
-function string.starts(String,Start)
-   return string.sub(String,1,string.len(Start))==Start
-end
-
-if SERVER then
-	function sBMRP.MapFire(entid, fire)
-		local ent = tonumber(entid) and IsValid(ents.GetMapCreatedEntity(entid)) and ents.GetMapCreatedEntity(entid) or IsValid(entid) and IsEntity(entid) or false
-		if ent then 
-			ent:Fire(fire)
-		end
-	end
-end
-
-function SetAllDoorsUnownable()
-	for k,ent in pairs(ents.GetAll()) do
-		if IsValid(ent) then
-		    ent:setKeysNonOwnable(not ent:getKeysNonOwnable())
-		    ent:removeAllKeysExtraOwners()
-		    ent:removeAllKeysAllowedToOwn()
-		    ent:removeAllKeysDoorTeams()
-		    ent:setDoorGroup(nil)
-		    ent:setKeysTitle(nil)
-
-		    -- Save it for future map loads
-		    DarkRP.storeDoorData(ent)
-		    DarkRP.storeDoorGroup(ent, nil)
-		    DarkRP.storeTeamDoorOwnability(ent)
-		end
-	end
-
-end
-if CLIENT then
-	concommand.Add("getposvec", function(ply)
-		location = LocalPlayer():EyePos()
-		print("Vector(" .. location[1] .. "," .. location[2] .. "," .. location[3] .. ")")
-	end)
-end
-function table.ValuesToKeys(tab)
-	local newtab = {}
-	for k, v in pairs(tab) do
-		if !v then continue end
-		newtab[v] = true
-	end
-	return newtab
-end
-
-function CheckInRange(vec1,vec2,vecx)
-	if IsEntity(vecx) then
-		local vecx = vecx:GetPos()
-	end
-	if vecx:WithinAABox(vec1,vec2) then
-		return true
-	else
-		return false
-	end
-end
-
-function TriggerEnt(entid, event) -- safe way to execute map functions
-	if !IsValid(ents.GetMapCreatedEntity(entid)) then return end
-	ents.GetMapCreatedEntity(entid):Fire(event)
-end
-
-if CLIENT then
-	function sBMRP.AppendFont(name, size, weight, antialias, outline, additive, shadow, underline)
-		surface.CreateFont("sBMRP." .. name, {
-			font = "ZektonRG-Regular",
-			size = size or 17,
-			weight = weight or 100,
-			antialias = antialias or true,
-			outline = outline or false,
-			additive = additive or true,
-			shadow = shadow or true,
-			underline = underline or false,
-		})
-		sBMRP.Fonts = sBMRP.Fonts || {}
-		sBMRP.Fonts[name] = true
-		return "sBMRP." .. name
-	end
-end
-
---[[-------------------------------------------------------------------------
-Skybox
----------------------------------------------------------------------------]]
-
-if CLIENT then
-	sBMRP.Default = sBMRP.Default || GetConVar("sv_skyname"):GetString()
-    net.Receive( "BMRP_Skybox", function( len, ply )
-        local netstr = net.ReadString()
-        local skyboxname = netstr != "default" and netstr or sBMRP.Default
-        print(skyboxname)
-        local SourceSkyname = GetConVar("sv_skyname"):GetString()
-        print(SourceSkyname)
-        local SourceSkyPre  = {"lf","ft","rt","bk","dn","up",}
-        local SourceSkyMat  = {
-            Material("skybox/"..SourceSkyname.."lf"),
-            Material("skybox/"..SourceSkyname.."ft"),
-            Material("skybox/"..SourceSkyname.."rt"),
-            Material("skybox/"..SourceSkyname.."bk"),
-            Material("skybox/"..SourceSkyname.."dn"),
-            Material("skybox/"..SourceSkyname.."up"),
-        }
-        for i = 1,6 do
-            local D = Material("skybox/"..skyboxname..SourceSkyPre[i]):GetTexture("$basetexture")
-            print(D)
-            print(SourceSkyMat[i])
-            SourceSkyMat[i]:SetTexture("$basetexture",D)
-        end
-    end)
-else
-	util.AddNetworkString( "BMRP_Skybox" )
-    function sBMRP.ChangeSkybox(skyboxname)
-        Log("sending skybox change attempt...")
-        net.Start( "BMRP_Skybox" )
-        	net.WriteString(skyboxname || "default")
-        net.Broadcast()
-    end
-end
-
-
-
---[[-------------------------------------------------------------------------
-Engine Lightstyle
----------------------------------------------------------------------------]]
-
-if SERVER then
-	util.AddNetworkString("sBMRP.enginelight")
-
-	function sBMRP.UpdateEngineLight(lightstyle, doStaticProps)
-		engine.LightStyle(0, lightstyle)
-		timer.Simple(0.5, function()
-
-			net.Start("sBMRP.enginelight")
-				net.WriteBool(doStaticProps or false)
-			net.Broadcast()
-
-
-		end)
-	end
-else
-	sBMRP.RedownloadAllLightmaps = sBMRP.RedownloadAllLightmaps or render.RedownloadAllLightmaps
-	sBMRP.ClearToRedownload = sBMRP.ClearToRedownload or true
-	function render.RedownloadAllLightmaps(doStaticProps)
-		if !sBMRP.ClearToRedownload then return end
-		
-		sBMRP.RedownloadAllLightmaps(doStaticProps)
-		timer.Simple(0.1, function()
-			sBMRP.RedownloadAllLightmaps(doStaticProps)
-			sBMRP.ClearToRedownload = false
-		end)
-		
-	end
-
-	net.Receive("sBMRP.enginelight", function(len)
-		local staticProps = net.ReadBool()
-		sBMRP.ClearToRedownload = true
-		render.RedownloadAllLightmaps(staticProps)
-	end)
-end
-
-
-function GetLocationRaw(recpos)
-	if type(recpos) == "Player" then
-		recpos = recpos:GetPos()
-	end
-	local location = DarkRP.getPhrase("gm_unknown")
-	for k,v in pairs(sBMRP.locationnames) do
-		if CheckInRange(v[2],v[3],recpos) then
-			location = v[1]
-			break
-		else location = "Unknown"
-		end
-	end
-	return location
-end
-
-
-if SERVER then
-	function vaporize(ply)
-		local d = DamageInfo()
-		d:SetDamage( math.huge )
-		d:SetAttacker(game.GetWorld())
-		d:SetDamageType( DMG_DISSOLVE )
-		ply:TakeDamageInfo( d )
-	end
-end
+end]]--
