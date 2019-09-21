@@ -6,8 +6,63 @@ if SERVER then
 	POWER_EVENT["StageThree"] = {}
 
 	POWER_EVENT.name = "PowerEvent"
-	SetGlobalString("generatorIDs", "")
+	SetGlobalString("generatorIDs", "") -- My shittier but easier method of networking entities to clients.
 	local genMeta = FindMetaTable("Entity")
+
+	--[[-------------------------------------------------------------------------
+	Generators
+	---------------------------------------------------------------------------]]
+	local generatorEnts = {
+		--["GeneratorName"] = {"GeneratorModel", Vector(pos), Angle(angles), function(ent)}
+		["TeleLab"] = {"models/props_am/powersource.mdl", Vector(-13589.46, -538.12, -412.52), Angle(0,0,0),
+		function(ent)
+			local teleporterArms = {
+				2401, -- arm4
+				2406, -- arm3
+				2408, -- arm2
+				2401, -- arm1
+			}
+			local genHP = ent:GetGenHealth()
+			local teleActive = 0
+			--[[
+			Looping through all the Teleporter arms to see if they're being used.
+			If they're being used, than that's how we tell if the teleporter is on or not.
+			]]
+			if genHP >= 1 then
+				for i = 1, 4 do
+					if ents.GetMapCreatedEntity(teleporterArms[i]):IsAcivated() then
+						teleActive = teleActive + 1
+					end
+				end
+				
+			end
+		end},
+		["Ams"] = {"models/props/hl10props/amsmachine00.mdl",  Vector(-5060.69, -3012.82, -1124.32), Angle(0,90,0),
+		function(ent)
+			--[[
+			AMS Generator uses the same principles as the Teleporter.
+			]]
+			local amsButtons = {
+			    1912, -- Motor button
+			    1922, -- Stage 1 Emitters
+			    1919, -- Stage 2 Emitters
+			    1818, -- AMS Prop Arm
+			}
+			local genHP = ent:GetGenHealth()
+			local amsActive = 0
+			if genHP >= 1 then
+				for i = 1, 4 do
+					if ents.GetMapCreatedEntity(amsButtons[i]):IsAcivated() then
+						amsActive = amsActive + 1
+					end
+				end
+				print(teleActive)
+			end
+		end},
+		["Facilities"] = {"models/props/hl16props/generator03.mdl",  Vector(-5957.46 ,-3499.58, -184.54), Angle(0,90,0), 
+		function(ent)
+		end}
+	}
 	--[[-------------------------------------------------------------------------
 	Meta funcs
 	---------------------------------------------------------------------------]]
@@ -38,9 +93,9 @@ if SERVER then
 		if #generators < 1 then return end
 
 		for k,ent in pairs(generators) do
-			local genHP = ent:GetGenHeath()
-
-
+			if generatorEnts[ ent:GetNWString("GenType", "") ] then
+				generatorEnts[ ent:GetNWString("GenType") ](ent)
+			end
 		end
 	end
 
@@ -61,22 +116,22 @@ if SERVER then
 
 
 	PowerSetup["Entities"] = {}
-	local generatorEnts = {
-		{"models/props_am/powersource.mdl", Vector(-13589.46, -538.12, -412.52), Angle(0,0,0), "TeleLab"},
-		{"models/props/hl10props/amsmachine00.mdl",  Vector(-5060.69, -3012.82, -1124.32), Angle(0,90,0), "Ams"},
-		{"models/props/hl16props/generator03.mdl",  Vector(-5957.46 ,-3499.58, -184.54), Angle(0,90,0), ""}
-	}
 	for k,v in pairs(generatorEnts) do
-		print("Debug 0")
-		PrintTable(v)
 		table.insert(PowerSetup["Entities"],{
+			--[[
+			Loops through all the entities I made and indexes them to be created.
+			]]
 			"prop_physics", true, function(ent)
 				ent:SetModel(v[1])
 				ent:SetPos(Vector(v[2]))
 				ent:SetAngles(Angle(v[3]))
+				ent:SetNWString("GenType",v[4])
 				ent:SetName("gm_power")
 				ent:DropToFloor()
 				ent.pos = ent:GetPos()
+				function ent:UpdateTransmitState() 
+					return TRANSMIT_ALWAYS 
+				end
 				ent:Spawn()
 				ent:SetNWInt("GMhealth", 100)
 				ent:GetPhysicsObject():EnableMotion(false)
@@ -97,7 +152,7 @@ if SERVER then
 	}
 
 
-	sBMRP.Event.rEvents[ "PowerEvent" ] = POWER_EVENT
+	--sBMRP.Event.rEvents[ "PowerEvent" ] = POWER_EVENT
 
 	concommand.Add("eset", function()
 		print("----------")
@@ -108,10 +163,11 @@ end
 
 if CLIENT then
 
-
+	--[[
+	Comma seperated Ent Indexed de-seralizer, don't judge me.
+	]]
 	local function getIndexedEnt(str)
-		local ent = {}
-		local nocopy = {}
+		local ent, copy = {}, {}
 		local generatorIndex = string.Explode(";", str)
 		for k,v in pairs(generatorIndex) do
 			if IsValid(ents.GetByIndex(tonumber(v) or -100)) and not nocopy[ v ] then
@@ -122,7 +178,9 @@ if CLIENT then
 		return ent
 	end
 
-
+	--[[
+	This just adds a little outline for the engineer jobs so they know what a generator is.
+	]]
 	hook.Add("PreDrawHalos", "gm_power-highlight", function()
 		if not LocalPlayer():IsService() then return end
 		local generatorIndex = getIndexedEnt(GetGlobalString("generatorIDs", ""))
@@ -135,6 +193,9 @@ if CLIENT then
 	end)
 	local codefont = sBMRP.AppendFont("genfont", ScreenScale(10))
 
+	--[[
+	HUD Display of all generators.
+	]]
 	hook.Add("HUDPaint", "gm_power-genhud", function()
 		local ply = LocalPlayer()
 		if not ply:IsService() then return end
