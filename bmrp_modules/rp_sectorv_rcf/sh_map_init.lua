@@ -24,11 +24,10 @@ local function mapinit()
 	for k,v in pairs({4647,3003, 5606, 4542, 2936}) do
 		SafeRemoveEntity(ents.GetMapCreatedEntity(v))
 	end
-	timer.Create("ambience-sound_fix", 1, 0, function()
+	timer.Create("ambience-sound_fix", 5, 0, function()
 		for k,v in pairs(ents.FindByName("amb")) do
-			local shouldplay = false
-			for k,ply in pairs(ents.FindInSphere(v:GetPos(),200)) do
-				if ply:IsPlayer() then
+			for k,ply in pairs(player.GetAll()) do
+				if ply:IsPlayer() and ply:GetPos():DistToSqr(v:GetPos()) <= 40000 then
 					shouldplay = true
 					break
 				end
@@ -290,9 +289,6 @@ end
 
 --3497
 hook.Add("EntityTakeDamage", "breakable_forcegod", function(ent, data)
-	local inf = data:GetInflictor()
-	local att = data:GetAttacker()
-
 	if ent:MapCreationID() == 3497 && !sBMRP.Cascade then
 		return true
 	end
