@@ -34,15 +34,118 @@ end
 	705356556
 ]]
 
+--[[
+	These two functions must exist outside the package or else they will not work
+	It took me a while to figure it out and now im suicidal
+]]
+
+
+
+if SERVER then
+	util.AddNetworkString("Hot.Start")
+	util.AddNetworkString("Hot.Request")
+	util.AddNetworkString("Hot.Execute")
+	function compileWeapon(path, wepname)
+		oldCSLua = oldCSLua || AddCSLuaFile
+		oldInclude = oldInclude || include
+		AddCSLuaFile = function()  end
+		include = function(p)
+			local sEnt = {
+				["init.lua"] = true,
+				["cl_init.lua"] = true,
+				["shared.lua"] = true,
+			}
+			if sEnt[p] then
+				return CompileFile(table.concat(path:Split("/"), "/", 1, 2) .. "/" ..  p)()
+			end
+			CompileFile(p)() 
+		end
+		SWEP = weapons.Get("weapon_base")
+		CompileFile(path)()
+		weapons.Register(SWEP, wepname:Replace(".lua", ""))
+		print("Registered weapon: " .. SWEP.PrintName or "NULL")
+		SWEP = nil
+		AddCSLuaFile = oldCSLua
+		include = oldInclude
+	end
+
+	function compileEnt(path, enttname)
+		oldCSLua = oldCSLua || AddCSLuaFile
+		oldInclude = oldInclude || include
+		AddCSLuaFile = function()  end
+		include = function(p)
+			local sEnt = {
+				["init.lua"] = true,
+				["cl_init.lua"] = true,
+				["shared.lua"] = true,
+			}
+			if sEnt[p] then
+				return CompileFile(table.concat(path:Split("/"), "/", 1, 2) .. "/" .. p)()
+				
+			end
+			return CompileFile(p)() 
+		end
+		ENT = scripted_ents.Get("base_gmodentity")
+		CompileFile(path)()
+		scripted_ents.Register(ENT, enttname:Replace(".lua", ""))
+		print("Registered entity: " .. ENT.PrintName or "NULL")
+		ENT = nil
+		AddCSLuaFile = oldCSLua
+		include = oldInclude
+	end
+else
+	function compileWeapon(code, name, path)
+		local oldInclude = include
+		include = function(p)
+			local sEnt = {
+				["init.lua"] = true,
+				["cl_init.lua"] = true,
+				["shared.lua"] = true,
+			}
+			if sEnt[p] then
+				return CompileString(LUA_CACHE[table.concat(path:Split("/"), "/", 1, 2) .. "/" .. p], name)()
+			end
+			return CompileFile(p)() 
+		end
+		SWEP = weapons.Get("weapon_base")
+			CompileString(code, name:Replace(".lua", ""))()
+			weapons.Register(SWEP, name:Replace(".lua", ""))
+			print("Registered weapon: " .. SWEP.PrintName or "NULL")
+		SWEP = nil
+		include = oldInclude
+	end
+
+	function compileEnt(code, name, path)
+		local oldInclude = include
+		include = function(p)
+			local sEnt = {
+				["init.lua"] = true,
+				["cl_init.lua"] = true,
+				["shared.lua"] = true,
+			}
+			if sEnt[p] then
+				return CompileString(LUA_CACHE[table.concat(path:Split("/"), "/", 1, 2) .. "/" .. p], name)()
+				
+			end
+			return CompileFile(p)() 
+		end
+		ENT = scripted_ents.Get("base_gmodentity")
+			CompileString(code, name)()
+			scripted_ents.Register(ENT, name:Replace(".lua", ""))
+			print("Registered entity: " .. ENT.PrintName or "NULL")
+		ENT = nil
+		include = oldInclude
+	end
+end
 file.CreateDir("sbmrp-cache")
 timer.Remove("hotmount_fetch")
-didRun = false
+sHotMount = {}
 TRANSMIT_CACHE = {}
+LOADED_ADDONS = {}
 if SERVER then
-	util.AddNetworkString("sHotmount.Start")
-	util.AddNetworkString("sHotmount.Request")
+
 	TRANSMIT_CACHE = TRANSMIT_CACHE || {}
-	function sBMRP.HotLoad(WSID)
+	function sHotMount.Load(WSID)
 		print("Starting hotload for " .. WSID .. ".")
 		local host, pi = nil, math.huge
 		table.Iterate(player.GetAll(), function(v)
@@ -51,11 +154,119 @@ if SERVER then
 				host = v
 			end
 		end)
-		print("HOST " .. host:GetName())
-		net.Start("sHotmount.Start")
-			net.WriteInt(WSID, 32)
-			net.WriteString(host:SteamID())
-		net.Broadcast() // TODO: CHANGE
+		if file.Exists("sbmrp-cache/" .. WSID .. ".dat", "DATA") then
+			print("File already exists in cache! Skipping fragment-download!")
+			net.Start("Hot.Start")
+				net.WriteInt(WSID, 32)
+				net.WriteString("-1")
+			net.Broadcast()
+
+			TRANSMIT_CACHE[WSID] = {file.Read("sbmrp-cache/" .. WSID .. ".dat", "DATA")}
+
+			compileToGMA(WSID)
+		else
+			print("File doesn't exist in cache. Starting download...")
+			net.Start("Hot.Start")
+				net.WriteInt(WSID, 32)
+				net.WriteString(host:SteamID())
+			net.Broadcast()
+		end
+
+	end
+	function checkForCompletion(wsid)
+		if !TRANSMIT_CACHE[wsid] then return nil end
+		local isComplete = true
+		local emptyFrags, transitFrags = {}, {}
+		for i = 1, #TRANSMIT_CACHE[wsid] do
+			if TRANSMIT_CACHE[wsid][i] == 0 then
+				table.insert(transitFrags, i)
+				isComplete = false
+			elseif TRANSMIT_CACHE[wsid][i] == -1 then
+				table.insert(emptyFrags, i)
+				isComplete = false
+			end
+		end
+		return isComplete, emptyFrags, transitFrags
+	end
+	function sendLuaFile(path, type, t)
+		local fCode = file.Read(path, "LUA")
+		net.Start("Hot.Execute")
+			net.WriteTable(t)
+			net.WriteString(type)
+			net.WriteString(path)
+			net.WriteInt(#fCode, 32)
+			net.WriteData(fCode, #fCode)
+		net.Broadcast()
+	end
+
+	--lua_run sHotMount.Load("535135982")
+	function compileLuaFiles(path)
+		local weps, ent, auto = 0, 0, 0
+
+		for k,v in pairs(path) do
+			if v:find("lua/") then
+				local t = v:Split("/")
+				local lPath = table.concat(t, "/", 2)
+				if t[2] == "autorun" then
+					if t[3] == "server" then
+						CompileFile(lPath)()
+					elseif t[3] == "client" then
+						sendLuaFile(lPath, "autorun", t)
+					else
+						CompileFile(lPath)()
+						sendLuaFile(lPath, "autorun", t)
+					end
+					auto = auto + 1
+				elseif t[2] == "weapons" then
+					if t[4] and t[4] == "init.lua" then
+						compileWeapon(lPath, t[3])
+					elseif t[4] and t[4] == "shared.lua" then
+						compileWeapon(lPath, t[3])
+						sendLuaFile(lPath, "weapon", t)
+					elseif t[4] and t[4] == "cl_init.lua" then
+						sendLuaFile(lPath, "weapon", t)
+					else
+						compileWeapon(lPath, t[3])
+						sendLuaFile(lPath, "weapon", t)						
+					end
+					weps = weps + 1
+				elseif t[2] == "entities" then
+					if t[4] and t[4] == "init.lua" then
+						compileEnt(lPath, t[3])
+					elseif t[4] and t[4] == "shared.lua" then
+						compileEnt(lPath, t[3])
+						sendLuaFile(lPath, "entity", t)
+					elseif t[4] and t[4] == "cl_init.lua" then
+						sendLuaFile(lPath, "entity", t)
+					else
+						compileEnt(lPath, t[3])
+						sendLuaFile(lPath, "entity", t)				
+					end
+					ent = ent + 1
+				else
+					sendLuaFile(lPath, "cache", t)
+				end
+			end
+		end
+
+		print("Compiled " .. ent .. " entities, " .. weps .. " weapons and " .. auto .. " autorun files.")
+	end
+	function compileToGMA(wsid)
+		local addon = table.concat(TRANSMIT_CACHE[wsid])
+		local writePath = "sbmrp-cache/" .. wsid .. ".dat"
+		print(string.NiceSize(#addon) .. "<-- ADDON SIZE")
+		file.Write(writePath, addon)
+		local success, tab = game.MountGMA("data/" .. writePath)
+		resource.AddWorkshop(wsid)
+		if success then
+			print("MOUNTED FILE SUCCESSFULLY!")
+			PrintTable(tab)
+			LOADED_ADDONS[wsid] = tab
+			compileLuaFiles(LOADED_ADDONS[wsid])
+		else
+			file.Delete(writePath)
+			print("FILE FAILED TO MOUNT!")
+		end
 	end
 	--[[-------------------------------------------------------------------------
 	TODO:
@@ -65,7 +276,9 @@ if SERVER then
 		resource.AddWorkshop()
 		Lua mounting
 	---------------------------------------------------------------------------]]
-	net.Receive("sHotmount.Start", function()
+
+	net.Receive("Hot.Start", function()
+
 		local addonID = net.ReadString()
 		local fragmentSize = net.ReadInt(32)
 
@@ -74,75 +287,94 @@ if SERVER then
 		for i = 1, fragmentSize do
 			TRANSMIT_CACHE[addonID][i] = -1
 		end
-		local playeritr = 1
-		timer.Create("hotmount_fetch", 1, 5, function()
-
-			for k,ply in pairs(player.GetAll()) do
-				if !ply:GetNWBool("isactive") and not ply.isSending then continue end
-				for i = 1, fragmentSize do
-					if TRANSMIT_CACHE[addonID][i] == -1 and not ply.isSending then
-						print("Assigned " .. ply:GetName() .. " with getting fragment " .. i)
-						TRANSMIT_CACHE[addonID][i] = 0
-						ply.isSending = true
-						didRun = true
-						net.Start("sHotmount.Request")
+		timer.Simple(10, function()
+			table.Iterate(player.GetAll(), function(ply)
+				if !ply:GetNWBool("isactive") then return end
+				local sID = ply:SteamID64()
+				ply.attFrag = 3
+				timer.Create("hotmount_" .. sID, 0, 0, function()
+					local complete, frags = checkForCompletion(addonID)
+					if frags[1] then
+						local frag = frags[1]
+						net.Start("Hot.Request")
 							net.WriteString(addonID)
-							net.WriteInt(i, 16)
+							net.WriteInt(frag, 16)
 						net.Send(ply)
+						print("Requesting fragment: " .. frag .. "/" .. #TRANSMIT_CACHE[addonID] .. " from " .. ply:GetName())
+						TRANSMIT_CACHE[addonID][frag] = 0
+						timer.Pause("hotmount_" .. sID)
 						timer.Simple(5, function()
-							if TRANSMIT_CACHE[addonID][i] == 0 then
-								print("FRAGMENT: " .. i .. " timed out!")
-								ply.isSending = false
+							if TRANSMIT_CACHE[addonID][frag] == 0 then
+								TRANSMIT_CACHE[addonID][frag] = -1
+								if ply.attFrag <= 0 then
+									timer.Remove("hotmount_" .. sID)
+									print(ply:GetName() .. " " ..  ply.attFrag .. " attempts left.")
+								else
+									ply.attFrag = ply.attFrag - 1
+									print(ply:GetName() .. " " ..  ply.attFrag .. " attempts left.")
+									timer.UnPause("hotmount_" .. sID)
+								end
 							end
 						end)
+					elseif complete then
+						print(ply:GetName() .. " has completed its task!")
+						timer.Remove("hotmount_" .. sID)
+						return
 					end
-				end		
-			end
-			if didRun then return end
-			local compressedAddon =  "" // table.concat(TRANSMIT_CACHE[addonID])
-			for i = 1, fragmentSize do
-				if TRANSMIT_CACHE[addonID][i] == -1 || TRANSMIT_CACHE[addonID][i] == "" then
-					print("MISSING FRAGMENT " .. i .. "???")
-					return
-				end
-				compressedAddon = compressedAddon .. TRANSMIT_CACHE[addonID][i]
-			end
-			local addon = compressedAddon //util.Decompress(compressedAddon) or "" -- we made it :D
-			local writePath = "sbmrp-cache/" .. addonID .. ".dat"
-			print(#compressedAddon .. "<-- THINGY")
-			print(#addon .. "<-- -THINGY 2!")
-			print(writePath)
-			file.Write(writePath, addon)
-			local success, tab = game.MountGMA("data/" .. writePath)
-			if success then
-				print("MOUNTED FILE SUCCESSFULLY!")
-				PrintTable(tab)
-			else
-				print("FILE FAILED TO MOUNT!")
-			end
-			TRANSMIT_CACHE[addonID] = nil
-			timer.Destroy("hotmount_fetch")
+				end)
+			end)
 		end)
-		net.Receive("sHotmount.Request", function()
-			local wsid = net.ReadString()
-			local fid = net.ReadInt(16)
-			local size = net.ReadInt(32)
-			local fragment = net.ReadData(size)
+	end)
 
-			print("RECIEVED FRAGMENT: " .. fid .. " : " .. #fragment .. " SIZE!")
+	net.Receive("Hot.Request", function(len, ply)
+		local wsid = net.ReadString()
+		local fid = net.ReadInt(16)
+		local size = net.ReadInt(32)
+		local fragment = net.ReadData(size)
 
-			TRANSMIT_CACHE[wsid][fid] = util.Decompress(fragment)
+		print("RECIEVED FRAGMENT: " .. fid .. " : " .. string.NiceSize(#fragment) .. " SIZE!")
 
-			timer.UnPause("hotmount_fetch")
+		TRANSMIT_CACHE[wsid][fid] = util.Decompress(fragment)
 
-		end)
+		timer.UnPause("hotmount_" .. ply:SteamID64())
+		print("Resuming " .. ply:GetName())
+		local complete, frags = checkForCompletion(wsid)
+
+		if complete then
+			print("Got all files!")
+			compileToGMA(wsid)
+		end
 
 	end)
-else
-	net.Receive("sHotMount.Start", function()
+	net.Receive("Hot.Execute", function(len, ply)
+		for k,v in pairs(LUA_CACHE) do
+			compileLuaFiles(k)
+		end
+	end)
+end
+if CLIENT then
+	print("Running")
+	LUA_CACHE = LUA_CACHE || {}
+	net.Receive("Hot.Execute", function()
+		local t = net.ReadTable()
+		local lType = net.ReadString()
+		local lPath = net.ReadString()
+		local size = net.ReadInt(32)
+		local lCode = net.ReadData(size)
+		LUA_CACHE[lPath] = lCode
+		timer.Simple(2, function()
+			if lType == "autorun" then
+				CompileString(lCode, "sHotMount-" .. lPath)
+			elseif lType == "weapon" then
+				compileWeapon(lCode, t[3], lPath)
+			elseif lType == "entity" then
+				compileEnt(lCode, t[3], lPath)
+			end
+		end)
+	end)
+	net.Receive("Hot.Start", function()
 		local WSID = net.ReadInt(32)
 		local host = net.ReadString()
-		host = host == LocalPlayer():SteamID() and true || false
 
 		--[[
 			Verify addon's existance
@@ -152,63 +384,71 @@ else
 				print( "HOST INSTALL FAILED>>>"  .. WSID)
 				return
 			end
-			print("FOUND ADDON: " .. dat.title)
+			print("Downloading/Mounting " .. dat.title)
 			--[[
 				Install Addon
 			]]
 			steamworks.Download( dat.fileid, true, function( path )
 				local success, tab = game.MountGMA(path) -- Mount addon
-				
-				--if !LocalPlayer():IsSirro() then return end
-				if success then PrintTable(tab) end -- //DEBUG
-				print(path) -- Path value
-
+				if !success then return end
+				print("Successfully loaded " .. dat.title)
 				local f_RAW, f_PATH = file.Read(path, "GAME"), "sbmrp-cache/" .. WSID .. ".dat"
+				print("Mouting...")
+				if host == "-1" then return end
 				file.Write(f_PATH, f_RAW)
 				fragmentAddon(f_PATH, WSID, host)
-				print("Wrote file!")
+				print("Mounted.")
 			end )
 		end )
+	end)
+
+	hook.Add("InitPostEntity", "catch_lua", function()
+		net.Start("Hot.Execute")
+		net.SendToServer()
 	end)
 
 	concommand.Add("testUpload", function()
 		fragmentAddon("sbmrp-cache/705356556.dat")
 	end)
-	net.Receive("sHotmount.Request", function()
+	net.Receive("Hot.Request", function()
 		local wsid = net.ReadString()
 		local fragmentID = net.ReadInt(16)
 
 		local path = "sbmrp-cache/" .. wsid .. ".dat"
 		if not TRANSMIT_CACHE[path] or not TRANSMIT_CACHE[path][fragmentID] then return end
 		local fragment = TRANSMIT_CACHE[path][fragmentID]
-		net.Start("sHotmount.Request")
+		net.Start("Hot.Request")
 			net.WriteString(wsid)
 			net.WriteInt(fragmentID, 16)
 			net.WriteInt(#fragment, 32)
 			net.WriteData(fragment, #fragment)
 		net.SendToServer()
 	end)
+	local sizeCompress = 64000
 	function fragmentAddon(f, id, host)
-		local addonRaw = file.Read(f, "DATA")
-		local addonCompressed = addonRaw // util.Compress(addonRaw)
-		local addonCompressFrag = addonCompressed
-		print("PATH OF CACHED ADDON " .. f)
-		local sizeCompress = 64000
+		local addonCompressFrag = file.Read(f, "DATA")		
 		local init_fragments = {}
-		for i = 1, math.huge do
+		local i = 1
+		timer.Create("split_up-slowley", .1, 0, function()
 			local fragment = #addonCompressFrag > sizeCompress and addonCompressFrag:Left(sizeCompress) or addonCompressFrag
 			local fr = util.Compress(fragment)
 			init_fragments[i] = fr
 			addonCompressFrag = #addonCompressFrag > sizeCompress and addonCompressFrag:sub(#fragment) or ""
-			print("FRAGMENT " .. i .. " : " .. #fr .. " (" .. #addonCompressFrag .. ") remaining.")
-			if #addonCompressFrag <= 0 then break end
-		end
+			--print("FRAGMENT " .. i .. " : " .. #fr .. " (" .. #addonCompressFrag .. ") remaining.")
+			i = i + 1
+			if #addonCompressFrag <= 0 then 
+				timer.Remove("split_up-slowley") 
+				combineAndSend(f, id, init_fragments, host)
+			end
+		end)
+	end
+	function combineAndSend(f, id, init_fragments, host)
 		TRANSMIT_CACHE[f] = {}
 		local transitcount = 1
 		local previ = ""
 		for i = 1, #init_fragments do
 			local combine = previ .. init_fragments[i]
-			if #combine <= 64000 then
+			if #combine <= sizeCompress then
 				previ = previ .. combine
 				TRANSMIT_CACHE[f][transitcount] = combine
 			else
@@ -216,183 +456,14 @@ else
 				transitcount = transitcount + 1
 			end
 		end
-		print(#TRANSMIT_CACHE[f])
+		print("Debug1")
+		--print(#TRANSMIT_CACHE[f])
 		print("Fragment tree built. Sending to server...")
-		if !host then return end
-		net.Start("sHotmount.Start")
+		if host != LocalPlayer():SteamID() then return end
+		net.Start("Hot.Start")
 			net.WriteString(id)
 			net.WriteInt(#TRANSMIT_CACHE[f], 32)
 		net.SendToServer()
 	end
-end
-
-
-
-
-
-
-/*TRANSMIT_START, TRANSMIT_ADDTOO, TRANSMIT_FINISH = 1, 2, 3
-file.CreateDir("sbmrp-cache")
-if SERVER then
-	util.AddNetworkString("sBMRP.DoHotMount")
 	
-	local TRANSMIT_CACHE = TRANSMIT_CACHE || {}
-	function sBMRP.DoHotMount(wsid)
-		Log("Starting hotmount for " .. wsid .. "..")
-		local host, pi = nil, math.huge
-
-		table.Iterate(player.GetAll(), function(v)
-			if v:Ping() < pi then
-				pi = v:Ping()
-				host = v
-			end
-		end)
-
-		Log("Found host --> " .. host:GetName())
-		if not IsValid( host ) then return end
-		net.Start("sBMRP.DoHotMount")
-			net.WriteString(tostring(wsid))
-		net.Broadcast()
-	end
-	util.AddNetworkString("testttt")
-	net.Receive("testttt", function()
-		local netsize = net.ReadInt(32)
-		print(netsize .. "<-- SIZE")
-		local nettab = util.Decompress(net.ReadData(netsize))
-		player.GetSirro():ChatPrint(nettab and "Server recived file part! (CHII S-WORKER) :" .. #nettab or "NO" .. "<---- (SERVER)")
-		local f_PATH = "sbmrp-cache/" .. os.time() .. ".dat"
-		--Log("Writing to --> " .. f_PATH)
-		--file.Write(f_PATH, nettab)
-
-		--[[Log("Mounting file....")
-		local success, tab = game.MountGMA("data/" .. f_PATH)
-		if success then
-			Log("Successfully mounted addon!")
-			PrintTable(tab)
-		else
-			Log("Failed mounting addon!")
-		end]]--
-	end)
-
-	net.Receive("sBMRP.DoHotMount", function(ply)
-		Log("Recieved Cache Data!")
-		local NET_DATA = net.ReadCompressedTable()
-		local header, wsid, size, precent, data = NET_DATA.header, NET_DATA.wsid, NET_DATA.size, NET_DATA.precent, NET_DATA.data
-
-		if header == TRANSMIT_START then
-			Log("Recieved transmit-start header from " .. ply:GetName() .. " starting transfer of " .. wsid .. " [" .. precent .. "] complete.")
-			TRANSMIT_CACHE[wsid] = data
-			Log("Added " .. size .. " characters to manifest.")
-
-		elseif header == TRANSMIT_ADDTOO then
-			TRANSMIT_CACHE[wsid] = TRANSMIT_CACHE[wsid] .. data
-			Log("Manifest: " .. wsid .. " added: " .. size .. " characters. [ " .. precent .. "]")
-		elseif header == TRANSMIT_FINISH then
-			Log("Recieved finished header from " .. ply:GetName() .. " finishing transfer of " .. wsid .. "!")
-			TRANSMIT_CACHE[wsid] = TRANSMIT_CACHE[wsid] .. data
-			local f_PATH = "sbmrp-cache/" .. os.time() .. ".dat"
-			Log("Writing to --> " .. f_PATH)
-			file.Write(f_PATH, TRANSMIT_CACHE[wsid])
-
-			Log("Mounting file....")
-			local success, tab = game.MountGMA("data/" .. f_PATH)
-			if success then
-				Log("Successfully mounted addon!")
-				PrintTable(tab)
-			else
-				Log("Failed mounting addon!")
-			end
-		end
-	end)
-else
-	-- 181699 CHARACTERS PER TRANSMIT!
-	concommand.Add("test", function(ply, con, int)
-		local done, rate = os.time(), os.time()
-		local start, finish = 0, 34000
-		local raw = file.Read("sbmrp-cache/1775530573.dat", "DATA")
-		local rawcut = raw:Left(tonumber(int[1] or -1))
-		print(#rawcut  .. "<--- CUT")
-		print(#raw - #rawcut  .. "<--- CUT")
-		print(#raw .. "<--- TOTAL")
-		local size = util.Compress(rawcut):len()
-		local ratio = math.Round((#raw / #rawcut))
-		print("File ratio: 1:" .. ratio)
-		net.Start("testttt")
-			net.WriteInt(size, 32)
-			net.WriteData(util.Compress(rawcut), size)
-			print("Wrote: ".. #util.Compress(rawcut))
-		net.SendToServer()
-		--[[
-		lua/weapons/weapon_pet/shared.lua
-		SWEP = weapons.Get("weapon_base") CompileFile("weapons/weapon_pet/shared.lua")() PrintTable(SWEP) weapons.Register(SWEP, "weapon_pet") SWEP = nil
-		lua_run local success, tab = game.MountGMA("data/sbmrp-cache/1775530573.dat") if success then PrintTable(tab) else print("FAILED") end
-		for i = 1, math.huge do
-			if os.time() % 2 != 0 then continue end
-			if start == finish then break end
-			start = start + 1
-			net.Start("testttt")
-				net.WriteString(file.Read("cache/workshop/800990260010774582.cache", "GAME"))
-			net.SendToServer()
-		end
-		print(os.time() - done .. " | " .. finish)]]--
-		
-	end)
-	net.Receive("sBMRP.DoHotMount", function()
-		print("Recieved hotmount trigger!")
-		local rnet = net.ReadString()
-		local WSID = rnet and tonumber(rnet) or nil
-		if not WSID then print("FAILED TO CONVERT!?!?") return end
-		print("Starting mount for " .. WSID)
-		steamworks.FileInfo( WSID, function( dat )
-			if not dat then
-				print( "HOST INSTALL FAILED>>>"  .. WSID)
-				return
-			end
-			print("FOUND ADDON: " .. dat.title)
-
-			steamworks.Download( dat.fileid, true, function( path )
-				local success, tab = game.MountGMA(path)
-				if success then PrintTable(tab) end
-				print(path)
-				if !LocalPlayer():IsSirro() then return end
-				local f_PATH = file.Read(path, "GAME")
-				file.Write("sbmrp-cache/" .. WSID .. ".dat", f_PATH)
-				print("Write file!")
-			end )
-		end )
-	end)
 end
-
-
-
-
-if SERVER then 
-	util.AddNetworkString("sBMRP.compileWeapon")
-	SWEP = weapons.Get("weapon_base")
-
-	CompileFile("weapons/weapon_pet/shared.lua")()
-	print("COMPILED " .. SWEP.Author)
-	weapons.Register(SWEP, "weapon_pet")
-	AddCSLuaFile("weapons/weapon_pet/shared.lua")
-	SWEP = nil
-
-	local luaFile = file.Read("weapons/weapon_pet/shared.lua", "LUA")
-	local compressedFile = util.Compress(luaFile)
-	net.Start("sBMRP.compileWeapon")
-		net.WriteInt(compressedFile:len(), 32)
-		net.WriteData(compressedFile, compressedFile:len())
-	net.Broadcast()
-else
-	net.Receive("sBMRP.compileWeapon", function()
-		print("DEBUG 0, IGNORE THE ERRORS THANKS!\n-Sirro")
-		local size = net.ReadInt(32)
-		local luaString = util.Decompress(net.ReadData(size))
-		if !luaString then return end
-
-		SWEP = weapons.Get("weapon_base")
-		CompileString(luaString, "SIRRO-TEST_WEAPON")()
-		print("COMPILED " .. SWEP.Author or "NULL")
-		weapons.Register(SWEP, "weapon_pet")
-		SWEP = nil 
-	end)
-end*/
