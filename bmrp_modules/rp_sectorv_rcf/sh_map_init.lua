@@ -307,6 +307,27 @@ end)
 
 if SERVER then
 
+
+	concommand.Add("regentoucherents", function()
+		table.Iterate(ents.FindByClass("quest_npc-dealer"), function(ent) ent:Remove() end)
+		local toucherents = {
+			{"models/hunter/plates/plate8x16.mdl", Vector(-4378.50, 10425.73, 225.74),Angle(-90, 180, 180.000), "canyon_2"},
+			{"models/hunter/plates/plate3x5.mdl", Vector(-2467.15, -1002.22, 640.75), Angle(90.000, 90.000, 180.000), "canyon_1"}
+		}
+		for k,v in pairs(ents.FindByClass("npc_quest-dealer")) do v:Remove() end
+		for k,v in pairs(toucherents) do
+			local ent = ents.Create("npc_quest-dealer")
+
+			ent:SetModel(v[1])
+			ent:PhysicsInit(SOLID_VPHYSICS)
+			ent:SetPos(v[2])
+			ent:SetAngles(v[3])
+			ent:SetName(v[4])
+			ent:Spawn()
+			ent:SetRenderMode(RENDERMODE_NONE)
+			ent:GetPhysicsObject():EnableMotion(false)
+		end
+	end)
 	hook.Add("TriggerEntTouch", "test", function(ent, triggerEnt)
 		if ent:GetName() == "canyon_1" and triggerEnt:IsPlayer() then
 			triggerEnt:SetPos(DarkRP.findEmptyPos(Vector(-4225.3720703125,10443.5,136.03125), {}, 300, 30, Vector(16,16,64)))

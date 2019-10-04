@@ -4,7 +4,7 @@ Varible Declaration
 sBMRP.AllowXenToEarth = false
 sBMRP.AllowEarthToXen = false
 sBMRP.AllowHECUToBMRF = false
-sBMRP.AntiRDM = true
+sBMRP.AntiRDM = false
 
 local ply = FindMetaTable("Player")
 local ent = FindMetaTable( "Entity" )

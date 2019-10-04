@@ -69,7 +69,15 @@ local function teamRadio(ply, text, teamc)
 end
 hook.Add("PlayerSay", "BMRP_RADIOCHAT", teamRadio)
 
+--[[-------------------------------------------------------------------------
+Wanted notifer
+---------------------------------------------------------------------------]]
 
+local function onWanted(ply, cp, reason)
+	sBMRP.ChatNotify(player.GetAll(), "VOX", ply:GetName() .. " was made wanted by " .. cp:GetName() .. " for reason: " .. reason)
+end
+
+hook.Add("playerWanted", "wanted-notify", onWanted)
 
 --[[-------------------------------------------------------------------------
 Security Stuff

@@ -181,7 +181,7 @@ if SERVER then
 			return
 		end
 		
-		if ply:IsScience() or ply:IsSurvey() then
+		if ply:IsScience() or ply:IsSurvey() or ply:IsBio() then
 			ply:EmitSound(Sound(SciencePhrase),80, 100)
 		end	
 	end

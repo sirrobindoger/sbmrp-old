@@ -1,3 +1,7 @@
+--[[-------------------------------------------------------------------------
+CURRENTLY INACTIVE MODULE, NEEDS TO BE REBUILT.
+---------------------------------------------------------------------------]]
+
 sBMRP.NPCs = sBMRP.NPCs || {}
 sBMRP.NPCs.Population = 0
 sBMRP.NPCs.Behavior = D_HT
@@ -144,6 +148,7 @@ if CLIENT then
 		["cycler"] = true,
 		["animprop_generic"] = true,
 		["npc_quest-dealer"] = true,
+		["ams_cart"] = true,
 
 	}
 	local npchud = sBMRP.AppendFont("bossfight", ScreenScale(10))

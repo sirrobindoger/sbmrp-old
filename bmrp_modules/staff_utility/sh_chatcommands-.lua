@@ -74,6 +74,20 @@ removepac:defaultAccess( ULib.ACCESS_ADMIN)
 removepac:help( "Grants the target player or steamid PAC3 permissions." )
 
 --[[-------------------------------------------------------------------------
+Set Model
+---------------------------------------------------------------------------]]
+function ulx.setmodel(ply, target_ply, model)
+   local target = target_ply[1] or false
+   
+	if target then
+		target:SetModel(model)
+	end
+end
+local setmodel = ulx.command(CATEGORY_NAME .. " - Players", "ulx setmodel", ulx.setmodel, "!setmodel", true, false)
+setmodel:addParam{ type=ULib.cmds.PlayersArg }
+setmodel:addParam{ type=ULib.cmds.StringArg, hint="Model"}
+setmodel:defaultAccess(ULib.ACCESS_ADMIN)
+--[[-------------------------------------------------------------------------
 Clear NPC's
 ---------------------------------------------------------------------------]]
 function ulx.clearnpcs(calling_ply)
@@ -93,7 +107,7 @@ clearnpcs:help("Clearns NPCs.")
 --[[-------------------------------------------------------------------------
 Prop Protection shit
 ---------------------------------------------------------------------------]]
-local ToJSON = util.TableToJSON
+--[[local ToJSON = util.TableToJSON
 local propoverrides = {
 	["worldspawn"] = true,
 	["player"] = true,
@@ -134,7 +148,7 @@ addBlockedCollisionEnt:addParam{ type=ULib.cmds.StringArg, hint="Entity class (y
 addBlockedCollisionEnt:addParam{ type=ULib.cmds.BoolArg, invisible=true}
 addBlockedCollisionEnt:defaultAccess( ULib.ACCESS_ADMIN)
 addBlockedCollisionEnt:help( "Blacklist/Unblacklist the entered entity/entity you are looking at from colliding with other entitys." )
-addBlockedCollisionEnt:setOpposite( "ulx removeblacklist", {_, _, true}, "!removeblacklist" )
+addBlockedCollisionEnt:setOpposite( "ulx removeblacklist", {_, _, true}, "!removeblacklist" )]]--
 
 
 --[[-------------------------------------------------------------------------
@@ -372,7 +386,7 @@ AllowAllXenians:help("Enable or disable Xenian's entry into Earth. Revoking entr
 --[[-------------------------------------------------------------------------
 NPC XEN SHIT
 ---------------------------------------------------------------------------]]
-function ulx.npcpopulation(calling_ply, pop)
+--[[function ulx.npcpopulation(calling_ply, pop)
 	local population = tonumber(pop)
 	if population == 0 then
 		sBMRP.NPCs.Sterile = true
@@ -424,7 +438,7 @@ end
 local xenbehavior = ulx.command( CATEGORY_NAME  .. " - Map", "ulx xenbehavior", ulx.xenbehavior, nil, false, false)
 xenbehavior:addParam{ type=ULib.cmds.StringArg, completes=titles, hint="Xen NPC's Behavior", error="invalid state \"%s\" specified", ULib.cmds.restrictToCompletes }
 xenbehavior:defaultAccess( ULib.ACCESS_ADMIN)
-xenbehavior:help( "Sets the xenian NPC's behavior towards humans." )
+xenbehavior:help( "Sets the xenian NPC's behavior towards humans." )]]--
 
 --[[-------------------------------------------------------------------------
 Lab prop spawning

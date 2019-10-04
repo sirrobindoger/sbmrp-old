@@ -42,8 +42,8 @@ END OF CONFIG
 ---------------------------------------------------------------------------]]
 
 -- collision nerf
-sPropProtection.OldConstant = sPropProtection.OldConstant || constraint.NoCollide -- double declaring for redundency 
-function constraint.NoCollide() end
+//sPropProtection.OldConstant = sPropProtection.OldConstant || constraint.NoCollide -- double declaring for redundency 
+//function constraint.NoCollide() end
 
 concommand.Add("sPropProtection_RestoreConstraintFunc", function(ply) -- incase players freak the fuck out
 	if IsValid(ply) then return end
@@ -162,9 +162,10 @@ end)
 Prop canFit function
 ---------------------------------------------------------------------------]]
 
-hook.Add("PlayerSpawnProp", "sPropProtection_primary", function(ply, model)
+hook.Add("PlayerSpawnProp", "sPropProtection_primary", function(ply, model, stacker)
 
-	if ply.AdvDupe2 && ply.AdvDupe2.Pasting then return end
+	if ply.AdvDupe2 && ply.AdvDupe2.Pasting || stacker then return end
+
 	local prop = ents.Create("prop_dynamic")
 	prop:SetPos(ply:GetEyeTrace().HitPos)
 	prop:SetModel(model)

@@ -30,9 +30,9 @@ VOX COMMANDS
 ---------------------------------------------------------------------------]]
 StateDisclaimers = { -- don't ask
 	"off",
-	"cvox",
-	"cvox-cascade",
-	"cjohnson",
+	--"cvox",
+	--"cvox-cascade",
+	--"cjohnson",
 	"bms-vox",
 	"bms-cascade",
 }
@@ -56,6 +56,79 @@ local voxtime = ulx.command(CATEGORY_NAME .. " - Chat", "ulx voxtime", ulx.voxti
 voxtime:addParam{type=ULib.cmds.NumArg, min=10, max=720,default=60,hint="time(seconds)",ULib.cmds.round}
 voxtime:defaultAccess(ULib.ACCESS_ADMIN)
 voxtime:help("Sets the vox time in seconds.")
+
+--[[-------------------------------------------------------------------------
+Skybox
+---------------------------------------------------------------------------]]
+local validSkyboxes = {
+	"2desert",
+	"alien1",
+	"alien2",
+	"alien3",
+	"avanti",
+	"backally",
+	"badlands",
+	"black",
+	"blue",
+	"city",
+	"cliff",
+	"cx",
+	"de_storm",
+	"des",
+	"desert",
+	"dmcw",
+	"doom1",
+	"drkg",
+	"dusk",
+	"dustbowl",
+	"forest",
+	"green",
+	"neb1",
+	"neb2",
+	"nen6",
+	"neb7",
+	"night",
+	"office",
+	"sky_dawn",
+	"sky_wasteland",
+	"snow",
+	"snowlake_",
+	"space",
+	"tornsky",
+	"trainyard",
+	"tsccity",
+	"xen8",
+	"xen9",
+	"xen10",
+}
+
+
+function ulx.skybox(ply, str)
+	sBMRP.ChangeSkybox(str)
+	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the skybox to #s",ply, str)
+end
+local skybox = ulx.command( CATEGORY_NAME .. " - Map", "ulx skybox", ulx.skybox, nil, false, false)
+skybox:addParam{ type=ULib.cmds.StringArg, completes=validSkyboxes, hint="Skybox name.", error="invalid skybox \"%s\" specified", ULib.cmds.restrictToCompletes }
+skybox:defaultAccess( ULib.ACCESS_ADMIN)
+skybox:help( "Sets the skybox for all players." )
+
+--[[-------------------------------------------------------------------------
+Light settings
+---------------------------------------------------------------------------]]
+
+local lightTable = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+
+
+
+function ulx.setlight(calling_ply, light)
+	sBMRP.UpdateEngineLight(lightTable[light], true)
+	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the engine light level to #i/26.",calling_ply, light)
+end
+local setlight = ulx.command(CATEGORY_NAME .. " - Map", "ulx setlight", ulx.setlight, nil, false, false )
+setlight:addParam{type=ULib.cmds.NumArg, min=1, max=26,default=13,hint="Light level.",ULib.cmds.round}
+setlight:defaultAccess(ULib.ACCESS_ADMIN)
+setlight:help("Sets the engine lighting level (1 darkest, 26 lightest).")
+
 
 --[[-------------------------------------------------------------------------
 Advert/Announce
@@ -165,7 +238,7 @@ function ulx.DisableOOC(ply, args)
 		ulx.fancyLog( player.GetAll(), "#P enabled the OOC Chat.",ply)
 	end
 end
-local DisableOOC = ulx.command(CATEGORY_NAME .. " - Chat", "ulx disableooc", ulx.DisableOOC, "!disableooc", true, false )
+local DisableOOC = ulx.command(CATEGORY_NAME .. " - Chat", "ulx toggleooc", ulx.DisableOOC, "!toggleooc", true, false )
 DisableOOC:defaultAccess(ULib.ACCESS_ADMIN)
 DisableOOC:help("Disable or enable OOC.")
 
@@ -465,7 +538,7 @@ hook.Add( "PlayerSay", "chat_looccustom", LOOCCustom)
 --[[-------------------------------------------------------------------------
 GMAN Time
 ---------------------------------------------------------------------------]]
--- Probably not good that I process the whole code here but whatever
+/*-- Probably not good that I process the whole code here but whatever
 GmanTimeFreezeToggleVar = 0
 function ulx.gmantime(ply, args)
 	if ply:IsAdmin() then
@@ -544,7 +617,7 @@ local gmantime = ulx.command(CATEGORY_NAME .. " - Players", "ulx gmantime", ulx.
 gmantime:defaultAccess(ULib.ACCESS_ADMIN)
 gmantime:help("Is it really that time again?")
 
-
+*/
 --[[-------------------------------------------------------------------------
 ADMIN HELP NOTIFER
 ---------------------------------------------------------------------------]]

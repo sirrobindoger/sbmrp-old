@@ -34,7 +34,7 @@ if SERVER then
 						teleActive = teleActive + 1
 					end
 				end
-				
+				print(teleActive)
 			end
 		end},
 		["Ams"] = {"models/props/hl10props/amsmachine00.mdl",  Vector(-5060.69, -3012.82, -1124.32), Angle(0,90,0),
@@ -129,9 +129,6 @@ if SERVER then
 				ent:SetName("gm_power")
 				ent:DropToFloor()
 				ent.pos = ent:GetPos()
-				function ent:UpdateTransmitState() 
-					return TRANSMIT_ALWAYS 
-				end
 				ent:Spawn()
 				ent:SetNWInt("GMhealth", 100)
 				ent:GetPhysicsObject():EnableMotion(false)
@@ -152,7 +149,7 @@ if SERVER then
 	}
 
 
-	--sBMRP.Event.rEvents[ "PowerEvent" ] = POWER_EVENT
+	sBMRP.Event.rEvents[ "PowerEvent" ] = POWER_EVENT
 
 	concommand.Add("eset", function()
 		print("----------")
@@ -167,7 +164,7 @@ if CLIENT then
 	Comma seperated Ent Indexed de-seralizer, don't judge me.
 	]]
 	local function getIndexedEnt(str)
-		local ent, copy = {}, {}
+		local ent, nocopy = {}, {}
 		local generatorIndex = string.Explode(";", str)
 		for k,v in pairs(generatorIndex) do
 			if IsValid(ents.GetByIndex(tonumber(v) or -100)) and not nocopy[ v ] then
