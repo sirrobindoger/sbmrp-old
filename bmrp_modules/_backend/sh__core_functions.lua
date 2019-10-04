@@ -291,6 +291,7 @@ end
 
 concommand.Add("animprop_selectname", function() return end)
 
+
 --[[
 	Its you!	
 ]]
@@ -369,6 +370,11 @@ function ply:Notify(text, typeint, time)
 	DarkRP.notify(self, typeint or 5, time or 5, text)
 end
 
+function ply:CanSee(targetVec)
+	return not (self:GetAimVector():Dot( ( targetVec - self:GetPos() + Vector( 70 ) ):GetNormalized() ) < 0.95)
+end
+
+
 --[[
 	Self explanitory.
 ]]
@@ -387,6 +393,17 @@ function table.ValuesToKeys(tab)
 		newtab[v] = true
 	end
 	return newtab
+end
+
+
+function table.GetSize(tab)
+	local size = 0
+	for k,v in pairs(tab) do
+		if isstring(v) then
+			size = size + #v
+		end
+	end
+	return size
 end
 
 --[[
