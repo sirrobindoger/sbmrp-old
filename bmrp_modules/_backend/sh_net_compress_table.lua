@@ -38,7 +38,7 @@ end
 
 file.CreateDir("sbmrp-cache")
 
-
+REGISTERED_TOOLS = REGISTERED_TOOLS || {}
 
 --[[-------------------------------------------------------------------------
 Shared section
@@ -80,10 +80,12 @@ function compileWeapon(path, wepname, tool)
 		Add tool into menu system.
 	]]
 	if tool then
+		REGISTERED_TOOLS[wepname] = TOOL
 		toolName = TOOL.Name or "#" .. wepname
 		TOOL:CreateConVars()
 		//SWEP.Tool[ wepname ] = TOOL
 		hook.Add( "PopulateToolMenu", "sHotMount_tool_" .. wepname, function()
+			TOOL = TOOL || REGISTERED_TOOLS[wepname]
 			if ( TOOL.AddToMenu != false ) then
 				spawnmenu.AddToolMenuOption(
 					TOOL.Tab or "Main",
@@ -95,7 +97,7 @@ function compileWeapon(path, wepname, tool)
 					TOOL.BuildCPanel
 				)
 			end
-
+			--hook.Remove("PopulateToolMenu", "sHotMount_tool_" .. wepname)
 		end)
 		TOOL = nil
 		ToolObj = nil
@@ -158,10 +160,11 @@ if SERVER then
 		end)
 	end
 
-	hook.Add("PlayerInitialSpawn", "shotload_catchup", function(ply)
+	net.Receive("sHotMount.Catchup",  function(len, ply)
 		net.Start("sHotMount.Catchup")
 			net.WriteTable(LOADED_ADDONS)
 		net.Send(ply)
+		print("Catching up " .. ply:GetName())
 	end)
 
 end
@@ -216,7 +219,7 @@ function compileFiles(path)
 		end
 	end
 	
-	if ent > 1 or weps > 1 or auto > 1 then
+	if ent > 0 or weps > 0 or auto > 0 then
 		timer.Create("sHotMount.refreshMenus", 10, 1, function()
 			if CLIENT then
 				RunConsoleCommand("spawnmenu_reload")
@@ -263,8 +266,17 @@ if CLIENT then
 		end )
 	end)
 
+	hook.Add("InitPostEntity", "hotmount_catchup", function()
+		print("Starting catchup.")
+		net.Start("sHotMount.Catchup")
+		net.WriteString("a")
+		net.SendToServer()
+	end)
+
 	net.Receive("sHotMount.Catchup", function()
+		print("Got catchup table.")
 		local addonTab = net.ReadTable()
+		PrintTable(addonTab)
 		for k,v in pairs(addonTab) do
 			compileFiles(v)
 		end
