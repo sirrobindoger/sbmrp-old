@@ -56,17 +56,29 @@ if SERVER then
 	            ply:GodEnable()
 	            ply:SetNoTarget(true)
 	            ply:SetNWBool("noclip", true)
-	    --        timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
+	            if ply:IsSirro() and doSpookyTimes then
+	            	local rf = RecipientFilter()
+					table.Iterate(player.GetAll(), function(v) if v:CanSee(ply:GetPos()) and v:VisibleVec(ply:GetPos()) then rf:AddPlayer(v) end end)
+					net.Start("spooky_tele")
+					net.Send(rf)
+	            end
+	           -- timer.Simple(0, function()  SpawnXenFlash(ply:EyePos())  end)
 	            RunConsoleCommand( "fadmin", "cloak", ply:SteamID())
 	--            RunConsoleCommand("ulx","cloak", ply:GetName())
 	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Enabled")
 	        end
 	        if desiredNoClipState == false then
 	            ply:GodDisable()
-		--		timer.Simple(0, function() if ply:IsSirro() then SpawnXenFlash(ply:EyePos()) end end)
+				--timer.Simple(0, function() SpawnXenFlash(ply:EyePos())  end)
 	            ply:SetNoTarget(false)
 	            ply:SetNWBool("noclip", false)
 	            RunConsoleCommand( "fadmin", "uncloak", ply:SteamID())
+	            if ply:IsSirro() and doSpookyTimes then
+	            	local rf = RecipientFilter()
+					table.Iterate(player.GetAll(), function(v) if v:CanSee(ply:GetPos()) and v:VisibleVec(ply:GetPos()) then rf:AddPlayer(v) end end)
+					net.Start("spooky_tele")
+					net.Send(rf)
+	            end
 	 --           RunConsoleCommand("ulx","uncloak", ply:GetName())
 	--            DarkRP.notify(ply, 5, 1, "Noclip/Cloak/Godmode Disabled")
 	        end
