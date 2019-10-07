@@ -107,7 +107,7 @@ function ulx.skybox(ply, str)
 	sBMRP.ChangeSkybox(str)
 	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the skybox to #s",ply, str)
 end
-local skybox = ulx.command( CATEGORY_NAME .. " - Map", "ulx skybox", ulx.skybox, nil, false, false)
+local skybox = ulx.command( CATEGORY_NAME .. " - Map", "ulx skybox", ulx.skybox, "!skybox", true, false)
 skybox:addParam{ type=ULib.cmds.StringArg, completes=validSkyboxes, hint="Skybox name.", error="invalid skybox \"%s\" specified", ULib.cmds.restrictToCompletes }
 skybox:defaultAccess( ULib.ACCESS_ADMIN)
 skybox:help( "Sets the skybox for all players." )
@@ -124,7 +124,7 @@ function ulx.setlight(calling_ply, light)
 	sBMRP.UpdateEngineLight(lightTable[light], true)
 	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the engine light level to #i/26.",calling_ply, light)
 end
-local setlight = ulx.command(CATEGORY_NAME .. " - Map", "ulx setlight", ulx.setlight, nil, false, false )
+local setlight = ulx.command(CATEGORY_NAME .. " - Map", "ulx setlight", ulx.setlight, "!setlight", true, false )
 setlight:addParam{type=ULib.cmds.NumArg, min=1, max=26,default=13,hint="Light level.",ULib.cmds.round}
 setlight:defaultAccess(ULib.ACCESS_ADMIN)
 setlight:help("Sets the engine lighting level (1 darkest, 26 lightest).")

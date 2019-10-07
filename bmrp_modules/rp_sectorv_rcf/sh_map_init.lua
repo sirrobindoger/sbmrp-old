@@ -26,13 +26,14 @@ local function mapinit()
 	end
 	timer.Create("ambience-sound_fix", 5, 0, function()
 		for k,v in pairs(ents.FindByName("amb")) do
+			local shouldPlay = false
 			for k,ply in pairs(player.GetAll()) do
-				if ply:IsPlayer() and ply:GetPos():DistToSqr(v:GetPos()) <= 40000 then
-					shouldplay = true
+				if ply:IsPlayer() and ply:GetPos():DistToSqr(v:GetPos()) <= 80000 then
+					shouldPlay = true
 					break
 				end
 			end
-			if not shouldplay then
+			if not shouldPlay then
 				v:Fire("StopSound")
 			else
 				v:Fire("PlaySound")

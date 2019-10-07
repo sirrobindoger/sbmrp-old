@@ -41,23 +41,22 @@ local healthchargers = {
 	[1809] = true
 }
 
+amsControls = {
+    rotorStart = 1912,
+    stageOne = 1922,
+    stageTwo = 1919,
+    cartBay = 1929,
+}
+
+
 local function scanner(ply, ent)
 	if !IsFirstTimePredicted() then return end
+	if sBMRP.Lockdown then return end
 	local Team = ply:Team()
 	local name = ent:GetName()
 	local mapid = ent:MapCreationID()
     
-	if ply.antispam_use == nil or ply.antispam_use == 0 then -- cBMRP antispam code
-		ply.antispam_use = 1
-		timer.Destroy("gm_"..ply:SteamID().."_antispam_use")
-		timer.Create("gm_"..ply:SteamID().."_antispam_use", 0.25, 1, function()
-			ply.antispam_use = 0
-		end )
-	elseif ply.antispam_use == 1 then
-		timer.Destroy("gm_"..ply:SteamID().."_antispam_use")
-		timer.Create( "gm_"..ply:SteamID().."_antispam_use", 0.25, 1, function()
-			ply.antispam_use = 0
-		end )
+	if !ply:AntiSpam() then
 		return false
 	end
 	if sciencedoors[mapid] then
@@ -178,6 +177,27 @@ local function scanner(ply, ent)
 			return true
 		end
 	end
+
+	--[[
+		AMS Section
+	]]
+
+	local amsStage = sBMRP.AMS.State
+	local entID = ent:MapCreationID()
+    if entID == amsControls.rotorStart then
+    	if amsStage > 1 then
+    		ent:EmitSound("buttons/button2.wav", 80, 100)
+    		return false
+		elseif !ply:IsSuperAdmin() then
+            sBMRP.ChatNotify({ply}, "Error", "Its not ready!")
+            return false
+        end
+    elseif entID == amsControls.stageOne then
+    	if amsStage > 2 then
+    		ent:EmitSound("buttons/button2.wav", 80, 100)
+    		return false
+    	end
+    end
 
 end
 

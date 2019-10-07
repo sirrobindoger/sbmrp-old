@@ -39,10 +39,17 @@ local HECU_Codes = {
 	["Yellow"] = {
 		color = {212, 184, 28, 156},
 		text = "Potential Active Threat(s)",
-		canenterbmrf = true,
+		canenterbmrf = false,
 		candamage = 1,
 		order = 2,
 	},
+	["Blue"] = {
+		color = {0, 47, 128, 156},
+		text = "BMRF Evacuation",
+		canenterbmrf = true,
+		candamage = 1,
+		order = 5,
+	}
 }
 
 
@@ -88,10 +95,12 @@ if SERVER then
 		if oldcodetbl.canenterbmrf and not newcodetbl.canenterbmrf then
 			sBMRP.HECUAllowAll(false)
 			sBMRP.LocationScan()
+			sBMRP.ChatNotify(player.GetHECU(), "Info", "BMRF entry revoked.")
 			sBMRP.ChatNotify( player.GetAdmins(),"Info", "Automatically removed the HECU to BMRF entry. (only admins can see this)")
 		elseif not oldcodetbl.canenterbmrf and newcodetbl.canenterbmrf then -- the new code can enter BMRF
 			sBMRP.HECUAllowAll(true)
 			sBMRP.LocationScan()
+			sBMRP.ChatNotify(player.GetHECU(), "Info", "BMRF entry granted.")
 			sBMRP.ChatNotify( player.GetAdmins(),"Info", "Automatically gave the HECU entry to BMRF. (only admins can see this)")
 
 		end
@@ -173,38 +182,29 @@ if CLIENT then
 		if not ply:IsHECU() then return end
 		surface.SetFont(codefont)
 		local codename = GetGlobalString("HECUCode", "Green")
-		local titlename = "HECU Code: "
+		local titlename = "HECU Code"
 
 		local titlesize = surface.GetTextSize(titlename)
-		local textsize = surface.GetTextSize(codename)
 		local subtextsize = surface.GetTextSize(HECU_Codes[codename].text)
-		local boxlength = 190
-
-		local titlepos = 533 + math.abs(boxlength-titlesize)/2
-		local codepos = 553 + math.abs(boxlength-textsize)/2
-		local subpos = 533 + math.abs(boxlength-subtextsize)
+		local boxSize = 210
 		
 		-- Box
 		surface.SetDrawColor( 0, 0, 0, 255 )
-		surface.DrawRect( ScrW() *(553/1280), ScrH()*(0/720), ScrW() *(boxlength/1280),ScrH() *(40/720))
+		surface.DrawRect(ScrW()/2 - boxSize/2, 0, boxSize, 40)
+
 		-- Header
 		surface.SetDrawColor( 50,50,50, 255 )
-		surface.DrawRect( ScrW() *(553/1280), ScrH()*(0/720),ScrW() *(boxlength/1280),ScrH()*(20/720) )
+		surface.DrawRect(ScrW() / 2 - boxSize/2, 0, boxSize, 20)
 		-- Color box
 		surface.SetDrawColor( unpack(HECU_Codes[codename].color))
-		surface.DrawRect( ScrW() *(553/1280), ScrH()*(20/720),ScrW() *((boxlength)/1280), ScrH()*(20/720) )
+		surface.DrawRect(ScrW() / 2 - boxSize/2, 20, boxSize, 20)
 		-- Title
 		surface.SetTextColor(255,255,255,100)
-		surface.SetTextPos(ScrW() *(titlepos/1280),0)
+		surface.SetTextPos(ScrW()/2 - titlesize/2, 0)
 		surface.DrawText(titlename)
-		-- Title 1
-		surface.SetTextColor(unpack(HECU_Codes[codename].color))
-		surface.SetTextPos(ScrW() *(titlepos*1.16 /1280),0)
-		surface.DrawText(codename)
-
 		-- subtext 1
-		surface.SetTextColor(255,255,255)
-		surface.SetTextPos(ScrW() *(subpos/1280),ScrH()*(20/720))
+		surface.SetTextColor(255,255,255, 150)
+		surface.SetTextPos(ScrW()/2 - subtextsize/2, 20)
 		surface.DrawText(HECU_Codes[codename].text)
 	end)
 end

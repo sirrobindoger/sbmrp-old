@@ -73,6 +73,19 @@ removepac:addParam{ type=ULib.cmds.StringArg, completes=playernames(), hint="Nam
 removepac:defaultAccess( ULib.ACCESS_ADMIN)
 removepac:help( "Grants the target player or steamid PAC3 permissions." )
 
+
+function ulx.voxban(ply, targets)
+	targ = targets[1] or false
+	if targ and !targ:IsAdmin() then
+		targ:SetPData("voxBanned", true)
+		ulx.fancyLog(player.GetAll(), "#P voxbanned #P.", ply, targ)
+	end
+end
+local voxban = ulx.command(CATEGORY_NAME .. " - Players", "ulx voxban", ulx.voxban, "!voxban", true, false)
+voxban:addParam{ type=ULib.cmds.PlayersArg }
+voxban:defaultAccess(ULib.ACCESS_ADMIN)
+voxban:help("VOX Ban a player from using it as Facility Administrator.")
+
 --[[-------------------------------------------------------------------------
 Set Model
 ---------------------------------------------------------------------------]]
@@ -250,6 +263,7 @@ local GoodCodes = {
 	["Green"] = true,
 	["Black"] = true,
 	["Red"] = true,
+	["Blue"] = true,
 }
 
 

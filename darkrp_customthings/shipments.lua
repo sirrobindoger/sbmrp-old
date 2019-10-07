@@ -211,6 +211,20 @@ DarkRP.createShipment("AWP", {
     allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
+
+DarkRP.createShipment("Leash", {
+    model = "models/items/boxmrounds.mdl",
+    entity = "weapon_leash_default",
+    price = 0,
+    amount = 1,
+    separate = true,
+    pricesep = 0,
+    noship = true,
+    customCheck = function(ply) if JobRanks[ply:Team()] and JobRanks[ply:Team()].Entities["tfcss_awp_alt"] and JobRanks[ply:Team()].Entities["tfcss_awp_alt"] > ply:GetJobRank() then return false else return true end end,
+    CustomCheckFailMsg = function(ply) return "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["tfcss_awp_alt"] .. " to purchase this." end,
+    allowed = {TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
+    onBought = function(ply, shipment) ply:Give(shipment.entity) end,
+})
 --[[-------------------------------------------------------------------------
 MISC
 ---------------------------------------------------------------------------]]

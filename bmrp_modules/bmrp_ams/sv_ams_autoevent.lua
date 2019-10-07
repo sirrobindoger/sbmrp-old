@@ -11,7 +11,7 @@ sound.Add( {
     volume = 1.0,
     level = 80,
     pitch = { 100 },
-    sound = "ambience/zapmachine.wav"
+    sound = "ambient/levels/citadel/stalk_StalkerTrainInterior_Loop.wav"
 } )
 sound.Add( {
     name = "bmrp_ams_start",
@@ -19,7 +19,7 @@ sound.Add( {
     volume = 1.0,
     level = 80,
     pitch = { 100 },
-    sound = "env/ams_start.wav"
+    sound = "ambient/levels/citadel/stalk_StalkerTrainStartUp.wav"
 } )
 sound.Add( {
     name = "bmrp_ams_zap",
@@ -31,44 +31,59 @@ sound.Add( {
 } )
 
 
+--[[-------------------------------------------------------------------------
+flicker pattersn
+mmnmmommommnonmmonqnmmo
+mmnnmmnnnmmnn
+nmonqnmomnmomomno
+---------------------------------------------------------------------------]]
 
-function sBMRP.AMS.SetRotorSpeed(speed)
-    ents.GetMapCreatedEntity(5369):SetKeyValue("speed",speed)
+
+local function setRotorSpeed(int)
+	table.Iterate(ents.GetAll(), function(v) 
+		if v:GetName():find("zap") then 
+			v:SetKeyValue("speed", tostring(int)) 
+		end 
+	end)
 end
 
+local function probeArmsOpen(bool)
+	table.Iterate(ents.GetAll(), function(v) 
+		if v:GetName():find("probe_arm_*") then
+			timer.Simple(1, function()
+				v:Fire(!bool && "Open" || "Close") 
+			end)
+		end 
+	end)
+end
+
+sBMRP.MapHook("close_probe", function()
+	probeArmsOpen(false)
+end)
 
 
 sBMRP.AMS.StateChange = {
 	[0] = function(state)
-		for k,v in pairs(ents.GetAll()) do if v:GetName() == "floor_spotlight_1" then v:Fire("TurnOff") end end
-	    amsCore:EmitSound("ambient/levels/labs/teleport_winddown1.wav", 80, 100, 1) 
+		table.Iterate(ents.FindByName("floor_spotlight_1"), function(v) v:Fire("TurnOff") end)
+		table.Iterate(player.InLocation("AMS Chamber"), function(v) v:SendLua([[util.ScreenShake( Vector( 0, 0, 0 ), 5, 5, 4, 5000 )]]) end)
+	    amsCore:EmitSound("ambient/levels/labs/teleport_winddown1.wav", 80, 100, 1)
 	    amsCore:EmitSound("ambient/energy/powerdown2.wav", 80, 95, 1)
-	    amsCore:StopSound("bmrp_ams_")
+	    amsCore:EmitSound("ambient/levels/citadel/stalk_StalkerTrainXtraBump03.wav", 80, 40, 1)
 	    amsCore:StopSound("bmrp_ams_start")
-	    timer.Remove("sBMRP.AMSTEST")
+	    amsCore:StopSound("bmrp_ams_")
+	    probeArmsOpen(false)
 	end,
 	[1] = function(state)
 		if state then
-			for k,v in pairs(player.GetAll()) do if GetLocation(v) == "AMS Chamber" then v:SendLua([[util.ScreenShake( Vector( 0, 0, 0 ), 5, 5, 4, 5000 )]]) end end
-			local rotorspeed = { {3, 5}, {8, 10}, {10,15}, {15, 35} }
-	        sBMRP.AMS.SetRotorSpeed(1)
-	        for k,v in pairs(rotorspeed)do
-	            timer.Simple(v[1], function()
-	                sBMRP.AMS.SetRotorSpeed(v[2])
-	            end)
-	        end
+			probeArmsOpen(true)
+			table.Iterate(ents.FindByName("floor_spotlight_1"), function(v) v:SetKeyValue("pattern", "mmnmmommommnonmmonqnmmo") v:Fire("TurnOn") end)
+			table.Iterate(player.InLocation("AMS Chamber"), function(v) v:SendLua([[util.ScreenShake( Vector( 0, 0, 0 ), 5, 5, 4, 5000 )]]) end)
 	        amsCore:EmitSound("bmrp_ams_start")
-	        sBMRP.ShakeMap(1)
-	        muteSound = true
-	        timer.Create("sBMRP.AMSTEST", 11, 1, function()
-	        	muteSound = false
-	            if sBMRP.AMS.state != 0 then
-	                sBMRP.AMS.SetRotorSpeed(70)
-	                amsCore:EmitSound("bmrp_ams_")
-	            end
-	        end)
+	        amsCore:EmitSound("bmrp_ams_")
 	        amsCore:EmitSound("ambient/machines/thumper_startup1.wav", 75, 47, 1)
+
 	    else
+
 		    amsCore:EmitSound("vehicles/apc/apc_shutdown.wav")
             amsCore:StopSound("vehicles/apc/apc_start_loop3.wav")
 	    end
@@ -84,6 +99,18 @@ sBMRP.AMS.StateChange = {
 	end,
 	[3] = function(state)
 
+	if state then
+		--sBMRP.UpdateEngineLight("mmnmmommommnonmmonqnmmo")
+		--RunConsoleCommand("vox", "deeoo", "warning", "high", "energy", "field", "detected", "in", "anomalous", "test", "lab")
+		amsCore:EmitSound("weapons/stunstick/alyx_stunner2.wav")
+		amsCore:EmitSound("ambient/levels/citadel/zapper_warmup1.wav")
+		amsCore:EmitSound("ambient/levels/intro/Rhumble_2_12_13.wav")
+	else
+		amsCore:EmitSound("npc/scanner/cbot_discharge1.wav")
+	end
+
+
+
 	end,
 	[4] = function(state)
 
@@ -93,12 +120,12 @@ sBMRP.AMS.StateChange = {
 
 
 
---[[hook.Add("EntityEmitSound", "silence_ams", function(data)
-    ent = data.Entity
-    if data.SoundName == "ambience/zapmachine.wav" and not muteSound then
-        return false
+hook.Add("EntityEmitSound", "silence_ams", function(data)
+    if data.SoundName == "ambience/steamburst1.wav" then
+    	data.SoundName = "hl1/ambience/steamburst1.wav"
+        return true
     end
-end)]]--
+end)
 
 
 

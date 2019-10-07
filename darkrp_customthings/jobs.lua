@@ -643,7 +643,7 @@ TEAM_VORT = DarkRP.createJob("Vortigaunt", {
     description = [[You are a Vortigaunt. You were born on XEN to protect it with your life. 
     Do not leave XEN or you will be banned from the job for a period of time. 
     The only reason to leave XEN is with authorization or during a cascade]],
-    weapons = {"swep_vortigaunt_beam","mininglaser"},
+    weapons = {"swep_vortigaunt_beam","mininglaser", "weapon_fists"},
     command = "vortigaunt",
     max = 10,
     admin = 0,

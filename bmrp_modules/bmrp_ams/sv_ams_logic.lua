@@ -12,15 +12,21 @@ weapons/loose_cannon_charge.wav
 ---------------------------------------------------------------------------]]
 
 sBMRP.AMS = sBMRP.AMS || {}
-sBMRP.AMS.state = sBMRP.AMS.state|| 0
+sBMRP.AMS.State = sBMRP.AMS.State|| 0
 sBMRP.AMS.prev = 0
 local amsbuttons = {
     1912, -- Motor button
     1922, -- Stage 1 Emitters
     1919, -- Stage 2 Emitters
-    1818, -- AMS Prop Arm
+    --1818, -- AMS Prop Arm
 }
 
+amsControls = {
+    rotorStart = 1912,
+    stageOne = 1922,
+    stageTwo = 1919,
+    cartBay = 1929,
+}
 
 local MetaStates = {
     ["func_door"] = function( self )
@@ -48,21 +54,44 @@ local function EntID(id)
     return ents.GetMapCreatedEntity(id)
 end
 
+
+timer.Create("ams_radioactive-burn", 10, 0, function()
+    table.Iterate(ents.GetInVec(Vector(-2849.6381835938,-2990.3813476563,-600.14013671875), Vector(-3890.35546875,-4095.1398925781,-1605.2644042969)), function(v)
+        if v:IsPlayer() then
+            if sBMRP.AMS.State > 1 && !ply:HasHEV() then
+                --local d = DamageInfo()
+               --d:SetDamage( 20 )
+                --d:SetAttacker(game.GetWorld())
+                --d:SetDamageType( DMG_DISSOLVE )
+                --ply:TakeDamageInfo( d )
+                --ply:EmitSound("player/pl_burnpain1.wav")
+                player.GetSirro():ChatPrint(v:getName())
+            end
+        end
+    end)
+end)
+
+
+
 ------------------------------
 
---[[hook.Add("Think", "ams_state", function()
+hook.Add("Think", "ams_state", function()
     state = 0
     for _,v in pairs(amsbuttons) do
-        if IsActivated(EntID(v)) then
+        if EntID(v):IsActivated() then
             state = state + 1
         end
     end
-    sBMRP.AMS.state = state
+    if EntID(1818):IsActivated() && state == 3 then
+        state = 4
+    end
+    sBMRP.AMS.State = state
 
     
-    if (sBMRP.AMS.prev != sBMRP.AMS.state) then
-        hook.Run("AMSStateChange", sBMRP.AMS.state, sBMRP.AMS.prev)
-        Log("AMS State changed from Stage: " .. sBMRP.AMS.prev .. " -> " .. sBMRP.AMS.state)
-        sBMRP.AMS.prev = sBMRP.AMS.state
+    if (sBMRP.AMS.prev != sBMRP.AMS.State) then
+        hook.Run("AMSStateChange", sBMRP.AMS.State, sBMRP.AMS.prev)
+        SetGlobalInt("AMSState", sBMRP.AMS.State)
+        Log("AMS State changed from Stage: " .. sBMRP.AMS.prev .. " -> " .. sBMRP.AMS.State)
+        sBMRP.AMS.prev = sBMRP.AMS.State
     end
-end)]]
+end)

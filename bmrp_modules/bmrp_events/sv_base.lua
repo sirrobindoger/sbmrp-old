@@ -44,7 +44,7 @@ function sBMRP.Event.SetActive( event, stage )
 
 
 
-		sBMRP.Event.SetupEvent(event, stage || 1)
+	sBMRP.Event.SetupEvent(event, stage || 1)
 
 end
 
@@ -55,6 +55,7 @@ function sBMRP.Event.SetupEvent(event, stage)
 	sBMRP.Event.aEvents[ event ].Hooks = {}
 	sBMRP.Event.aEvents[ event ].Timers = {}
 	sBMRP.Event.aEvents[ event ].Entities = {}
+	sBMRP.Event.aEvents[ event ].OnEnd = {}
 	sBMRP.Event.aEvents[ event ].Stage = stage || 1
 	sBMRP.Event.aEvents[ event ].Meta = Event
 
@@ -69,6 +70,7 @@ function sBMRP.Event.UpdateEvent(rEvent, aEvent, stage)
 	-------------Cleanup old varibles----------
 	for k,v in pairs(aEvent.Hooks) do hook.Remove(v[1], v[2]) end
 	for k,v in pairs(aEvent.Timers) do timer.Remove(v) end
+	for k,v in pairs(aEvent.OnEnd) do v() end
 	for k,v in pairs(aEvent.Entities) do
 		if v.EventPersistant then
 			continue
@@ -78,9 +80,8 @@ function sBMRP.Event.UpdateEvent(rEvent, aEvent, stage)
 		end
 		table.remove(aEvent.Entities, v)
 	end
-	tRemove({aEvent.Hooks, aEvent.Timers})
+	tRemove({aEvent.Hooks, aEvent.Timers, aEvent.OnEnd})
 	------------------------------------------
-
 	for flag, func in pairs(rEvent[stage]) do
 		if flag == "UpdateStage" then
 			table.insert(aEvent.Hooks, {"Think","update-stage-think_" .. aEvent.Name})
@@ -112,10 +113,12 @@ function sBMRP.Event.UpdateEvent(rEvent, aEvent, stage)
 
 				hook.Add(hooks[1], hookname, hooks[2])
 			end
-		elseif flag == "Functions" then
-			for k,func in pairs(rEvent[stage]["Functions"]) do
+		elseif flag == "OnStart" then
+			for k,func in pairs(rEvent[stage]["OnStart"]) do
 				pcall(function() func(ply) end)
 			end
+		elseif flag == "OnEnd" then
+			table.insert(aEvent.OnEnd, func)
 		elseif flag == "Entities" then
 			for _, enttab in pairs(rEvent[stage]["Entities"]) do
 				local eEnt = ents.Create(enttab[1])
@@ -137,13 +140,13 @@ function sBMRP.Event.SetInactive(event)
 	local rEvent, aEvent = getEvent(event), getEvent(event, true)
 	for k,v in pairs(aEvent.Hooks) do hook.Remove(v[1], v[2]) end
 	for k,v in pairs(aEvent.Timers) do timer.Remove(v) end
+	for k,v in pairs(aEvent.OnEnd) do v[1]() end
 	for k,v in pairs(aEvent.Entities) do
 		if v and v:IsValid() then
 			v:Remove()
 		end
 		table.remove(aEvent.Entities, k)
 	end
-	tRemove({aEvent.Hooks, aEvent.Timers})
 	sBMRP.Event.aEvents[event] = nil
 
 

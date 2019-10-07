@@ -95,6 +95,21 @@ if SERVER then
 		return ents.GetMapCreatedEntity(ent)
 	end
 
+	function ply:AntiSpam()
+		local ply = self
+		if ply.antispam_use == nil or ply.antispam_use == 0 then -- cBMRP antispam code
+			ply.antispam_use = 1
+			timer.Destroy("gm_"..ply:SteamID().."_antispam_use")
+			timer.Create("gm_"..ply:SteamID().."_antispam_use", 0.25, 1, function()
+				ply.antispam_use = 0
+			end )
+			return true
+		else
+			return false
+		end
+	end
+
+
 	--[[
 		IDK why nobody thought of this, so I made it myself.
 		Returns the vector but with rounded values.
@@ -161,7 +176,7 @@ if SERVER then
 	    else
 	        engine.LightStyle(0,"vvvbvprvvbvpcvvvvdvf")
 	        timer.Simple(2, function()
-	            engine.LightStyle(0,"vvvpvvpvs")
+	            engine.LightStyle(0,"jklmnopqrstuvwxyzyxwvutsrqponmlkj")
 	        end)
 	    end        
 	    timer.Simple(7, function()
@@ -177,7 +192,7 @@ if SERVER then
 	    if optional == 1 then
 	        for k,v in pairs(player.GetAll()) do
 	            v:SendLua([[
-	                surface.PlaySound("env/rumble_shake.wav")]])
+	                surface.PlaySound("ambient/levels/intro/Rhumble_1_42_07.wav")]])
 	        end
 	    else
 	        for k,v in pairs(player.GetAll()) do
@@ -199,7 +214,13 @@ if SERVER then
 		end
 	end
 
-
+	function ents.sMapEnt(id, func)
+		local ent = ents.GetMapCreatedEntity(id)
+		if IsValid(ent) then
+			func(ent)
+			return true
+		end
+	end
 	--[[
 		Resets all the doors in the map to unownable, this is used for resetting up doors when a map update happens.
 	]]
@@ -326,7 +347,7 @@ end
 function ents.GetInVec(vec1,vec2)
 	local l = {}
 	for k,v in pairs(ents.GetAll()) do
-		if v:WithinAABox(vec1, vec2) then
+		if v:GetPos():WithinAABox(vec1, vec2) then
 			table.insert(l, v)
 		end
 	end
@@ -345,7 +366,7 @@ function player.InLocation(loc)
 			istrue = true
 		end
 	end
-	return #e > 1 and e or false
+	return e
 end
 
 --[[
@@ -360,7 +381,7 @@ function ents.InLocation(loc)
 			istrue = true
 		end
 	end
-	return #e > 1 and e or false
+	return e
 end
 
 --[[
