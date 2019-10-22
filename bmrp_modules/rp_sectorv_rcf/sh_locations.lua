@@ -131,3 +131,4 @@ sBMRP Locations
 
 
 
+	--Material("MODELS/PLAYER/SHARED/GOLD_PLAYER"):SetTexture( "$basetexture", Material("models/player/shared/gold_player"):GetTexture("$basetexture") )

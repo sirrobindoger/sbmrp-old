@@ -2,6 +2,7 @@
 Sirro"s Prop Protection (recoded)
 ---------------------------------------------------------------------------]]
 sPropProtection = sPropProtection || {}
+require("fps")
 
 local eMeta = FindMetaTable("Entity")
 local pMeta = FindMetaTable("Player")
@@ -23,6 +24,7 @@ CONFIG
 local NoDamageEnts = { -- list of damage types player"s can"t be damaged by
 	["entityflame"] = true, -- flames
 	["prop_physics"] = true, -- props
+	["prop_vehicle_prisoner_pod"] = true, -- prop pod?
 	["worldspawn"] = false, -- fall damage
 	["func_movelinear"] = true, -- moving map entites
 	["prop_ragdoll"] = true, -- ragdolls
@@ -34,7 +36,7 @@ local NoDamageEnts = { -- list of damage types player"s can"t be damaged by
 
 -- The precentage at which if a prop exceeds at on being outside the world, is blocked from being spawned
 -- Ex. Spawning a massive prop in a small room will result in most of the prop being outside the world
-sPropProtection.PropPrecentage = 50 --%
+sPropProtection.PropPrecentage = 75// percent
 
 --[[-------------------------------------------------------------------------
 END OF CONFIG
@@ -130,6 +132,27 @@ hook.Add("CanProperty", "bmrp_fireblock", function(ply, ent) -- smoking isn"t co
 end)
 
 --[[-------------------------------------------------------------------------
+Lag Checks
+---------------------------------------------------------------------------]]
+local Delay = SysTime() + 30
+hook.Add("Think", "sPP.Tick", function()
+	local systime = SysTime()
+	if Delay and Delay > systime then return end
+
+	local realframetime = engine.RealFrameTime()
+	if realframetime >= 0.5 then -- We're seriously lagging
+		RunConsoleCommand( "phys_timescale", "0" )
+		sBMRP.ChatNotify(player.GetAll(), "Server", "Server physics frozen! Resuming in 30 seconds.")
+		game.ConsoleCommand("darkrp admintellall Server physics have been frozen temporaraly.\n")
+		timer.Simple(30, function()
+			RunConsoleCommand( "phys_timescale", "1" )
+			sBMRP.ChatNotify(player.GetAll(), "Server", "Server physics have been unfrozen.")
+		end)
+
+	end
+	Delay = systime + 30
+end)
+--[[-------------------------------------------------------------------------
 Blocking some known exploits (credits to Crident"s anticrash for this one)
 ---------------------------------------------------------------------------]]
 hook.Add( "CanTool", "sPropProtection.CanTool", function( ply, tr, tool ) -- Stop people fucking with tools
@@ -187,7 +210,7 @@ hook.Add("PlayerSpawnProp", "sPropProtection_primary", function(ply, model, stac
 	local precentageoutside = math.Round( numoutside / totalmesh * 100)
 
 	if precentageoutside >= sPropProtection.PropPrecentage then
-		ply:Notify("This prop is " .. precentageoutside .. "% outside the world; cannot fit!", 1, 3)
+		ply:Notify("Prop cannot fit [" .. precentageoutside .. "% outside].", 1, 3)
 		Log(ply:GetName() .. " tried to spawn in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 		prop:Remove()
 		return false
@@ -249,4 +272,15 @@ for k,v in pairs({"PlayerInitalSpawn", "PlayerDisconnected"}) do
 	hook.Add(v, "sPP_CollisionCheck", function()
 		doCollisionCheck(#player.GetHumans())
 	end)
+end
+
+function findPenetratingPhys(prop)
+    local min, max = prop:GetModelBounds()
+    local penetratingEnts = {}
+    for k,v in pairs(ents.FindByClass("prop_physics")) do
+        if v:GetPos():WithinAABox(min, max) && v:GetPhysicsObject():IsMotionEnabled() then
+            table.insert(penetratingEnts, v)
+        end
+    end
+    return penetratingEnts
 end

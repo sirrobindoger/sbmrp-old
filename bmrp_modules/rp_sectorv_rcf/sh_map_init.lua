@@ -288,6 +288,7 @@ if SERVER then
 
 end
 
+
 --3497
 hook.Add("EntityTakeDamage", "breakable_forcegod", function(ent, data)
 	if ent:MapCreationID() == 3497 && !sBMRP.Cascade then

@@ -524,6 +524,22 @@ if CLIENT then
 		sBMRP.Fonts[name] = true
 		return "sBMRP." .. name
 	end
+
+
+	properties.Add( "contextcopymodel", {
+		MenuLabel = "Copy Model",
+		Order = 999,
+		MenuIcon = "icon16/page_attach.png",
+
+		Filter = function( self, ent, ply )
+			if ( !IsValid( ent ) ) then return false end
+			return true
+		end,
+
+		Action = function( self, ent )
+			SetClipboardText(ent:GetModel())
+		end
+	})
 end
 
 

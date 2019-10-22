@@ -824,7 +824,7 @@ TEAM_HECUCOMMAND = DarkRP.createJob("HECU Sergeant", {
         --"models/bms_hecu_classic_marine_v3.mdl", -- reverie
     },
     description = [[You are the head of the onsight millitary; H.E.C.U. Lead the main force of security of BMRF, and to make sure that all unauthorized personnel are taken care of.]],
-    weapons = {"weapon_bms_shotgun","weapon_bms_mp5","itemstore_pickup"},
+    weapons = {"tfa_bms_shotgun","weapon_bms_mp5","itemstore_pickup"},
     command = "hecucommander",
     max = 1,
     admin = 0,

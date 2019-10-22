@@ -18,6 +18,7 @@ local function sCON_ErrorMSG(reason, messageClass)
 	}
 end
 
+local timeToStr = Utime.timeToStr
 
 --[[-------------------------------------------------------------------------
 Hello world test command
@@ -27,6 +28,36 @@ sCON:RegisterCommand("ping", function(message)
 	message:ReturnResponse("Hello " .. author:Nick() .. "!")
 end)
 
+--[[-------------------------------------------------------------------------
+gmodstore scanner
+---------------------------------------------------------------------------]]
+local GM_JOBS = {"NULL"}
+local function getGmodStore(int)
+	http.Fetch("https://www.gmodstore.com/jobmarket/jobs/browse?sortby=new&page=" .. int, function(body)
+		local e = body:Split("\n")
+		GM_JOBS = {}
+		for k,v in pairs(e) do
+			if v:find("placement") then
+				table.insert(GM_JOBS, v:sub(85):Replace('"', ""):Replace(">", ""))
+			end
+		end
+	end)
+end
+
+sCON:RegisterCommand("gm_jobs", function(message)
+	local page = message:Args()[1] or 1
+	if message:GetAuthor():HasRole("Owner") then
+		getGmodStore(page)
+		timer.Simple(3, function()
+			message:ReturnResponse({
+				title = "**Gmodstore jobs** (Page " .. page .. ")",
+				url = "https://www.gmodstore.com/jobmarket/jobs/browse?sortby=new&page=" .. page,
+				description = table.concat(GM_JOBS, "\n"),
+				color = 8781827, -- color stays the same
+			})
+		end)
+	end
+end)
 
 --[[-------------------------------------------------------------------------
 Find command
@@ -167,14 +198,12 @@ Status
 ---------------------------------------------------------------------------]]
 
 sCON:RegisterCommand("status", function(message)
-    local staffcount = 0
-	for k,v in pairs(player.GetAll()) do 
+	local staffcount = 0
+	for k,v in pairs(player.GetAll()) do
 		if v:IsAdmin() then
 			staffcount = staffcount + 1
 		end
-    end
-    local TimeString = os.date( "%H:%M:%S - %d/%m/%Y" , Timestamp )
-	local time = CurTime() 
+	end
 	local uptime = string.format("%.2d:%.2d:%.2d",
 		math.floor(CurTime() / 60 / 60), -- hours
 		math.floor(CurTime() / 60 % 60), -- minutes
@@ -423,7 +452,7 @@ end)
 
 
 sCON:RegisterCommand("unban", function(message)
-	if not message:GetAuthor():HasRole("Offical Staff") then message:ReturnResponse(unauthorized_message) return end
+	if not message:GetAuthor():HasRole("Staff") then message:ReturnResponse(unauthorized_message) return end
 	local target = message:Args()[1]
 
 	if string.starts(target,"STEAM_") then

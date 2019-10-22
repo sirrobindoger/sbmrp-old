@@ -144,14 +144,14 @@ HEAVY ARMS
 
 DarkRP.createShipment("SPAS-12", {
     model = "models/bms/weapons/w_shotgun.mdl",
-    entity = "weapon_bms_shotgun",
+    entity = "tfa_bms_shotgun",
     price = 1500,
     amount = 1,
     separate = true,
     pricesep = 600,
     noship = true,
-    customCheck = function(ply) if JobRanks[ply:Team()] and JobRanks[ply:Team()].Entities["weapon_bms_shotgun"] and JobRanks[ply:Team()].Entities["weapon_bms_shotgun"] > ply:GetJobRank() then return false else return true end end,
-    CustomCheckFailMsg = function(ply) return "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["weapon_bms_shotgun"] .. " to purchase this." end,
+    customCheck = function(ply) if JobRanks[ply:Team()] and JobRanks[ply:Team()].Entities["tfa_bms_shotgun"] and JobRanks[ply:Team()].Entities["tfa_bms_shotgun"] > ply:GetJobRank() then return false else return true end end,
+    CustomCheckFailMsg = function(ply) return "You must be Lvl. " ..  JobRanks[ply:Team()].Entities["tfa_bms_shotgun"] .. " to purchase this." end,
     allowed = {TEAM_SECURITYCHEIF,TEAM_SECURITY, TEAM_HECUCOMMAND,TEAM_HECUMED,TEAM_HECU,TEAM_HECUSPECOPS},
     onBought = function(ply, shipment) ply:Give(shipment.entity) end,
 })
