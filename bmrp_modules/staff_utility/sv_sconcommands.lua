@@ -450,6 +450,35 @@ sCON:RegisterCommand("ban", function(message)
 	end
 end)
 
+sCON:RegisterCommand("msg", function(message)
+	local rtarg = message:Args()[1]
+	local targ = sCON:findPlayer(rtarg)
+	local msg = table.concat(message:Args(), " "):Replace(rtarg, ""):Trim() || "Something broke"
+	local author = message:GetAuthor():Nick()
+	if targ then
+		targ:AddText(Color(225, 25, 255), "[Discord - PM] " .. author .. " to you: ", Color(225, 255, 255), msg)
+		message:ReturnResponse({
+			title = author .. " to " .. targ:Nick(),
+			description =  "```" .. msg .. "```",
+			color = 2031360,
+			timestamp = message.timestamp,
+			footer = {
+				text = "sCON"
+			},
+		})
+	else
+		message:ReturnResponse({
+			title = "**Error**",
+			description = "Could not find player.",
+			color = 16711689,
+			timestamp = message.timestamp,
+			footer = {
+				text = "sCON"
+			},
+		})		
+	end
+
+end)
 
 sCON:RegisterCommand("unban", function(message)
 	if not message:GetAuthor():HasRole("Staff") then message:ReturnResponse(unauthorized_message) return end

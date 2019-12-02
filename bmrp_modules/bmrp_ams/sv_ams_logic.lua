@@ -95,3 +95,8 @@ hook.Add("Think", "ams_state", function()
         sBMRP.AMS.prev = sBMRP.AMS.State
     end
 end)
+
+
+--timer.Create("test_amsdist", 1,1, function()
+--    player.GetSirro():ChatPrint(player.GetSirro():GetPos():Distance(Vector(-3370.8483886719,-3503.1198730469,-1319.6999511719)))
+--end)

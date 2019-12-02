@@ -1,3 +1,7 @@
+print("sh_powerevent disabled.")
+
+if true then return end
+
 if SERVER then
 	local POWER_EVENT = {}
 	POWER_EVENT["SetupStage"] = {}

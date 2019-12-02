@@ -6,15 +6,16 @@ local function AntiRDM(ent,dmginfo)
 	local inf = dmginfo:GetInflictor()
 	local att = dmginfo:GetAttacker()
 	if inf == NULL or inf == nil or att == NULL or inf == nil or (inf:GetClass() == nil and not(att:IsPlayer())) then return end
-	if ent:IsPlayer() and att:IsPlayer() and !att:CanHurt(ent) then
+	if ent:IsPlayer() and att:IsPlayer() and att:CanHurt(ent) == 0 then
+		ent:ChatPrint("Faggot")
 		return true
+	elseif att:IsPlayer() and att:CanHurt(ent) == 1 then
+		dmginfo:ScaleDamage(0.5)
 	end
 end
-
-
-
 hook.Add("EntityTakeDamage", "sBMRP_AntiRDM", AntiRDM)
 
+hook.Remove("ScalePlayerDamage", "bm_scaledamage")
 
 --[[-------------------------------------------------------------------------
 Locational Restrictions
@@ -324,7 +325,7 @@ local function AntiPropSpawn(ply, model, entity)
 	elseif sBMRP.DisablePropsSpawn and !ply:IsAdmin() then
 		ply:ChatPrint("Prop Spawning has been disabled by staff.")
 		entity:Remove()
-	elseif !ply:IsAdmin() or (!ply.AdvDupe2 or !ply.AdvDupe2.Pasting) then
+	elseif (!ply.AdvDupe2 or !ply.AdvDupe2.Pasting) then
 		if tonumber(ply:getDarkRPVar("money")) <= 0 then return end
 		ply:addMoney(sBMRP.PropTax or -1)
 	end

@@ -28,7 +28,7 @@ DarkRP.createEntity("Radio", {
 ]]--
 
 
---[[DarkRP.createEntity("Terminal",{
+DarkRP.createEntity("Terminal",{
 	ent = "sent_computer",
 	model = "models/props_lab/monitor01a.mdl",
 	price = 0,
@@ -36,7 +36,7 @@ DarkRP.createEntity("Radio", {
 	cmd = "buyterminal",
 	allowed = {TEAM_ITTECH},
 	category = "IT Equipment"
-})]]--
+})
 
 DarkRP.createEntity("Crystal Storage", {
 	ent = "tester_storage",

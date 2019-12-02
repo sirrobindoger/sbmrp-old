@@ -1,3 +1,4 @@
+if true then return end // DISABLED
 CATEGORY_NAME = "BMRP"
 --[[-------------------------------------------------------------------------
 Pac Commands

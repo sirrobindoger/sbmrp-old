@@ -14,82 +14,61 @@ sBMRP Job Info func's
 ---------------------------------------------------------------------------]]
 
 function ply:CanHurt(ent)
-	local damageoverride = hook.Run("AntiRDMOverride", self, ent)
-	-- If the target is not marked "anything can hurt this target", and (the ply in questions is marked "cannot give damage" or the rdmgroup of the target and ply are the same)
-	if not(ent:getJobTable()["rdmnoblockingdamage"]) and (self:getJobTable()["rdmnogivingdamage"] or self:getJobTable()["rdmgroup"] == ent:getJobTable()["rdmgroup"]) and sBMRP.AntiRDM and damageoverride != true then
-		return false --Say no, we cannot hurt this ent
+	local damageOverride = hook.Run("AntiRDMLogic", self, ent)
+	local plyTab, entTab = self:getJobTable(), ent:getJobTable()
+	if damageOverride then
+		return damageOverride
+	elseif plyTab.category == entTab.category then
+		return 0
+	elseif plyTab.rdmgroup != entTab.rdmgroup then
+		return 2
 	else
-		return true --Otherwise fuck it yeah damage it
+		return 1
 	end
 end
 
 function ply:IsAlien()
-	if (self:getJobTable()["isalien"]) then --We need to build a wall
-		return true
-	else return false end
+	return self:getJobTable()["isalien"] --We need to build a wall
 end
 
 function ply:IsBlackMesa()
-	if (self:getJobTable()["isblackmesa"]) then
-		return true
-	else return false end
+	return self:getJobTable()["isblackmesa"]
 end
 
 function ply:IsScience()	
-	if ( self:getJobTable()["isscience"]) then 
-		return true
-	else return false end
+	return self:getJobTable()["isscience"]
 end
 
 function ply:IsBio()
-	if (self:getJobTable()["isbio"]) then
-		return true
-	else return false end
+	return self:getJobTable()["isbio"]
 end
 
 function ply:IsService()
-	if (self:getJobTable() and self:getJobTable()["isservice"]) then
-		return true
-	else return false end
+	return self:getJobTable() && self:getJobTable()["isservice"]
 end
 
 function ply:IsSecurity()
-	if (self:getJobTable()["issecurity"]) then
-		return true
-	else return false end
+	return self:getJobTable()["issecurity"]
 end
 
 function ply:IsHECU()
-	if (self:getJobTable()["ishecu"]) then
-		return true
-	else return false end
+	return self:getJobTable()["ishecu"]
 end
 
 function ply:IsSubject()
-	if(self:getJobTable()["issubject"]) then
-		return true
-	else return false end
+	return self:getJobTable()["issubject"]
 end
 
 function ply:IsSurvey()
-	if (self:getJobTable()["issurvey"]) then
-		return true
-	else return false end
+	return self:getJobTable()["issurvey"]
 end
 
 function ply:IsPill()
-	if(self:getJobTable()["ispill"]) then
-		return true
-	else return false end
+	return self:getJobTable()["ispill"]
 end
 
 function ply:HasHEV()
-	for k,v in pairs({"models/jheviv/jhevmk4.mdl"}) do
-		if (self:GetModel() == v) then
-			return true
-		end
-	end
-	return false
+	return self:GetModel() == "models/jheviv/jhevmk4.mdl"
 end
 
 

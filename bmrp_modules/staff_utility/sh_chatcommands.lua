@@ -1,3 +1,4 @@
+if true then return end // DISABLED
 --[[-------------------------------------------------------------------------
 sBMRP ChatCommand handler
 ---------------------------------------------------------------------------]]
@@ -66,7 +67,6 @@ local validSkyboxes = {
 	"alien2",
 	"alien3",
 	"avanti",
-	"backally",
 	"badlands",
 	"black",
 	"blue",
@@ -83,20 +83,16 @@ local validSkyboxes = {
 	"dustbowl",
 	"forest",
 	"green",
+	"murlock",
 	"neb1",
-	"neb2",
-	"nen6",
 	"neb7",
 	"night",
 	"office",
-	"sky_dawn",
-	"sky_wasteland",
 	"snow",
 	"snowlake_",
 	"space",
 	"tornsky",
 	"trainyard",
-	"tsccity",
 	"xen8",
 	"xen9",
 	"xen10",
