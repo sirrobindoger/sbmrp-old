@@ -318,6 +318,57 @@ end
 
 concommand.Add("animprop_selectname", function() return end)
 
+--[[
+	FAdmin command wrapper (makes things easier)
+]]
+BMRP_SUPERADMIN = 2
+BMRP_ADMIN = 1
+BMRP_ALL = 0
+
+function sBMRP.SetupFAdminCommand(tab)
+	assert(istable(tab), "Table not found.")
+	local name, action, params, level, icon = 
+	tab.name, tab.func,tab.params, tab.level, tab.icon
+
+	if SERVER then
+		-- Server side of the command process.
+		assert(isstring( name ) && isfunction( action ), "You need a name and function!")
+
+		FAdmin.Commands.AddCommand(name, function(ply, cmd, args)
+			-- Does the player have access to run the command?
+			if (level >= 2 && !ply:IsSuperAdmin()) || (level >= 1 && !ply:IsAdmin()) then
+				FAdmin.Messages.SendMessage(ply, 5, "No Access!")
+				return false -- They don't, so bail.
+			end
+			-- They have access
+
+			local ran, message = action(ply, cmd, args) -- Run the command.	
+
+			if !ran then -- some part of the command failed (I.E missing arugment)
+				FAdmin.Messages.SendMessage(ply, 5, message || "[Null Response]")
+				return
+			end
+
+			if message && istable( message ) then
+				FAdmin.Messages.ActionMessage(
+					ply, -- player that ran the command
+					message.targets || player.GetAll(), -- targets that will get the message
+					message.plymsg || "You ran command: " .. name, -- message the player gets
+					message.targetmsg || ply:GetName() .. " ran command: " .. name, -- message the targets get
+					message.consolemsg || ply:GetName() .. " ran command: " .. name -- message the console gets
+				)
+			else
+				ply:ChatPrint("Die")
+			end
+			return true
+		end)
+	else
+		-- Client side of the command process.
+		FAdmin.Commands.AddCommand(name, nil, unpack(params))
+
+	end
+	--FAdmin.Access.AddPrivilege("bmrp_" .. name, tonumber( level ) || BMRP_ADMIN)
+end
 
 --[[
 	Its you!	

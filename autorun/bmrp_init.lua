@@ -2,7 +2,7 @@
 sBMRP -- Coded by Sirro, Fay and Creed et al.
 
 ---------------------------------------------------------------------------]]
-sBMRP = sBMRP || {}
+sBMRP = sBMRP || setmetatable({}, DarkRP)
 sBMRP.LoadedModules = sBMRP.LoadedModules || {}
 sBMRP.version = "2.3 - Events"
 sBMRP.AMS = sBMRP.AMS || {}

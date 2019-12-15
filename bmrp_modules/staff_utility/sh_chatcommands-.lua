@@ -1,3 +1,28 @@
+
+local function test(ply, cmd, args)
+	if !ply:IsSirro() then
+		return false, "you're not sirro you fuckface" -- will fire a FAdmin error message
+	end
+	return true, {
+		targets = player.GetAdmins(), -- who will get the command message
+		targetmsg = "You got fucked.", -- what it says to them
+		plymsg = "You fucked them.", -- what the command message says to the player
+		consolemsg = ply:GetName() .. " fucked them." -- what it says to the console
+
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "test",
+	func = test,
+	params = {"<Player>", "Dingus<1/0>"},
+	level = 2,
+})
+
+
+
+
+
+
 if true then return end // DISABLED
 CATEGORY_NAME = "BMRP"
 --[[-------------------------------------------------------------------------
