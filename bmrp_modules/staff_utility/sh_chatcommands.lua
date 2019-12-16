@@ -1,8 +1,6 @@
-if true then return end // DISABLED
 --[[-------------------------------------------------------------------------
 sBMRP ChatCommand handler
 ---------------------------------------------------------------------------]]
-CATEGORY_NAME = "BMRP"
 -- Useless DarkRP commands
 DarkRP.removeChatCommand("addagenda")
 DarkRP.removeChatCommand("addlaw")
@@ -29,34 +27,50 @@ DarkRP.removeChatCommand("ooc")
 --[[-------------------------------------------------------------------------
 VOX COMMANDS
 ---------------------------------------------------------------------------]]
-StateDisclaimers = { -- don't ask
-	"off",
-	--"cvox",
-	--"cvox-cascade",
-	--"cjohnson",
-	"bms-vox",
-	"bms-cascade",
+local StateDisclaimers = { -- don't ask
+	["off"] = 1,
+	["vox"] = 5,
+	["cascade"] = 6,
 }
 
-function ulx.setvox(calling_ply, state)
-	sBMRP.VOX.State = table.KeyFromValue(StateDisclaimers, state)
-	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the VOX state to #s",calling_ply, state)
+local function setvox(ply, cmd, args)
+	if !StateDisclaimers[ args[1] ] then
+		return false, "Invalid state entered!"
+	else
+		sBMRP.VOX.State = StateDisclaimers(args[1])
+		sBMRP.ChatNotify(player.GetAdmins(),"Staff", ("%s set the VOX state to %s."):format(ply:GetName(), args[1]) )
+		return true, {
+			targets = player.GetAll(),
+			targetmsg = "Staff changed the VOX to " .. args[1],
+			plymsg = "You changed the VOX state.",
+			consolemsg = ply:GetName() .. " set the VOX state to " .. args[1]
+		}
+	end
 end
+sBMRP.SetupFAdminCommand({
+	name = "setvox",
+	func = setvox,
+	params = {"State (off/vox/cascade)"},
+	level = 2
+})
 
-local setvox = ulx.command( CATEGORY_NAME .. " - Chat", "ulx setvox", ulx.setvox, nil, false, false)
-setvox:addParam{ type=ULib.cmds.StringArg, completes=StateDisclaimers, hint="Vox Alert State", error="invalid state \"%s\" specified", ULib.cmds.restrictToCompletes }
-setvox:defaultAccess( ULib.ACCESS_ADMIN)
-setvox:help( "Sets the vox state." )
-
-function ulx.voxtime(calling_ply, time)
-	sBMRP.VOX.Time = tonumber(time)
+local function voxtime(ply, cmd, args)
+	sBMRP.VOX.Time = tonumber(args[1]) || 120
 	sBMRP.VOX.VoxTime = os.time() + sBMRP.VOX.Time
-	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the VOX time interval to #i seconds",calling_ply, time)
+	sBMRP.ChatNotify(player.GetAdmins(),"Staff", ("%s set the VOX time to %s."):format(ply:GetName(), sBMRP.VOX.Time) )
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "Staff changed the VOX time to " .. sBMRP.VOX.Time,
+		plymsg = "You changed the VOX time.",
+		consolemsg = ply:GetName() .. " set the VOX time to " .. sBMRP.VOX.Time
+	}
 end
-local voxtime = ulx.command(CATEGORY_NAME .. " - Chat", "ulx voxtime", ulx.voxtime, nil, false, false )
-voxtime:addParam{type=ULib.cmds.NumArg, min=10, max=720,default=60,hint="time(seconds)",ULib.cmds.round}
-voxtime:defaultAccess(ULib.ACCESS_ADMIN)
-voxtime:help("Sets the vox time in seconds.")
+sBMRP.SetupFAdminCommand({
+	name = "setvox",
+	func = setvox,
+	params = {"State (off/vox/cascade)"},
+	level = 2
+})
 
 --[[-------------------------------------------------------------------------
 Skybox
@@ -99,14 +113,32 @@ local validSkyboxes = {
 }
 
 
-function ulx.skybox(ply, str)
-	sBMRP.ChangeSkybox(str)
-	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the skybox to #s",ply, str)
+local function skybox(ply, cmd, args)
+	if !table.HasValue(validSkyboxes, args[1]) then
+		return false, "Invalid skybox! (Type 'skybox' in console for a list.)"
+	end
+	sBMRP.ChangeSkybox(args[1])
+	sBMRP.ChatNotify(player.GetAdmins(),"Staff", ("%s set the skybox to %s."):format(ply:GetName(), args[1]) )
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "Staff changed the skybox to " .. args[1],
+		plymsg = "You changed the skybox.",
+		consolemsg = ply:GetName() .. " set the skybox to " .. args[1]
+	}
 end
-local skybox = ulx.command( CATEGORY_NAME .. " - Map", "ulx skybox", ulx.skybox, "!skybox", true, false)
-skybox:addParam{ type=ULib.cmds.StringArg, completes=validSkyboxes, hint="Skybox name.", error="invalid skybox \"%s\" specified", ULib.cmds.restrictToCompletes }
-skybox:defaultAccess( ULib.ACCESS_ADMIN)
-skybox:help( "Sets the skybox for all players." )
+sBMRP.SetupFAdminCommand({
+	name = "skybox",
+	func = skybox,
+	params = {"State (Type 'skybox' in console for a list.)"},
+	level = 2
+})
+
+concommand.Add("skybox", function()
+	print("VALID SKYBOXES:")
+	table.Iterate(validSkyboxes, function(v) MsgC(Color(255,255,255), v .. "\n") end)
+	print("Example, /skybox xen8")
+end)
+
 
 --[[-------------------------------------------------------------------------
 Light settings
@@ -116,14 +148,25 @@ local lightTable = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o",
 
 
 
-function ulx.setlight(calling_ply, light)
-	sBMRP.UpdateEngineLight(lightTable[light], true)
-	ulx.fancyLog( player.GetAdmins(), "[Staff]: #P changed the engine light level to #i/26.",calling_ply, light)
+local function setlight(ply, cmd, args)
+	if !table.HasValue(lightTable, args[1]:lower()) then
+		return false, "Invalid value."
+	end
+	sBMRP.UpdateEngineLight(lightTable[args[1]:lower()], true)
+	sBMRP.ChatNotify(player.GetAdmins(),"Staff", ("%s set the light to %s/26."):format(ply:GetName(), args[1]) )
+	return true, {
+		targets = player.GetAdmins(),
+		targetmsg = "Staff changed the light to " .. args[1],
+		plymsg = "You changed the light settings.",
+		consolemsg = ply:GetName() .. " set the light setting to " .. args[1]
+	}
 end
-local setlight = ulx.command(CATEGORY_NAME .. " - Map", "ulx setlight", ulx.setlight, "!setlight", true, false )
-setlight:addParam{type=ULib.cmds.NumArg, min=1, max=26,default=13,hint="Light level.",ULib.cmds.round}
-setlight:defaultAccess(ULib.ACCESS_ADMIN)
-setlight:help("Sets the engine lighting level (1 darkest, 26 lightest).")
+sBMRP.SetupFAdminCommand({
+	name = "setlight",
+	func = setlight,
+	params = {"State (a-z)"},
+	level = 2
+})
 
 
 --[[-------------------------------------------------------------------------
@@ -226,46 +269,28 @@ if SERVER then
 	sBMRP.CreateChatCommand("ooc", OOC, "Global Out-of-character chat.", 1.5)
 end
 
-function ulx.DisableOOC(ply, args)
-	sBMRP.OOCState = !sBMRP.OOCState
-	if sBMRP.OOCState == false then
-		ulx.fancyLog( player.GetAll(), "#P disabled the OOC Chat.",ply)
-	else
-		ulx.fancyLog( player.GetAll(), "#P enabled the OOC Chat.",ply)
-	end
-end
-local DisableOOC = ulx.command(CATEGORY_NAME .. " - Chat", "ulx toggleooc", ulx.DisableOOC, "!toggleooc", true, false )
-DisableOOC:defaultAccess(ULib.ACCESS_ADMIN)
-DisableOOC:help("Disable or enable OOC.")
-
-
-
-
 --[[-------------------------------------------------------------------------
-Dev Box commands
+Toggle OOC
 ---------------------------------------------------------------------------]]
-local DevBoxs = {
-	["Open"] = Vector(-11456.893554688,3849.1801757813,-1967.96875),
-	["Closed"] = Vector(-11556.98828125,7204.3393554688,-1967.96875),
-	["Canyon"] = Vector(-9100.609375,5628.7661132813,-2092.8466796875),
-	["Helipad"] = Vector(-8807.2734375,8082.2431640625,-1967.96875),
-	["BigFuckingCanyon"] = Vector(-3745.5524902344,10321.29296875,136.03125),
-}
-local devtitle = table.GetKeys(DevBoxs)
+local function disableooc(ply, cmd, args)
+	sBMRP.OOCState = !sBMRP.OOCState
+	local state = sBMRP.OOCState && "enabled" || "disabled"
+	sBMRP.ChatNotify(player.GetAll(), "Staff", ply:GetName() .. " " .. state .. " OOC.")
 
-function ulx.devbox(ply, args)
-
-	if DevBoxs[args] then
-		local pos = DarkRP.findEmptyPos(DevBoxs[args], {ply}, 300, 10, Vector(16, 16, 64))
-		ply:SetPos(pos)
-		SpawnXenFlash(pos)
-
-	end
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "The AntiRDM Field was " .. state .. ".",
+		plymsg = "You " .. state .. " OOC.",
+		consolemsg = ply:GetName() .. " " .. state .. " OOC."
+	}
 end
-local devbox = ulx.command(CATEGORY_NAME .. " - Players", "ulx devbox", ulx.devbox, "!devbox", true, false )
-devbox:addParam{ type=ULib.cmds.StringArg, completes=devtitle, hint="Dev Box name", error="invalid location \"%s\" specified", ULib.cmds.restrictToCompletes }
-devbox:defaultAccess( ULib.ACCESS_ADMIN)
-devbox:help( "Teleports you to a dev box location to build in." )
+sBMRP.SetupFAdminCommand({
+	name = "disableooc",
+	func = disableooc,
+	params = {},
+	level = 2
+})
+
 
 --[[-------------------------------------------------------------------------
 it/who
@@ -291,206 +316,24 @@ end
 --[[-------------------------------------------------------------------------
 Disable Announce/Advert
 ---------------------------------------------------------------------------]]
-function ulx.toggleannounce(calling_ply, args)
+local function disableannounce(ply, cmd, args)
+	sBMRP.AnnounceState = !sBMRP.AnnounceState
+	local state = sBMRP.OOCState && "enabled" || "disabled"
+	sBMRP.ChatNotify(player.GetAll(), "Staff", ply:GetName() .. " " .. state .. " /announce.")
 
-	if sBMRP.AnnounceState then
-		sBMRP.AnnounceState = false
-		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P disabled the announcement system.",calling_ply)
-	else
-		sBMRP.AnnounceState = true
-		ulx.fancyLog( player.GetAdmins(), "[Staff]: #P enabled the announcement system.",calling_ply)
-	end
-end
-local toggleannounce = ulx.command(CATEGORY_NAME .. " - Chat", "ulx toggleannounce", ulx.toggleannounce, "!toggleannounce", true, false )
-toggleannounce:defaultAccess(ULib.ACCESS_ADMIN)
-toggleannounce:help("Disable or enable the announcement system.")
-
-
-
---[[-------------------------------------------------------------------------
-Create custom job 
-
-TEAM_CONTROLLER = DarkRP.createJob("Xenian Controller", {
-	color = Color(234, 0, 255, 255),
-	model = {"models/player/bms_controller.mdl"},
-	description = You are a species of Xenian that can control the lesser minds of the creatures that inhabit Xen. ,
-	weapons = {"weapon_possessor", "weapon_sporelauncher"},
-	command = "controller",
-	max = 2,
-	salary = 250,
-	admin = 0,
-	vote = true,
-	hasLicense = false,
-	candemote = false,
-	category = "Xenians",
-	rdmgroup = "Xenian",
-	noradio = true,
-	isalien = true,
-})
----------------------------------------------------------------------------]]
-if SERVER then
-	util.AddNetworkString("ulx.job")
-end
-
-local function getJobCategories() -- Getting all the job categories in DarkRP because falco couldn't have made it any fucking easier.
-	local c = {}
-	local j = table.Copy(DarkRP.getCategories())
-	for k, v in pairs(j) do
-		if k != "jobs" then
-			continue
-		end
-		for _,l in pairs(v) do
-			if !c[l.name] then
-				c[l.name] = true
-			end
-		end
-	end
-	return table.GetKeys(c)
-end
-
-function getJobs(keys, command) -- Getting all the job categories in DarkRP because falco couldn't have made it any fucking easier.
-	local c = {}
-	local j = table.Copy(DarkRP.getCategories())
-	for k, v in pairs(j) do
-		if k != "jobs" then
-			continue
-		end
-		for _,l in pairs(v) do
-			for x,o in pairs(l.members) do
-				if !select(1, DarkRP.getJobByCommand(o.command)) then continue end
-				c[o.name] = !command and o.team or o.command
-			end
-		end
-	end
-	if keys then
-		return table.GetKeys(c)
-	else
-		return c
-	end
-end
-
-
-local rdmGroups = {
-	"BMRF",
-	"Xenian",
-	"None",
-}
-
-local factions = {
-	"Security",
-	"Black Mesa (not scientist or security)",
-	"Scientist",
-	"Xenians",
-	"HECU",
-	"None"
-}
-
-function ulx.CreateJob(ply, name, desc, color, model, weapons, command, max, rdmgroup, canannounce, category, hide, faction)
-	ply:AddText(Color(255,255,255), "Compiling job...")
-	print(faction)
-	local ctab = string.Explode(",", color:Replace(" ", ""))
-	local wtab = string.Explode(",", weapons:Replace(" ", ""))
-	local mtab = string.Explode(",", model:Replace(" ", ""))
-	local job_struct = {
-		color = Color( ctab[1] and tonumber(ctab[1]) or 255,ctab[2] and tonumber(ctab[2]) or 255, ctab[3] and tonumber(ctab[3]) or 255),
-		model = mtab,
-		description = desc,
-		weapons = wtab,
-		command = command,
-		max = max,
-		salary = 0,
-		admin = hide and 1 or 0,
-		vote = false,
-		hasLicence = false,
-		candemote = false,
-		isblackmesa = true,
-		category = category,
-		rdmgroup = rdmgroup != "None" and rdmgroup or false,
-		isblackmesa = faction != "Xenians" and faction != "HECU" and faction != "None",
-		isscience = faction == "Scientist",
-		isalien = faction == "Xenians",
-		issecurity = faction == "Security",
-		ishecu = faction == "HECU",
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "The Announcement System was " .. state .. ".",
+		plymsg = "You " .. state .. " /announce.",
+		consolemsg = ply:GetName() .. " " .. state .. " /announce."
 	}
-	job_struct.name = name
-	job_struct.default = DarkRP.DARKRP_LOADING
-	local valid, err, hints = DarkRP.validateJob(job_struct)
-	if not valid then
-		ply:AddText(Color(255,0,0), "Compilation failed, check console!")
-		DarkRP.error(string.format("Failed creating custom team! %s!\n%s", job_struct.name or "", err), 2, hints) 
-		return
-	end
-	ply:AddText(Color(0,255,0), "Compilation successfull!")
-	DarkRP.createJob(job_struct.name, job_struct)
-	net.Start("ulx.job")
-		net.WriteBool(false)
-		net.WriteTable(job_struct)
-	net.Broadcast()
-	ulx.fancyLog( player.GetAll(), "#P created the job #s.",ply, job_struct.name)
 end
-local CreateJob = ulx.command(CATEGORY_NAME .. " - Jobs", "ulx createjob", ulx.CreateJob, nil, false, false )
-CreateJob:addParam{ type=ULib.cmds.StringArg, hint="Name of the job."}
-CreateJob:addParam{ type=ULib.cmds.StringArg, hint="Description of the job."}
-CreateJob:addParam{ type=ULib.cmds.StringArg, hint='255,255,255'}
-CreateJob:addParam{ type=ULib.cmds.StringArg, hint='models/player/gman_high.mdl'}
-CreateJob:addParam{ type=ULib.cmds.StringArg, hint='weapon_crowbar,weapon_fists'}
-CreateJob:addParam{ type=ULib.cmds.StringArg, hint='Job Command'}
-CreateJob:addParam{type=ULib.cmds.NumArg, min=0, max=48,default=1,hint="Job Slot Count (0=infinte)", ULib.cmds.round}
-CreateJob:addParam{ type=ULib.cmds.StringArg, completes=rdmGroups, hint="RDM Group", ULib.cmds.restrictToCompletes }
-CreateJob:addParam{ type=ULib.cmds.BoolArg, hint ="'/announce?'", default=false}
-CreateJob:addParam{ type=ULib.cmds.StringArg, completes=getJobCategories(), hint="Job Category", ULib.cmds.restrictToCompletes }
-CreateJob:addParam{ type=ULib.cmds.BoolArg, hint ="Staff only?"}
-CreateJob:addParam{ type=ULib.cmds.StringArg, completes=factions, hint="Job Faction", ULib.cmds.restrictToCompletes }
-CreateJob:defaultAccess(ULib.ACCESS_ADMIN)
-CreateJob:help("Create a custom job for events. You can add more than one weapon/model to the job by seperating them with commas. eg. model1,model2")
-
-
-function ulx.removeJob(ply, job)
-	if job == "visitor" then
-		ULib.tsayError( calling_ply, "Removing the vistior job would fuck everything up. Nice try though.", true )
-		return
-	end
-	local jobindex = select(2, DarkRP.getJobByCommand(job))
-	if not jobindex then
-		ULib.tsayError( calling_ply, "Job index is nil! (Job doesn't exist)", true )
-		return
-	end
-	for k,ply in pairs(player.GetAll()) do
-		if ply:Team() == jobindex then
-			ply:changeTeam(TEAM_VISITOR, true)
-			sBMRP.ChatNotify({ply}, "Info", "The job you are in is being removed, so you are being moved to visitor.")
-		end
-	end
-	net.Start("ulx.job")
-		net.WriteBool(true)
-		net.WriteInt(jobindex, 7)
-	net.Broadcast()
-	DarkRP.removeJob(jobindex)
-	ulx.fancyLog( player.GetAll(), "#P removed the job #s.",ply, job)
-end
-
-
-local removeJob = ulx.command(CATEGORY_NAME .. " - Jobs", "ulx removejob", ulx.removeJob, "!removejob", true, false )
-removeJob:addParam{ type=ULib.cmds.StringArg, hint="jobcommand" }
-removeJob:defaultAccess(ULib.ACCESS_ADMIN)
-removeJob:help("Remove custom created job by using its command. If you don't know what its command is; use the console command 'getjobcommands' for reference.")
-
-concommand.Add("getjobcommands", function()
-	PrintTable(getJobs(false, true))
-end)
-
-net.Receive("ulx.job", function(len)
-	local remove = net.ReadBool()
-	if !remove then
-		local job_struct = net.ReadTable()
-		PrintTable(job_struct)
-		DarkRP.createJob(job_struct.name, job_struct)
-	else
-		local job = net.ReadInt(7)
-
-		DarkRP.removeJob(job)
-	end
-end)
+sBMRP.SetupFAdminCommand({
+	name = "disableannounce",
+	func = disableannounce,
+	params = {},
+	level = 2
+})
 
 
 
@@ -531,164 +374,447 @@ local function LOOCCustom(ply, txt, public)
 end
 hook.Add( "PlayerSay", "chat_looccustom", LOOCCustom)
 
+
 --[[-------------------------------------------------------------------------
-GMAN Time
+Pac Commands
 ---------------------------------------------------------------------------]]
-/*-- Probably not good that I process the whole code here but whatever
-GmanTimeFreezeToggleVar = 0
-function ulx.gmantime(ply, args)
-	if ply:IsAdmin() then
-		if GmanTimeFreezeToggleVar == 0 then
-			GmanTimeFreezeToggleVar = 1
---[[			for k, v in pairs( ents.FindByName( "train" ) ) do
-				v:SetMoveType(0)
-				v:EmitSound("npc/dog/dog_straining1.wav", 80, 100)
-				v:EmitSound("ambient/machines/wall_ambient1.wav", 80, 100)
-				v:EmitSound("ambient/machines/zap3.wav", 80,100)
-			end -- setpos -17040.894531 8124.455078 -20616.332031;setang -0.214555 102.681900 0.000000
-]]			for k, v in pairs(player.GetAll()) do
-				v:EmitSound("npc/attack_helicopter/aheli_charge_up.wav", 80, 100)
-				v:EmitSound( "TimeGrenade/TimeExplosion.mp3",50 )
-				v:EmitSound( "hl1/ambience/labdrone2.wav",50 )
-				if v:SteamID() != "STEAM_0:1:72140646" then
-					v:Freeze(true)
-				end
-			timer.Simple(2,function()
-				for k, v in pairs(player.GetAll()) do
-					if !v:IsAdmin() then
-						v:Freeze(true)
-					end
-			end
-			end)
-				--local effectdata = EffectData()
-				--while GmanTimeFreezeToggleVar == 1 do
-					--DrawMaterialOverlay( string Material, number RefractAmount )
-				--	effectdata:SetOrigin( v:GetPos() )
-				--	util.Effect( "TimeStop", effectdata )
-				--end
-				timer.Simple(7,function() 			
-					v:EmitSound( "vo/citadel/gman_exit01.wav",50 )
-					timer.Simple(3,function() 
-						v:EmitSound( "vo/citadel/gman_exit02.wav",50 )
-						timer.Simple(4,function()
-							v:EmitSound( "vo/citadel/gman_exit03.wav",50 )
-							timer.Simple(4.5,function()
-								v:EmitSound( "vo/citadel/gman_exit04.wav",50 )
-								timer.Simple(5.8,function()
-									v:EmitSound( "vo/citadel/gman_exit05.wav",50 )
-									timer.Simple(15,function()
-										v:EmitSound( "vo/citadel/gman_exit06.wav",50 )
-										timer.Simple(15,function()
-											v:EmitSound( "vo/citadel/gman_exit07.wav",50 )
-											timer.Simple(14,function()
-												v:EmitSound( "vo/citadel/gman_exit08.wav",50 )
-												timer.Simple(4,function()
-													v:EmitSound( "vo/citadel/gman_exit09.wav",50 )
-													timer.Simple(3,function()
-														v:EmitSound( "vo/citadel/gman_exit10.wav",50 )
-														timer.Simple(5,function()
-														v:Freeze(false)
-														GmanTimeFreezeToggleVar = 0
-														v:ConCommand( "stopsound" )
-															--v:EmitSound( "vo/citadel/gman_exit10.wav",30 )
-														end)
-													end)
-												end)
-											end)
-										end)
-									end)
-								end)
-							end)
-						end)
-					end)
-				end)
-				end
-			--end
-		end
+
+
+local function unpac(ply, cmd, args)
+	local target = player.Find(args[1]) or false
+	if target then
+	   	sBMRP.ChatNotify( player.GetAdmins(), "StafF", ("%s forcefully unweared %s PAC Outfit"):format(ply:GetName(), target:GetName()))
+		target:ConCommand("pac_clear_parts;pac_wear_parts")
+		target:ChatPrint("Your pac outfit has been forcefully removed by staff.\nConsider re-thinking your pac outfit.")
+		return true, {
+			targets = {target},
+			targetmsg = "Your pac outfit was removed by staff.",
+			plymsg = "You removed " .. target:GetName() .. "'s pac outfit.",
+			consolemsg = ply:GetName() .. " removed " .. target:GetName() .. "'s pac3 outfit."
+
+		}
 	else
-		ply:ChatPrint("You are not admin!")
+		return false, "Target not found!"
 	end
 end
-local gmantime = ulx.command(CATEGORY_NAME .. " - Players", "ulx gmantime", ulx.gmantime, "!gmantime", true, false)
-gmantime:defaultAccess(ULib.ACCESS_ADMIN)
-gmantime:help("Is it really that time again?")
+sBMRP.SetupFAdminCommand({
+	name = "unpac",
+	func = unpac,
+	params = {"<Player>"},
+	level = 2
+})
 
-*/
+
+local function grantpac(ply, cmd, args)
+	local target = player.Find(args[1]) || args[1]
+	if target && !isstring(target) && target:IsPlayer() then
+		sBMRP.ChatNotify( player.GetAdmins(), "Staff", ("%s granted PAC3 Permissions to %s."):format(ply:GetName(), target:GetName()))
+		--sCONGivePac(target:SteamID())
+		target:ConCommand("pac_clear_parts;pac_wear_parts")
+		target:SetPData("PAC3", true)
+	elseif isstring(target) && target:find("STEAM_") && tobool(util.GetPData(target, "scon",false)) then
+		sBMRP.ChatNotify( player.GetAdmins(), "Staff", ("%s granted PAC3 Permissions to %s."):format(ply:GetName(), target))
+		--sCONGivePac(target)
+		util.SetPData(target, "PAC3", true)
+	else
+		return false, "Invalid Player/SteamID!"
+	end
+	return true, {
+		targets = {target},
+		targetmsg = "You were granted PAC3 Permissions.",
+		plymsg = "You granted PAC3 Permissions to " .. ( IsValid(target) && target:GetName() ) || target,
+		consolemsg = ply:GetName() .. " granted PAC3 perms to " .. ( IsValid(target) && target:GetName() ) || target,
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "grantpac",
+	func = grantpac,
+	params = {"<Player>"},
+	level = 2
+})
+
+
+
+local function removepac(ply, cmd, args)
+	local target = player.Find(args[1]) || args[1]
+	if target && !isstring(target) && target:IsPlayer() then
+		sBMRP.ChatNotify( player.GetAdmins(), "Staff", ("%s revoked PAC3 Permissions to %s."):format(ply:GetName(), target:GetName()))
+		--sCONGivePac(target:SteamID())
+		target:ConCommand("pac_clear_parts;pac_wear_parts")
+		target:SetPData("PAC3", false)
+	elseif isstring(target) && target:find("STEAM_") && tobool(util.GetPData(target, "scon",false)) then
+		sBMRP.ChatNotify( player.GetAdmins(), "Staff", ("%s revoked PAC3 Permissions to %s."):format(ply:GetName(), target) )
+		--sCONGivePac(target)
+		util.SetPData(target, "PAC3", true)
+	else
+		return false, "Invalid Player/SteamID!"
+	end
+	return true, {
+		targets = {target},
+		targetmsg = "You were revoked of PAC3 Permissions.",
+		plymsg = "You revoked PAC3 Permissions to " .. ( IsValid(target) && target:GetName() ) || target,
+		consolemsg = ply:GetName() .. " revoked PAC3 perms to " .. ( IsValid(target) && target:GetName() ) || target,
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "removepac",
+	func = removepac,
+	params = {"<Player>"},
+	level = 2
+})
+
+
+local function voxban(ply, cmd, args)
+	local targ = player.Find(args[1]) or false
+	if targ and !targ:IsAdmin() then
+		targ:SetPData("voxBanned", true)
+		sBMRP.ChatNotify(player.GetAll(), "Staff", ("%s voxbanned %s."):format( ply:GetName(), targ:GetName()) )
+		return true, {
+			targets = {targ},
+			targetmsg = "You were voxbanned, this is a permaneant status.",
+			plymsg = "You voxbanned " .. targ:GetName(),
+			consolemsg = ("%s voxbanned %s."):format(ply:GetName(), targ:GetName())
+		}
+	end
+	return false, "Player not found."
+end
+sBMRP.SetupFAdminCommand({
+	name = "voxban",
+	func = voxban,
+	params = {"<Player>"},
+	level = 2
+})
+
+
 --[[-------------------------------------------------------------------------
-ADMIN HELP NOTIFER
+Set Model
 ---------------------------------------------------------------------------]]
-local function ChatNotifier ( ply, txt, public )
-	if ply:IsAdmin() then return end
-	local txt = string.lower( txt )
-	local txts = string.gsub(txt, "@ ", "")
-	txts = string.gsub(txts,"@","")
-	txts = string.gsub(txts,"// ","")
-	txts = string.gsub(txts,"/ooc ","")
-	txts = string.gsub(txts,"/pm sirro ","")
-	txts = string.gsub(txts,"/// ","")
-	--UNSTUCK--
-	if txt != "@/stuck" and not(string.find(txt, "still")) and string.find(txt, "stuck") and (string.find(txt, '^' .. "@") ~= nil or string.find(txt, '^' .. "///") ~= nil) then
-		--timer.Simple(0.2,function() ply:Say( "@[sBMRP OVERRIDE]: Do not respond to this call") end)
-		local pos = DarkRP.findEmptyPos(ply:GetPos(), {ply}, 2000, 10, Vector(16, 16, 64))
-		ply:SetPos(pos)
-		ply:ChatPrint("--IF YOU ARE STILL STUCK TYPE @still stuck--")
-		return ""
-		/*
-	elseif txt != "@/stuck" and (string.find(txt, "still") and string.find(txt, "stuck")) and (string.find(txt, '^' .. "@") ~= nil or string.find(txt, '^' .. "///") ~= nil) then
-		timer.Simple(0.2,function() ply:Say( "@[sBMRP OVERRIDE]: Do not respond to this call") end)
-		local pos = {}
-		if ply:Team() == TEAM_TESTSUBJECT or ply:Team() == TEAM_HEADCRAB then
-			pos = {{Vector(-2584.057373,-3678.041260,-165.024750),"Test Subject Spawn"}}
-		elseif CheckInRange(Vector(-1407.327393,1061.189697,318.697754),Vector(-9684.939453,-3459.970459,3820.808838),ply:GetPos()) then --Surface, non-bm
-			pos = {{Vector( -3676.808350,-906.981079,629.872925),"Black Mesa Spawn"},{Vector(-5861.890625,-1257.135132,634.031250),"Black Mesa Topside"}}
-		elseif CheckInRange(Vector(-11615.540039,-4814.913574,-5864.372070),Vector(-1696.177734,-13936.375977,2038.580933),ply:GetPos()) then --Xen
-			pos = {{Vector(-4394.238281,-10876.547852,72.502808),"Xen Survey Spawn"},{Vector(-5263.162109,-6148.592773,-912.968750),"Xen Hallway"}}
-		else
-			pos = {{Vector(-4829.938965,-589.023254,-237.046753),"Sector C Hallway"},{Vector(-8743.806641,-1029.124268,-188.968750),"Sector A Tramstation"},{Vector( -10273.783203,-1385.192261,-189.007751),"Sector A Elevator"},{Vector(153.759689,-3076.688477,-188.968750),"Sector D"},{Vector(5532.438477,-1470.136597,-177.968750),"Sector B"},{Vector(861.198547,-3463.968994,-2793.968750),"Canals"},{Vector(2300.0590820313,304.84335327148,-297.96875),"Upper Canals"}}
+local function setmodel(ply, cmd, args)
+   local target = player.Find(args[1]) or false
+   
+	if target then
+		target:SetModel(args[2])
+		return true, {
+			targets = {target},
+			targetmsg = "Your model was set to " .. args[2],
+			plymsg = "You set " .. target:GetName() .. "'s model to " .. args[2],
+			consolemsg = ("%s set %s's model to %s"):format(ply:GetName(), target:GetName(), args[2])
+		}
+	end
+	return false, "Player not found."
+end
+sBMRP.SetupFAdminCommand({
+	name = "setmodel",
+	func = setmodel,
+	params = {"<Player>", "Model"},
+	level = 2
+})
+
+
+--[[-------------------------------------------------------------------------
+Clear NPC's
+---------------------------------------------------------------------------]]
+local function clearnpcs(ply)
+	for k,v in pairs(ents.GetAll()) do
+		if v:IsNPC() and v:MapCreationID() == -1 then
+			v:Remove()
 		end
-		local distance=0
-		local curpos = Vector(-3676.808350,-906.981079,629.872925)
-		local curposname = "Black Mesa Spawn"
-		for k,v in pairs(pos) do
-			if distance == 0 or ply:GetPos():Distance(v[1]) < distance then
-				distance = ply:GetPos():Distance(v[1])
-				curpos = v[1]
-				curposname = v[2]
-			end
+	end
+	sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " removed all NPC's.")
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "All NPC's have been removed.",
+		plymsg = "You cleared all NPC's.",
+		consolemsg = ply:GetName() .. " removed all NPC's."
+	}
+
+end
+sBMRP.SetupFAdminCommand({
+	name = "clearnpcs",
+	func = clearnpcs,
+	params = {},
+	level = 2
+})
+
+
+local function antirdm(ply)
+	sBMRP.AntiRDM = !sBMRP.AntiRDM
+	local state = sBMRP.AntiRDM && "enabled" || "disabled"
+	sBMRP.ChatNotify(player.GetAll(), "Staff", ply:GetName() .. " " .. state .. " the AntiRDM field.")
+
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "The AntiRDM Field was " .. state .. ".",
+		plymsg = "You " .. state .. " the AntiRDM Field.",
+		consolemsg = ply:GetName() .. " " .. state .. " the AntiRDM field."
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "antirdm",
+	func = antirdm,
+	params = {},
+	level = 2
+})
+
+
+
+--[[-------------------------------------------------------------------------
+Tram
+---------------------------------------------------------------------------]]
+sBMRP.TramState = true
+local function tram(calling_ply)
+	local state = !sBMRP.TramState && "enabled" || "disabled"
+	if sBMRP.TramState then
+		timer.Simple(.1, function() sBMRP.TramState = false end)
+		for k, v in pairs( ents.FindByName( "train" ) ) do
+			v:SetMoveType(0)
+			v:EmitSound("npc/scanner/scanner_explode_crash2.wav", 80, 100)
+			v:EmitSound("npc/dog/dog_straining1.wav", 80, 100)
+			v:EmitSound("ambient/machines/wall_ambient1.wav", 80, 100)
+			v:EmitSound("ambient/machines/zap3.wav", 80,100)
 		end
-		ply:SetPos(DarkRP.findEmptyPos(curpos, {ply}, 500, 30, Vector(16, 16, 64)))
-		ply:ChatPrint("--SET POSITION TO "..curposname.."--")
-		ply:ChatPrint("--FOR FURTHER HELP TYPE @/stuck--")
-		--Antispam--
-		*/
-	elseif (txts == "to me" or txts == "sirro" or txts == "sirro cmere" or txts == "admin" or txts == "admin to me" or txts == "admin tp" or txts == "help" or txts == "tp to me" or txts == "come to me" or txts == "can a staff member come to me please" or txts == "staff tp to me" or txts=="can i please get an admin to me?" or txts=="c'mere" or txts == "admin to me please" or txts == "i need an admin" or txts == "i need a admin") then
-		if (string.find(txt, '^' .. "/ooc") ~= nil) or (string.find(txt, '^' .. "//") ~= nil) or (string.find(txt, '^' .. "/pm")) ~= nil then
-			ply:ChatPrint("--You are attempting to summon a staff member without a valid reason, in OOC or pms. Please ensure you include a valid reason in your request, and use '@' instead of '/ooc' or '//'--") 		
-		else
-			ply:ChatPrint("--You are attempting to summon a staff member without a valid reason. Please ensure you include a valid reason in your request.--")
+		for k, v in pairs( ents.FindByName( "traindoor1") ) do
+			v:Fire( "Open" )
+		end
+		for k, v in pairs( ents.FindByName( "traindoor2") ) do
+			v:Fire( "Open" )
+		end
+		sBMRP.ChatNotify( player.GetAdmins(), "Staff", ("%s disabled the tram."):format(calling_ply:GetName()) )
+	else
+		sBMRP.TramState = true
+		for k, v in pairs( ents.FindByName( "train" ) ) do
+			v:SetMoveType(7)
+			v:EmitSound("npc/attack_helicopter/aheli_charge_up.wav", 80, 100)
+			v:EmitSound("npc/scanner/cbot_energyexplosion1.wav", 80, 100)
+			v:EmitSound("ambient/machines/wall_ambient1.wav", 80, 100)
 		end
 		
-		if string.find(txt, '^' .. "@") ~= nil then
-			timer.Simple(0.2,function() ply:Say( "@[sBMRP]: Do not respond to this call") end)
-			return ""
-		elseif string.find(txt, '^' .. "/pm") ~= nil then
-			return ""
-		elseif string.find(txt, '^' .. "//") ~= nil or string.find(txt, '^' .. "/ooc") ~= nil then
-			return ""
-		else
-			return ""
+		for k, v in pairs( ents.FindByName( "traindoor1") ) do
+			v:Fire( "Close" )
 		end
-	elseif (string.find(txt, '^' .. "@") ~= nil or string.find(txt, '^' .. "///") ~= nil) then
-		local adminon = false
-		for k, v in pairs(player.GetAll()) do
-			if v:IsAdmin() then
-				adminon = true
-			end
+		for k, v in pairs( ents.FindByName( "traindoor2") ) do
+			v:Fire( "Close" )
 		end
-		if adminon == false then
-			ply:ChatPrint("[sBMRP]: There are no staff on at the moment! Visit our discord at [https://discord.gg/ajbT4vh] and mention a staff member for help.")
-			ply:ChatPrint("[sBMRP]: If you wish to report a minge do /report <name> offence.")
-		end
+		sBMRP.ChatNotify( player.GetAdmins(), "Staff", ("%s enabled the tram."):format(calling_ply:GetName()) )
+	end
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "The tram was " .. state .. ".",
+		plymsg = "You " .. state .. " the tram.",
+		consolemsg = ("%s set the tram to %s."):format(calling_ply:GetName(), state)
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "tram",
+	func = tram,
+	params = {},
+	level = 2
+})
+
+
+
+--[[-------------------------------------------------------------------------
+Ragdolls
+---------------------------------------------------------------------------]]
+local function clearcorpses(calling_ply)
+	RunConsoleCommand( "g_ragdoll_maxcount", "0")
+	--[[
+	for k,v in pairs(ents.FindByClass( "weapon_*" )) do
+		v:Remove()
+	end]]
+	timer.Simple(1,function()
+		RunConsoleCommand( "g_ragdoll_maxcount","32")
+	end)
+	sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " removed all corpses.")
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "All corpses have been removed.",
+		plymsg = "You cleared all corpses.",
+		consolemsg = ply:GetName() .. " removed all corpses."
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "tram",
+	func = tram,
+	params = {},
+	level = 2
+})
+
+
+--[[-------------------------------------------------------------------------
+ClearFire
+---------------------------------------------------------------------------]]
+local function clearfire(calling_ply)
+	RunConsoleCommand( "vfire_remove_all")
+
+	sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " removed all fire.")
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "All fire have been removed.",
+		plymsg = "You cleared all fire.",
+		consolemsg = ply:GetName() .. " removed all fire."
+	}
+
+end
+sBMRP.SetupFAdminCommand({
+	name = "clearfire",
+	func = clearfire,
+	params = {},
+	level = 2
+})
+
+
+--[[-------------------------------------------------------------------------
+HECU Code
+---------------------------------------------------------------------------]]
+
+local GoodCodes = {
+	["Yellow"] = true,
+	["Green"] = true,
+	["Black"] = true,
+	["Red"] = true,
+	["Blue"] = true,
+}
+
+
+local function hecucode(ply, cmd ,args)
+	if !GoodCodes[ args[1] ] then
+		return false, "Invalid code entered!"
+	else
+		sBMRP.SetHECUCode(args[1])
+		sBMRP.ChatNotify(player.GetAdmins(),"Staff", ("%s forced the HECU code to %s."):format(ply:GetName(), args[1]) )
+		return true, {
+			targets = player.GetAll(),
+			targetmsg = "Staff have overrided the HECU code.",
+			plymsg = "You overrode the HECU code.",
+			consolemsg = ply:GetName() .. " set the HECU code to " .. args[1]
+		}
 	end
 end
-hook.Add( "PlayerSay", "bmrp_chatnotifier", ChatNotifier)
+sBMRP.SetupFAdminCommand({
+	name = "hecucode",
+	func = hecucode,
+	params = {"Code (Yellow/Green/Black/Red/Blue)"},
+	level = 2
+})
+
+
+--[[-------------------------------------------------------------------------
+Xenian Toggle
+---------------------------------------------------------------------------]]
+
+local function allowsinglexenian(ply, cmd, args)
+	local target = player.Find(args[1]) 
+	local ply = calling_ply
+	if !target then
+		return false, "Player not found."
+	elseif !target:IsAlien() then
+		return false, "The player targeted is not a xenian."
+	end
+	local bool = tobool(args[2]) || false
+	local state = bool and "granted" || "denied"
+
+	target:AllowToEarth(bool)
+	sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " " .. state .. " " .. target:GetName() .. "'s permission to go to earth.")
+	sBMRP.LocationScan()
+
+	local function resetperms(ply)
+		target:AllowToEarth(false)
+		for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
+			hook.Remove(k, "sBMRP.EarthRestrictPerms_" .. ply:SteamID())
+		end
+	end
+	for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
+		hook.Add(k, "sBMRP.EarthRestrictPerms_" .. ply:SteamID(), resetperms)
+	end
+	return true, {
+		targets = {target},
+		targetmsg = "You've been given permission to go earth.",
+		plymsg = "You granted" .. target:GetName() .. "'s permission to go to earth",
+		consolemsg = ply:GetName() .. " " .. state .. " " .. target:GetName() .. "'s permission to go to earth."
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "allowearth",
+	func = allowsinglexenian,
+	params = {"<Player>", "Allow(1/0)"},
+	level = 2
+})
+
+local function allowsinglehecu(ply, cmd, args)
+	local target = player.Find(args[1]) 
+	local ply = calling_ply
+	if !target then
+		return false, "Player not found."
+	elseif !target:IsHECU() then
+		return false, "The player targeted is not a HECU."
+	end
+	local bool = tobool(args[2]) || false
+	local state = bool and "granted" || "denied"
+
+	target:AllowToBMRF(bool)
+	sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " " .. state .. " " .. target:GetName() .. "'s permission to go to BMRF.")
+	sBMRP.LocationScan()
+
+	local function resetperms(ply)
+		target:AllowToBMRF(false)
+		for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
+			hook.Remove(k, "sBMRP.BMRFRestrictPerms_" .. ply:SteamID())
+		end
+	end
+	for k,v in pairs({"PlayerDeath", "OnPlayerChangedTeam"}) do
+		hook.Add(k, "sBMRP.BMRFRestrictPerms_" .. ply:SteamID(), resetperms)
+	end
+	return true, {
+		targets = {target},
+		targetmsg = "You've been given permission to go BMRF.",
+		plymsg = "You granted" .. target:GetName() .. "'s permission to go to BMRF",
+		consolemsg = ply:GetName() .. " " .. state .. " " .. target:GetName() .. "'s permission to go to BMRF."
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "allowbmrf",
+	func = allowsinglehecu,
+	params = {"<Player>", "Allow(1/0)"},
+	level = 2
+})
+
+--[[-------------------------------------------------------------------------
+Building toggle
+---------------------------------------------------------------------------]]
+sBMRP.DisableBuilding = false
+local function disablebuilding(ply)
+	if not sBMRP.DisableBuilding then
+		sBMRP.DisableBuilding = true
+		sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " disabled bulding for players.")
+		local function blockspawning(ply)
+			if not ply:IsAdmin() then
+				return false
+			end
+		end
+		for k,v in pairs({"PlayerSpawnProp", "CanTool", "PlayerSpawnVehicle","PlayerSpawnRagdoll", "PlayerSpawnEffect"}) do
+			hook.Add(v, "sBMRP.BlockSpawning", blockspawning)
+		end
+
+	else
+		sBMRP.DisableBuilding = false
+		sBMRP.ChatNotify(player.GetAdmins(), "Staff", ply:GetName() .. " enabled bulding for players.")
+		for k,v in pairs({"PlayerSpawnProp", "CanTool", "PlayerSpawnVehicle","PlayerSpawnRagdoll", "PlayerSpawnEffect"}) do
+			hook.Remove(v, "sBMRP.BlockSpawning")
+		end
+	end
+	local state = !sBMRP.DisableBuilding and "enabled" or "disabled"
+	return true, {
+		targets = player.GetAll(),
+		targetmsg = "Building has " .. state .. "by staff.",
+		plymsg = "You " .. state .. " player building.",
+		consolemsg = ply:GetName() .. " " .. state .. " " .. "player building."
+	}
+end
+sBMRP.SetupFAdminCommand({
+	name = "disablebuilding",
+	func = disablebuilding,
+	params = {},
+	level = 2
+})
+

@@ -14,6 +14,11 @@ sBMRP_Notify["Server"] = {
 	[2] = {52, 158, 235} 
 }
 
+sBMRP_Notify["Staff"] = {
+	[1] = {0, 118, 204},
+	[2] = {52, 158, 235} 
+}
+
 sBMRP_Notify["Error"] = {
 	[1] = {201, 0, 10},
 	[2] = {255, 0, 13}
@@ -45,7 +50,6 @@ if SERVER then
 		if !sBMRP_Notify[ tab ] then return end
 		if !istable( plytab ) then return end
 		if !isstring( str ) then return end
-
 		local nettab = {}
 		nettab[ "type" ] = tab
 		nettab[ "msg" ] = str

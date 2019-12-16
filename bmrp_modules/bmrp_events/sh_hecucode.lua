@@ -85,7 +85,7 @@ if SERVER then
 	local function OnHECUCodeChanged(oldcode, newcode)
 		local oldcodetbl = HECU_Codes[ oldcode ]
 		local newcodetbl = HECU_Codes[ newcode ]
-		ulx.logString("HECU Code Updated: " .. oldcode .. " --> " .. newcode .. "\n")
+		--ulx.logString("HECU Code Updated: " .. oldcode .. " --> " .. newcode .. "\n")
 		for k,v in pairs(player.GetAll()) do
 			v:AddText(Color(27, 158, 62),"[Vox]", Color(4, 217, 61), " The HECU Code has been updated from code ", Color(unpack(oldcodetbl.color)), oldcode, Color(4, 217, 61), " to " , Color(unpack(newcodetbl.color)), newcode,Color(4, 217, 61), "! [" .. newcodetbl.text .. "]")
 		end

@@ -388,6 +388,22 @@ function player.GetSirro()
 end
 
 --[[
+	Finds a player
+]]
+
+function player.Find(name)
+    name = string.lower(name)
+    id = name
+    for _, ply in pairs(player.GetAll()) do
+        if string.find(string.lower(ply:Nick()), name, 1, true) or
+            string.find(string.lower(ply:Name()), name, 1, true) or
+            string.find(string.lower(ply:SteamID()), string.lower(id), 1, true) then
+            return ply
+        end
+    end
+end
+
+--[[
 	Finds the admins.
 ]]
 function player.GetAdmins()
