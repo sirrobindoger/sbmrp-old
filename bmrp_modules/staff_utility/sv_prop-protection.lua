@@ -2,7 +2,6 @@
 Sirro"s Prop Protection (recoded)
 ---------------------------------------------------------------------------]]
 sPropProtection = sPropProtection || {}
-require("fps")
 
 local eMeta = FindMetaTable("Entity")
 local pMeta = FindMetaTable("Player")
@@ -13,7 +12,7 @@ local string = string
 local ToJSON = util.TableToJSON
 local FromJSON = util.JSONToTable
 local file = file
-
+require('fps')
 sPropProtection.CollisionOverride = sPropProtection.CollisionOverride || false
 sPropProtection.NoCollidedEnts = file.Read("blockedents.txt", "DATA") && FromJSON(file.Read("blockedents.txt", "DATA")) || {}
 
@@ -132,27 +131,6 @@ hook.Add("CanProperty", "bmrp_fireblock", function(ply, ent) -- smoking isn"t co
 end)
 
 --[[-------------------------------------------------------------------------
-Lag Checks
----------------------------------------------------------------------------]]
-local Delay = SysTime() + 30
-hook.Add("Think", "sPP.Tick", function()
-	local systime = SysTime()
-	if Delay and Delay > systime then return end
-
-	local realframetime = engine.RealFrameTime()
-	if realframetime >= 0.5 then -- We're seriously lagging
-		RunConsoleCommand( "phys_timescale", "0" )
-		sBMRP.ChatNotify(player.GetAll(), "Server", "Server physics frozen! Resuming in 30 seconds.")
-		game.ConsoleCommand("darkrp admintellall Server physics have been frozen temporaraly.\n")
-		timer.Simple(30, function()
-			RunConsoleCommand( "phys_timescale", "1" )
-			sBMRP.ChatNotify(player.GetAll(), "Server", "Server physics have been unfrozen.")
-		end)
-
-	end
-	Delay = systime + 30
-end)
---[[-------------------------------------------------------------------------
 Blocking some known exploits (credits to Crident"s anticrash for this one)
 ---------------------------------------------------------------------------]]
 hook.Add( "CanTool", "sPropProtection.CanTool", function( ply, tr, tool ) -- Stop people fucking with tools
@@ -217,9 +195,30 @@ hook.Add("PlayerSpawnProp", "sPropProtection_primary", function(ply, model, stac
 	end
 	Log(ply:GetName() .. " spawned in " .. model .. ".[" .. precentageoutside .. "% outside map.]")
 	prop:Remove()
-
 end)
 
+
+local Delay = SysTime() + 30
+hook.Add("Think", "sPP.Tick", function()
+	local systime = SysTime()
+	if Delay and Delay > systime then return end
+
+	local realframetime = engine.RealFrameTime()
+	if realframetime >= 0.4 then -- We're seriously lagging
+		table.Iterate(ents.FindByClass("prop_physics"), function(v)
+			v:GetPhysicsObject():EnableMotion(false)
+		end)
+		RunConsoleCommand( "phys_timescale", "0" )
+		sBMRP.ChatNotify(player.GetAll(), "Server", "Server physics frozen! Resuming in 30 seconds.")
+		game.ConsoleCommand("darkrp admintellall Server physics have been frozen temporaraly.\n")
+		timer.Simple(30, function()
+			RunConsoleCommand( "phys_timescale", "1" )
+			sBMRP.ChatNotify(player.GetAll(), "Server", "Server physics have been unfrozen.")
+		end)
+
+	end
+	Delay = systime + 30
+end)
 --[[-------------------------------------------------------------------------
 Collision Overrides Section
 ---------------------------------------------------------------------------]]
@@ -227,23 +226,42 @@ Collision Overrides Section
 local function onEntityCreated(ent)
 	timer.Simple(0, function()
 		local ply = ent:CPPIGetOwner()
-		if ply && sPropProtection.CollisionOverride && sPropProtection.NoCollidedEnts[ ent:GetClass() ] then
+		if ply then
 			ent:SetCustomCollisionCheck(true)
 			ent:CollisionRulesChanged()
-			if !ply.warned then
-				ply.warned = true
-				sBMRP.ChatNotify({ply}, "Warning", "Due to the high traffic in players, prop collisions for player-props have been disabled for proformance reasons.")
-			end
+			ent.Collisions = 0
 		end
 	end)
 end
 hook.Add("OnEntityCreated", "prop_collide", onEntityCreated)
 
 hook.Add("ShouldCollide", "sPropProtectionShouldCollide" , function(e1 , e2)
-	if sPropProtection.NoCollidedEnts[e1:GetClass()] && sPropProtection.NoCollidedEnts[e2:GetClass()] then
-		return false
+	if e1.FPPOwner && e2.FPPOwner then
+		e1.Collisions = e1.Collisions + 1
 	end
 end)
+
+
+timer.Create("reset_shit", 5, 0, function()
+	table.Iterate(ents.GetAll(), function(v)
+		if v:CPPIGetOwner() then
+			v.Collisions = 0
+		end
+	end)
+end)
+
+/*
+hook.Remove("Think", "update-ispenetrating_slow")
+timer.Create("update-slow", 0.01, 0, function()
+	for k,v in pairs(ents.GetAll()) do
+		local phys = v:GetPhysicsObject()
+		if !v.FPPOwner || !IsValid(phys) || v.Penetrating == phys:IsPenetrating() then continue end
+		v.Penetrating = phys:IsPenetrating()
+		player.GetSirro():ChatPrint("Updated " .. v:EntIndex()  .. ": ".. tostring(v.Penetrating))
+	end
+end)
+
+
 
 function sPropProtection.EnableCollisionCheck(bool)
 	for k,v in pairs(ents.GetAll()) do
@@ -273,14 +291,4 @@ for k,v in pairs({"PlayerInitalSpawn", "PlayerDisconnected"}) do
 		doCollisionCheck(#player.GetHumans())
 	end)
 end
-
-function findPenetratingPhys(prop)
-    local min, max = prop:GetModelBounds()
-    local penetratingEnts = {}
-    for k,v in pairs(ents.FindByClass("prop_physics")) do
-        if v:GetPos():WithinAABox(min, max) && v:GetPhysicsObject():IsMotionEnabled() then
-            table.insert(penetratingEnts, v)
-        end
-    end
-    return penetratingEnts
-end
+*/

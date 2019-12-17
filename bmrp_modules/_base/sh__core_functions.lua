@@ -357,8 +357,6 @@ function sBMRP.SetupFAdminCommand(tab)
 					message.targetmsg || ply:GetName() .. " ran command: " .. name, -- message the targets get
 					message.consolemsg || ply:GetName() .. " ran command: " .. name -- message the console gets
 				)
-			else
-				ply:ChatPrint("Die")
 			end
 			return true
 		end)

@@ -198,7 +198,7 @@ function compileFiles(path)
 				elseif t[4] and t[4] == "cl_init.lua" then
 					if c then compileWeapon(lPath, t[3]) end
 				else
-					compileWeapon(lPath, t[3] != "gmod_tool" and t[3] or t[5],t[3] == "gmod_tool" )
+					compileWeapon(lPath, Either(t[3] != "gmod_tool", t[3], t[5]),t[3] == "gmod_tool" )
 				end
 				weps = weps + 1
 			elseif t[2] == "entities" then

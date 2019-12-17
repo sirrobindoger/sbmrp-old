@@ -29,7 +29,7 @@ Event._meta["getName"] = function(self, str)
 	return self.Name || "NULL", self.ID || "NULL"
 end
 
-Event._meta["getStage"] = function(self,str)
+Event._meta["stage"] = function(self,str)
 	return self.stages[str]
 end
 
@@ -44,9 +44,14 @@ Event._meta["getActiveStages"] = function(self)
 			activeStages[v.ID] = v
 		end
 	end)
+	return activeStages
 end
 
+Event._meta["addStage"] = function(self, str, tab)
+	assert(isstring(str), "Name is required!")
 
+	
+end
 
 --[[-------------------------------------------------------------------------
 Event -> Stage Object
@@ -59,6 +64,15 @@ Event._stageMeta.__index = Event._stageMeta
 Event._stageMeta["isActive"] = function(self)
 	return self.IsActive
 end
+
+Event._stageMeta["setActive"] = function(self)
+	local hookOverride = hook.Run("Event.StageActive", self)
+	if !hookOverride then
+		Event._internal.SetActive(self) // define
+	end
+end
+
+
 
 --[[-------------------------------------------------------------------------
 Event Meta
